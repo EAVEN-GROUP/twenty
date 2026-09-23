@@ -28,10 +28,16 @@ jobs:
       # ubuntu-latest runners only have ~7GB RAM. Add swap so the build doesn't OOM.
       - name: Add swap for the memory-heavy frontend build
         run: |
+          # ubuntu-latest runners already ship with an active /swapfile, which makes
+          # fallocate fail with "Text file busy" if we try to layer another one on
+          # top of it — drop the existing swap first.
+          sudo swapoff -a
+          sudo rm -f /swapfile
           sudo fallocate -l 8G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
+          free -h
 
       - uses: docker/setup-buildx-action@v3
 
