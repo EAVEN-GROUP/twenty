@@ -230,7 +230,6 @@ export const AttachmentRow = ({
           </StyledCalendarIconContainer>
           {formatToHumanReadableDate(attachment.createdAt)}
           <AttachmentDropdown
-            attachmentId={attachment.id}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onRename={handleRename}

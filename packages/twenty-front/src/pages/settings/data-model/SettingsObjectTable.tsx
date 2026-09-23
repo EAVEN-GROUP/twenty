@@ -265,9 +265,6 @@ export const SettingsObjectTable = ({
                               objectSettingsItem.objectMetadataItem,
                             )}
                             isReadOnly={isDDLLocked}
-                            objectMetadataItemNamePlural={
-                              objectSettingsItem.objectMetadataItem.namePlural
-                            }
                             onEdit={() =>
                               navigate(SettingsPath.ObjectDetail, {
                                 objectNamePlural:

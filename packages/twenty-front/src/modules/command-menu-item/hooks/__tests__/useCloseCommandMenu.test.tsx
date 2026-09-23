@@ -1,3 +1,4 @@
+import { CommandMenuDropdownCloseContext } from '@/command-menu-item/contexts/CommandMenuDropdownCloseContext';
 import { CommandMenuContext } from '@/command-menu-item/contexts/CommandMenuContext';
 import { useCloseCommandMenu } from '@/command-menu-item/hooks/useCloseCommandMenu';
 import { CommandMenuItemContainerType } from '@/command-menu-item/types/CommandMenuItemContainerType';
@@ -33,9 +34,11 @@ const getWrapper =
   ({
     containerType,
     isInSidePanel = false,
+    onClose,
   }: {
     containerType: CommandMenuItemContainerType;
     isInSidePanel?: boolean;
+    onClose?: () => void;
   }) =>
   ({ children }: { children: ReactNode }) => (
     <CommandMenuContext.Provider
@@ -75,7 +78,9 @@ const getWrapper =
         isInPreviewMode: false,
       }}
     >
-      {children}
+      <CommandMenuDropdownCloseContext.Provider value={onClose}>
+        {children}
+      </CommandMenuDropdownCloseContext.Provider>
     </CommandMenuContext.Provider>
   );
 
@@ -221,21 +226,36 @@ describe('useCloseCommandMenu', () => {
   });
 
   describe('when isInSidePanel is true', () => {
-    it('should use side panel dropdown id for closeDropdown', () => {
+    it('closes the feature-owned dropdown without changing legacy dropdown state', () => {
+      const onClose = jest.fn();
       const wrapper = getWrapper({
-        containerType: CommandMenuItemContainerType.IndexPageDropdown,
+        containerType: CommandMenuItemContainerType.CommandMenuShowPageDropdown,
         isInSidePanel: true,
+        onClose,
       });
-
       const { result } = renderHook(() => useCloseCommandMenu(), { wrapper });
 
       act(() => {
         result.current.closeCommandMenu();
       });
 
-      expect(mockCloseDropdown).toHaveBeenCalledWith(
-        `side-panel-command-menu-dropdown-${TEST_COMMAND_MENU_ID}`,
-      );
+      expect(onClose).toHaveBeenCalledTimes(1);
+      expect(mockCloseDropdown).not.toHaveBeenCalled();
+      expect(mockCloseSidePanelMenu).not.toHaveBeenCalled();
+    });
+
+    it('leaves the main dropdown alone when the side-panel dropdown is unmounted', () => {
+      const wrapper = getWrapper({
+        containerType: CommandMenuItemContainerType.CommandMenuShowPageDropdown,
+        isInSidePanel: true,
+      });
+      const { result } = renderHook(() => useCloseCommandMenu(), { wrapper });
+
+      act(() => {
+        result.current.closeCommandMenu();
+      });
+
+      expect(mockCloseDropdown).not.toHaveBeenCalled();
     });
   });
 });

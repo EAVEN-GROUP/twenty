@@ -1,14 +1,11 @@
-import { ListItem } from 'twenty-ui/primitives/navigation';
+import { useState } from 'react';
+import { DropdownFocusEffect } from '@/ui/utilities/focus/components/DropdownFocusEffect';
 import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsFromError';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { useLingui } from '@lingui/react/macro';
 import { IconDotsVertical, IconTrash } from 'twenty-ui/icon';
 import { useToast } from 'twenty-ui/primitives/feedback';
-import { LightIconButton } from 'twenty-ui/components';
+import { Dropdown, LightIconButton } from 'twenty-ui/components';
 import {
   type PublicDomain,
   DeletePublicDomainDocument,
@@ -20,12 +17,10 @@ export const SettingPublicDomainRowDropdownMenu = ({
 }: {
   publicDomain: PublicDomain;
 }) => {
-  const dropdownId = `settings-public-domain-row-${publicDomain.id}`;
+  const [open, setOpen] = useState(false);
   const { t } = useLingui();
 
   const { enqueueToast } = useToast();
-
-  const { closeDropdown } = useCloseDropdown();
 
   const { refetch: refetchPublicDomains } = useQuery(
     FindManyPublicDomainsDocument,
@@ -48,29 +43,29 @@ export const SettingPublicDomainRowDropdownMenu = ({
   };
 
   return (
-    <Dropdown
-      dropdownId={dropdownId}
-      dropdownPlacement="right-start"
-      clickableComponent={
-        <LightIconButton emphasis="subtle" aria-label={t`More options`}>
-          <IconDotsVertical />
-        </LightIconButton>
-      }
-      dropdownComponents={
-        <DropdownContent>
-          <DropdownMenuItemsContainer>
-            <ListItem
-              color="danger"
-              startIcon={<IconTrash />}
-              onClick={async () => {
-                await handleDeletePublicDomain();
-                closeDropdown(dropdownId);
-                await refetchPublicDomains();
-              }}
-            >{t`Delete`}</ListItem>
-          </DropdownMenuItemsContainer>
-        </DropdownContent>
-      }
-    />
+    <Dropdown.Root kind="menu" open={open} onOpenChange={setOpen}>
+      <Dropdown.Trigger
+        render={
+          <LightIconButton emphasis="subtle" aria-label={t`More options`}>
+            <IconDotsVertical />
+          </LightIconButton>
+        }
+      />
+      <Dropdown.Content side="right" align="start">
+        <DropdownFocusEffect />
+        <Dropdown.Section>
+          <Dropdown.ActionItem
+            closeOnClick={false}
+            color="danger"
+            startIcon={<IconTrash />}
+            onClick={async () => {
+              await handleDeletePublicDomain();
+              setOpen(false);
+              await refetchPublicDomains();
+            }}
+          >{t`Delete`}</Dropdown.ActionItem>
+        </Dropdown.Section>
+      </Dropdown.Content>
+    </Dropdown.Root>
   );
 };

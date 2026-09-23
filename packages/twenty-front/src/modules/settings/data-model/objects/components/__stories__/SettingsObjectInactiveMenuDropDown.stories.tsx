@@ -25,7 +25,6 @@ const meta: Meta<typeof SettingsObjectInactiveMenuDropDown> = {
   title: 'Modules/Settings/DataModel/SettingsObjectInactiveMenuDropDown',
   component: SettingsObjectInactiveMenuDropDown,
   args: {
-    objectMetadataItemNamePlural: 'settings-object-inactive-menu-dropdown',
     onActivate: handleActivateMockFunction,
     onDelete: handleDeleteMockFunction,
     onEdit: handleEditMockFunction,

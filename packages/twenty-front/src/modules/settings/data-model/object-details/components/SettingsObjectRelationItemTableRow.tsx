@@ -244,7 +244,6 @@ export const SettingsObjectRelationItemTableRow = ({
           <SettingsObjectFieldInactiveActionDropdown
             isCustomField={getIsMetadataItemCustom(fieldMetadataItem)}
             readonly={readonly}
-            fieldMetadataItemId={fieldMetadataItem.id}
             onEdit={navigateToFieldEdit}
             onActivate={() =>
               activateMetadataField(fieldMetadataItem.id, objectMetadataItem.id)

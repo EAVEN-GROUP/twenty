@@ -1,4 +1,3 @@
-import { ListItem } from 'twenty-ui/primitives/navigation';
 import { TooltipDelay } from '@/ui/layout/tooltip/constants/TooltipDelay';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
@@ -9,10 +8,6 @@ import { useDebounce } from 'use-debounce';
 
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
 import { type WorkspaceMember } from '@/workspace-member/types/WorkspaceMember';
@@ -22,7 +17,9 @@ import {
   SettingsPath,
 } from 'twenty-shared/types';
 import { generateILikeFiltersForCompositeFields } from 'twenty-shared/utils';
-import { Section } from 'twenty-ui/components';
+import { Dropdown, Section } from 'twenty-ui/components';
+
+import { DropdownFocusEffect } from '@/ui/utilities/focus/components/DropdownFocusEffect';
 import { Avatar } from 'twenty-ui/primitives/data-display';
 import {
   IconArrowUpRight,
@@ -87,7 +84,6 @@ export const SettingsWorkspaceMembersTeamTab = () => {
   const { t } = useLingui();
   const navigateApp = useNavigateApp();
   const navigateSettings = useNavigateSettings();
-  const { closeDropdown } = useCloseDropdown();
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
@@ -175,42 +171,38 @@ export const SettingsWorkspaceMembersTeamTab = () => {
           onChange={handleSearchChange}
           placeholder={t`Search a team member...`}
         />
-        <Dropdown
-          dropdownId="workspace-members-open-dropdown"
-          clickableComponent={
-            <Button
-              startIcon={<IconArrowUpRight />}
-              size="md"
-              variant="outline"
-            >{t`Open`}</Button>
-          }
-          dropdownPlacement="bottom-end"
-          dropdownOffset={{ y: 8 }}
-          dropdownComponents={
-            <DropdownContent>
-              <DropdownMenuItemsContainer>
-                <ListItem
-                  startIcon={<IconListDetails />}
-                  onClick={() => {
-                    navigateApp(AppPath.RecordIndexPage, {
-                      objectNamePlural: 'workspaceMembers',
-                    });
-                    closeDropdown('workspace-members-open-dropdown');
-                  }}
-                >{t`See records`}</ListItem>
-                <ListItem
-                  startIcon={<IconHierarchy />}
-                  onClick={() => {
-                    navigateSettings(SettingsPath.ObjectDetail, {
-                      objectNamePlural: 'workspaceMembers',
-                    });
-                    closeDropdown('workspace-members-open-dropdown');
-                  }}
-                >{t`See data model settings`}</ListItem>
-              </DropdownMenuItemsContainer>
-            </DropdownContent>
-          }
-        />
+        <Dropdown.Root kind="menu">
+          <Dropdown.Trigger
+            render={
+              <Button
+                startIcon={<IconArrowUpRight />}
+                size="md"
+                variant="outline"
+              >{t`Open`}</Button>
+            }
+          />
+          <Dropdown.Content align="end" sideOffset={8}>
+            <DropdownFocusEffect />
+            <Dropdown.Section>
+              <Dropdown.ActionItem
+                startIcon={<IconListDetails />}
+                onClick={() => {
+                  navigateApp(AppPath.RecordIndexPage, {
+                    objectNamePlural: 'workspaceMembers',
+                  });
+                }}
+              >{t`See records`}</Dropdown.ActionItem>
+              <Dropdown.ActionItem
+                startIcon={<IconHierarchy />}
+                onClick={() => {
+                  navigateSettings(SettingsPath.ObjectDetail, {
+                    objectNamePlural: 'workspaceMembers',
+                  });
+                }}
+              >{t`See data model settings`}</Dropdown.ActionItem>
+            </Dropdown.Section>
+          </Dropdown.Content>
+        </Dropdown.Root>
       </StyledSearchContainer>
       <StyledTableContainer hasMoreRows={hasNextPage}>
         <Table>

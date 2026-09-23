@@ -75,7 +75,6 @@ export const SettingsAgentSkillsTable = ({
                 ) : (
                   <SettingsSkillInactiveMenuDropDown
                     isCustomSkill={skill.isCustom}
-                    skillId={skill.id}
                     onActivate={() => onActivate(skill.id)}
                     onDelete={() => onDelete(skill.id)}
                   />

@@ -12,17 +12,14 @@ import { IconDotsVertical } from 'twenty-ui/icon';
 import { MAIN_CONTEXT_STORE_INSTANCE_ID } from '@/context-store/constants/MainContextStoreInstanceId';
 import { ContextStoreComponentInstanceContext } from '@/context-store/states/contexts/ContextStoreComponentInstanceContext';
 import { contextStoreRecordShowParentViewComponentState } from '@/context-store/states/contextStoreRecordShowParentViewComponentState';
-import { computeRecordShowComponentInstanceId } from '@/object-record/record-show/utils/computeRecordShowComponentInstanceId';
 import { useNavigateToRecordPageFromSidePanel } from '@/side-panel/pages/record-page/hooks/useNavigateToRecordPageFromSidePanel';
 import { SidePanelPageComponentInstanceContext } from '@/side-panel/states/contexts/SidePanelPageComponentInstanceContext';
 import { sidePanelNavigationStackState } from '@/side-panel/states/sidePanelNavigationStackState';
 import { WorkspaceSurfaceContext } from '@/ui/layout/contexts/WorkspaceSurfaceContext';
-import { getSidePanelCommandMenuDropdownIdFromCommandMenuId } from '@/command-menu-item/utils/getSidePanelCommandMenuDropdownIdFromCommandMenuId';
 import { getJestMetadataAndApolloMocksWrapper } from '~/testing/jest/getJestMetadataAndApolloMocksWrapper';
 
 const navigateMock = jest.fn();
 const closeSidePanelMenuMock = jest.fn();
-const closeDropdownMock = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -33,10 +30,6 @@ jest.mock('@/side-panel/hooks/useSidePanelMenu', () => ({
   useSidePanelMenu: () => ({
     closeSidePanelMenu: closeSidePanelMenuMock,
   }),
-}));
-
-jest.mock('@/ui/layout/dropdown/hooks/useCloseDropdown', () => ({
-  useCloseDropdown: () => ({ closeDropdown: closeDropdownMock }),
 }));
 
 const PAGE_INSTANCE_ID = 'side-panel-page-instance-id';
@@ -144,11 +137,6 @@ describe('useNavigateToRecordPageFromSidePanel', () => {
 
     expect(navigateMock).toHaveBeenCalledWith(recordPath, { surface: 'main' });
     expect(closeSidePanelMenuMock).toHaveBeenCalled();
-    expect(closeDropdownMock).toHaveBeenCalledWith(
-      getSidePanelCommandMenuDropdownIdFromCommandMenuId(
-        `${computeRecordShowComponentInstanceId(RECORD_ID)}-${PAGE_INSTANCE_ID}`,
-      ),
-    );
   });
 
   it('uses the canonical timeline hash for a legacy record panel', () => {

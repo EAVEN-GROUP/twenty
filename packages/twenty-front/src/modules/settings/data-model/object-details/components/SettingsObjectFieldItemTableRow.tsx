@@ -268,7 +268,6 @@ export const SettingsObjectFieldItemTableRow = ({
             isCustomField={getIsMetadataItemCustom(fieldMetadataItem)}
             isSystemField={fieldMetadataItem.isSystem === true}
             readonly={readonly}
-            fieldMetadataItemId={fieldMetadataItem.id}
             onEdit={navigateToFieldEdit}
             onActivate={() =>
               activateMetadataField(fieldMetadataItem.id, objectMetadataItem.id)

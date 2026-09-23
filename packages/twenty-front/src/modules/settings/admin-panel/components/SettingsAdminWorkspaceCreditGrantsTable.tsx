@@ -170,7 +170,6 @@ export const SettingsAdminWorkspaceCreditGrantsTable = ({
             Cell: ({ item }) =>
               item.current.isActive ? (
                 <SettingsAdminWorkspaceCreditGrantRowDropdownMenu
-                  creditGrantId={item.current.id}
                   onRevoke={() => handleRevokeClick(item.current)}
                 />
               ) : null,

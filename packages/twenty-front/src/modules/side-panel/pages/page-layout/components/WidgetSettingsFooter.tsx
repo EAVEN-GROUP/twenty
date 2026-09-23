@@ -1,26 +1,29 @@
-import { ListItem } from 'twenty-ui/primitives/navigation';
+import { SIDE_PANEL_CLICK_OUTSIDE_ID } from '@/side-panel/constants/SidePanelClickOutsideId';
 import { useDeletePageLayoutWidget } from '@/page-layout/hooks/useDeletePageLayoutWidget';
 import { useDuplicatePageLayoutWidget } from '@/page-layout/hooks/useDuplicatePageLayoutWidget';
 import { pageLayoutEditingWidgetIdComponentState } from '@/page-layout/states/pageLayoutEditingWidgetIdComponentState';
-import { OptionsDropdownMenu } from '@/ui/layout/dropdown/components/OptionsDropdownMenu';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
-import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
-import { selectedItemIdComponentState } from '@/ui/layout/selectable-list/states/selectedItemIdComponentState';
+import { useSidePanelOptionsHotkeys } from '@/side-panel/hooks/useSidePanelOptionsHotkeys';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
+import { DropdownFocusEffect } from '@/ui/utilities/focus/components/DropdownFocusEffect';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useLingui } from '@lingui/react/macro';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { IconCopyPlus, IconTrash } from 'twenty-ui/icon';
+import { Dropdown, IconButton } from 'twenty-ui/components';
+import { IconCopyPlus, IconDotsVertical, IconTrash } from 'twenty-ui/icon';
 
 export const WidgetSettingsFooter = ({
   pageLayoutId,
 }: {
   pageLayoutId: string;
 }) => {
-  const dropdownId = useId();
+  const focusId = useId();
+  const [open, setOpen] = useState(false);
+  const { handleContentKeyDown } = useSidePanelOptionsHotkeys({
+    focusId,
+    onToggle: () => setOpen((previousOpen) => !previousOpen),
+  });
   const { t } = useLingui();
-  const { closeDropdown } = useCloseDropdown();
   const { duplicateWidget } = useDuplicatePageLayoutWidget(pageLayoutId);
   const { deletePageLayoutWidget } = useDeletePageLayoutWidget(pageLayoutId);
   const pageLayoutEditingWidgetId = useAtomComponentStateValue(
@@ -32,53 +35,59 @@ export const WidgetSettingsFooter = ({
     if (isDefined(pageLayoutEditingWidgetId)) {
       duplicateWidget(pageLayoutEditingWidgetId);
     }
-    closeDropdown(dropdownId);
   };
 
   const handleDeleteWidget = () => {
     if (isDefined(pageLayoutEditingWidgetId)) {
       deletePageLayoutWidget(pageLayoutEditingWidgetId);
     }
-    closeDropdown(dropdownId);
   };
-
-  const selectedItemId = useAtomComponentStateValue(
-    selectedItemIdComponentState,
-    dropdownId,
-  );
 
   return (
     <SidePanelFooter
       actions={[
-        <OptionsDropdownMenu
+        <Dropdown.Root
           key="options"
-          dropdownId={dropdownId}
-          selectableListId={dropdownId}
-          selectableItemIdArray={['duplicate-widget', 'delete-widget']}
+          kind="menu"
+          open={open}
+          onOpenChange={setOpen}
         >
-          <SelectableListItem
-            itemId="duplicate-widget"
-            onEnter={handleDuplicateWidget}
+          <Dropdown.Trigger
+            data-select-disable
+            render={
+              <IconButton aria-label={t`Options`} size="sm" variant="outline">
+                <IconDotsVertical />
+              </IconButton>
+            }
+          />
+          <Dropdown.Content
+            data-click-outside-id={SIDE_PANEL_CLICK_OUTSIDE_ID}
+            side="top"
+            align="end"
+            sideOffset={8}
+            onKeyDown={handleContentKeyDown}
           >
-            <ListItem
-              focused={selectedItemId === 'duplicate-widget'}
-              onClick={handleDuplicateWidget}
-              startIcon={<IconCopyPlus />}
-            >{t`Duplicate widget`}</ListItem>
-          </SelectableListItem>
-
-          <SelectableListItem
-            itemId="delete-widget"
-            onEnter={handleDeleteWidget}
-          >
-            <ListItem
-              focused={selectedItemId === 'delete-widget'}
-              onClick={handleDeleteWidget}
-              startIcon={<IconTrash />}
-              color="danger"
-            >{t`Delete widget`}</ListItem>
-          </SelectableListItem>
-        </OptionsDropdownMenu>,
+            <DropdownFocusEffect
+              focusId={focusId}
+              enableGlobalHotkeysWithModifiers
+            />
+            <Dropdown.Section>
+              <Dropdown.ActionItem
+                onClick={handleDuplicateWidget}
+                startIcon={<IconCopyPlus />}
+              >
+                {t`Duplicate widget`}
+              </Dropdown.ActionItem>
+              <Dropdown.ActionItem
+                onClick={handleDeleteWidget}
+                startIcon={<IconTrash />}
+                color="danger"
+              >
+                {t`Delete widget`}
+              </Dropdown.ActionItem>
+            </Dropdown.Section>
+          </Dropdown.Content>
+        </Dropdown.Root>,
       ]}
     />
   );

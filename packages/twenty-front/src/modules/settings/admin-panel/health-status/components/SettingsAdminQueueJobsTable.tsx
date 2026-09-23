@@ -346,7 +346,6 @@ export const SettingsAdminQueueJobsTable = ({
                       </TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <SettingsAdminQueueJobRowDropdownMenu
-                          jobId={job.id}
                           jobState={job.state}
                           onRetry={
                             job.state === JobState.FAILED

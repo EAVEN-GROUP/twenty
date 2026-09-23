@@ -1,19 +1,17 @@
-import { ListItem } from 'twenty-ui/primitives/navigation';
+import { useContext } from 'react';
+import { ParentClickOutsideIdContext } from '@/ui/utilities/pointer-event/contexts/ParentClickOutsideIdContext';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { IconDotsVertical, IconReload } from 'twenty-ui/icon';
-import { LightIconButton } from 'twenty-ui/components';
+import { DropdownFocusEffect } from '@/ui/utilities/focus/components/DropdownFocusEffect';
+import { Dropdown, LightIconButton } from 'twenty-ui/components';
 import { GRAY_SCALE_LIGHT } from 'twenty-ui/theme';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
-import { LAYOUT_CUSTOMIZATION_BAR_DROPDOWN_ID } from '@/layout-customization/constants/LayoutCustomizationBarDropdownId';
 import { RESET_RECORD_PAGE_LAYOUT_MODAL_ID } from '@/layout-customization/constants/ResetRecordPageLayoutModalId';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
+
+const LAYOUT_MENU_WIDTH = 240;
 
 const StyledInvertedIconButtonWrapper = styled.span`
   align-items: center;
@@ -29,39 +27,42 @@ const StyledInvertedIconButtonWrapper = styled.span`
 `;
 
 export const LayoutCustomizationBarMenuDropdown = () => {
+  const parentClickOutsideId = useContext(ParentClickOutsideIdContext);
   const { t } = useLingui();
-  const { closeDropdown } = useCloseDropdown();
   const { openDialog } = useDialog();
 
   const handleResetClick = () => {
-    closeDropdown(LAYOUT_CUSTOMIZATION_BAR_DROPDOWN_ID);
     openDialog(RESET_RECORD_PAGE_LAYOUT_MODAL_ID);
   };
 
   return (
-    <Dropdown
-      dropdownId={LAYOUT_CUSTOMIZATION_BAR_DROPDOWN_ID}
-      dropdownPlacement="bottom-start"
-      clickableComponent={
-        <StyledInvertedIconButtonWrapper>
-          <LightIconButton
-            emphasis="subtle"
-            aria-label={t`Layout customization menu`}
+    <Dropdown.Root kind="menu">
+      <StyledInvertedIconButtonWrapper>
+        <Dropdown.Trigger
+          render={
+            <LightIconButton
+              emphasis="subtle"
+              aria-label={t`Layout customization menu`}
+            >
+              <IconDotsVertical />
+            </LightIconButton>
+          }
+        />
+      </StyledInvertedIconButtonWrapper>
+      <Dropdown.Content
+        data-click-outside-id={parentClickOutsideId}
+        width={LAYOUT_MENU_WIDTH}
+      >
+        <DropdownFocusEffect />
+        <Dropdown.Section>
+          <Dropdown.ActionItem
+            startIcon={<IconReload />}
+            onClick={handleResetClick}
           >
-            <IconDotsVertical />
-          </LightIconButton>
-        </StyledInvertedIconButtonWrapper>
-      }
-      dropdownComponents={
-        <DropdownContent widthInPixels={GenericDropdownContentWidth.Large}>
-          <DropdownMenuItemsContainer>
-            <ListItem
-              startIcon={<IconReload />}
-              onClick={handleResetClick}
-            >{t`Reset record page layout`}</ListItem>
-          </DropdownMenuItemsContainer>
-        </DropdownContent>
-      }
-    />
+            {t`Reset record page layout`}
+          </Dropdown.ActionItem>
+        </Dropdown.Section>
+      </Dropdown.Content>
+    </Dropdown.Root>
   );
 };

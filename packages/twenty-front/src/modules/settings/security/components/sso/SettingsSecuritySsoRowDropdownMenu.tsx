@@ -1,16 +1,12 @@
-import { ListItem } from 'twenty-ui/primitives/navigation';
+import { DropdownFocusEffect } from '@/ui/utilities/focus/components/DropdownFocusEffect';
 import { useDeleteSsoIdentityProvider } from '@/settings/security/hooks/useDeleteSsoIdentityProvider';
 import { useUpdateSsoIdentityProvider } from '@/settings/security/hooks/useUpdateSsoIdentityProvider';
 import { type SsoIdentityProvider } from '@/settings/security/types/SsoIdentityProvider';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/primitives/feedback';
 import { IconArchive, IconDotsVertical, IconTrash } from 'twenty-ui/icon';
-import { LightIconButton } from 'twenty-ui/components';
+import { Dropdown, LightIconButton } from 'twenty-ui/components';
 import { SsoIdentityProviderStatus } from '~/generated-metadata/graphql';
 
 type SettingsSecuritySsoRowDropdownMenuProps = {
@@ -20,11 +16,7 @@ type SettingsSecuritySsoRowDropdownMenuProps = {
 export const SettingsSecuritySsoRowDropdownMenu = ({
   ssoIdp,
 }: SettingsSecuritySsoRowDropdownMenuProps) => {
-  const dropdownId = `settings-account-row-${ssoIdp.id}`;
-
   const { enqueueToast } = useToast();
-
-  const { closeDropdown } = useCloseDropdown();
 
   const { deleteSsoIdentityProvider } = useDeleteSsoIdentityProvider();
   const { updateSsoIdentityProvider } = useUpdateSsoIdentityProvider();
@@ -66,37 +58,34 @@ export const SettingsSecuritySsoRowDropdownMenu = ({
   };
 
   return (
-    <Dropdown
-      dropdownId={dropdownId}
-      dropdownPlacement="right-start"
-      clickableComponent={
-        <LightIconButton emphasis="subtle" aria-label={t`More options`}>
-          <IconDotsVertical />
-        </LightIconButton>
-      }
-      dropdownComponents={
-        <DropdownContent>
-          <DropdownMenuItemsContainer>
-            <ListItem
-              startIcon={<IconArchive />}
-              onClick={() => {
-                toggleSsoIdentityProviderStatus(ssoIdp.id);
-                closeDropdown(dropdownId);
-              }}
-            >
-              {ssoIdp.status === 'Active' ? t`Deactivate` : t`Activate`}
-            </ListItem>
-            <ListItem
-              color="danger"
-              startIcon={<IconTrash />}
-              onClick={() => {
-                handleDeleteSsoIdentityProvider(ssoIdp.id);
-                closeDropdown(dropdownId);
-              }}
-            >{t`Delete`}</ListItem>
-          </DropdownMenuItemsContainer>
-        </DropdownContent>
-      }
-    />
+    <Dropdown.Root kind="menu">
+      <Dropdown.Trigger
+        render={
+          <LightIconButton emphasis="subtle" aria-label={t`More options`}>
+            <IconDotsVertical />
+          </LightIconButton>
+        }
+      />
+      <Dropdown.Content side="right" align="start">
+        <DropdownFocusEffect />
+        <Dropdown.Section>
+          <Dropdown.ActionItem
+            startIcon={<IconArchive />}
+            onClick={() => {
+              toggleSsoIdentityProviderStatus(ssoIdp.id);
+            }}
+          >
+            {ssoIdp.status === 'Active' ? t`Deactivate` : t`Activate`}
+          </Dropdown.ActionItem>
+          <Dropdown.ActionItem
+            color="danger"
+            startIcon={<IconTrash />}
+            onClick={() => {
+              handleDeleteSsoIdentityProvider(ssoIdp.id);
+            }}
+          >{t`Delete`}</Dropdown.ActionItem>
+        </Dropdown.Section>
+      </Dropdown.Content>
+    </Dropdown.Root>
   );
 };

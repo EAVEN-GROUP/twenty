@@ -4,8 +4,17 @@ import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePush
 import { useRemoveFocusItemFromFocusStackById } from '@/ui/utilities/focus/hooks/useRemoveFocusItemFromFocusStackById';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
 
-export const DropdownFocusEffect = () => {
-  const focusId = useId();
+type DropdownFocusEffectProps = {
+  focusId?: string;
+  enableGlobalHotkeysWithModifiers?: boolean;
+};
+
+export const DropdownFocusEffect = ({
+  focusId: focusIdFromProps,
+  enableGlobalHotkeysWithModifiers = false,
+}: DropdownFocusEffectProps) => {
+  const generatedFocusId = useId();
+  const focusId = focusIdFromProps ?? generatedFocusId;
   const { pushFocusItemToFocusStack } = usePushFocusItemToFocusStack();
   const { removeFocusItemFromFocusStackById } =
     useRemoveFocusItemFromFocusStackById();
@@ -16,12 +25,17 @@ export const DropdownFocusEffect = () => {
       component: { type: FocusComponentType.DROPDOWN, instanceId: focusId },
       globalHotkeysConfig: {
         enableGlobalHotkeysConflictingWithKeyboard: false,
-        enableGlobalHotkeysWithModifiers: false,
+        enableGlobalHotkeysWithModifiers,
       },
     });
 
     return () => removeFocusItemFromFocusStackById({ focusId });
-  }, [focusId, pushFocusItemToFocusStack, removeFocusItemFromFocusStackById]);
+  }, [
+    enableGlobalHotkeysWithModifiers,
+    focusId,
+    pushFocusItemToFocusStack,
+    removeFocusItemFromFocusStackById,
+  ]);
 
   return null;
 };
