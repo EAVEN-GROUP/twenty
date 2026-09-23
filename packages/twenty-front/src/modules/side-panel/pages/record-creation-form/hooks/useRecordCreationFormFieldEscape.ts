@@ -6,6 +6,7 @@ import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotke
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { type RefObject } from 'react';
 import { Key } from 'ts-key-enum';
+import { isDefined } from 'twenty-shared/utils';
 
 export const useRecordCreationFormFieldEscape = ({
   formFieldsRef,
@@ -30,9 +31,11 @@ export const useRecordCreationFormFieldEscape = ({
         return;
       }
 
-      // Field-level Escape handlers, like the date picker's, can run after this listener
       setTimeout(() => {
-        if (keyboardEvent.defaultPrevented) {
+        if (
+          keyboardEvent.defaultPrevented ||
+          !isDefined(formFieldsRef.current)
+        ) {
           return;
         }
 

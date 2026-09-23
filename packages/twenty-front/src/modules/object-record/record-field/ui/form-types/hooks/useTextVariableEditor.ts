@@ -68,8 +68,6 @@ export const useTextVariableEditor = ({
     },
     editorProps: {
       handleDOMEvents: {
-        // ProseMirror prevents Escape's default without using the key, which
-        // record forms read as a field having handled Escape itself
         keydown: (_view, event) => event.key === Key.Escape,
       },
       handleKeyDown: (view, event) => {

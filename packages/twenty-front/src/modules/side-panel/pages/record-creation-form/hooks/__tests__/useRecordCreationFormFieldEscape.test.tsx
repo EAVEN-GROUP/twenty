@@ -154,6 +154,18 @@ it('leaves the creation form when Escape is pressed in a focused field', async (
   expect(name).not.toHaveFocus();
 });
 
+it('does not leave the side panel again when the form closed before Escape settled', async () => {
+  const { rerender } = renderForm();
+  const name = screen.getByRole('textbox', { name: 'Name' });
+  await userEvent.click(name);
+
+  fireEvent.keyDown(name, { key: 'Escape', code: 'Escape', keyCode: 27 });
+  rerender(<></>);
+  await new Promise((resolve) => setTimeout(resolve));
+
+  expect(mockHandleSidePanelEscape).not.toHaveBeenCalled();
+});
+
 it('lets a field that handles Escape itself keep the form open, even when its listener is bound later', async () => {
   const onDateEscape = jest.fn();
   const { rerender } = renderForm();
