@@ -1,4 +1,5 @@
 import { FormArrayFieldInput } from '@/object-record/record-field/ui/form-types/components/FormArrayFieldInput';
+import { FormDateFieldInput } from '@/object-record/record-field/ui/form-types/components/FormDateFieldInput';
 import { FormFieldInputInnerContainer } from '@/object-record/record-field/ui/form-types/components/FormFieldInputInnerContainer';
 import { FormMultiSelectFieldInput } from '@/object-record/record-field/ui/form-types/components/FormMultiSelectFieldInput';
 import { FormNumberFieldInput } from '@/object-record/record-field/ui/form-types/components/FormNumberFieldInput';
@@ -238,6 +239,25 @@ it('leaves the creation form when Escape is pressed in a text editor field', asy
 
   // ProseMirror prevents the default of any keydown whose keyCode is Escape's
   fireEvent.keyDown(editor, { key: 'Escape', code: 'Escape', keyCode: 27 });
+
+  await waitFor(() =>
+    expect(mockHandleSidePanelEscape).toHaveBeenCalledTimes(1),
+  );
+});
+
+it('leaves the creation form from a date field once its picker is closed', async () => {
+  const user = userEvent.setup();
+  renderForm(
+    <FormDateFieldInput
+      label="Close date"
+      defaultValue={undefined}
+      onChange={jest.fn()}
+    />,
+  );
+  await user.click(screen.getAllByRole('textbox')[0]);
+
+  await user.keyboard('{Escape}');
+  await user.keyboard('{Escape}');
 
   await waitFor(() =>
     expect(mockHandleSidePanelEscape).toHaveBeenCalledTimes(1),

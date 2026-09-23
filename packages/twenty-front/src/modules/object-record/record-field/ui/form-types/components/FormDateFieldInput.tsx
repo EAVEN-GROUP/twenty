@@ -231,7 +231,8 @@ export const FormDateFieldInput = ({
     keys: [Key.Escape],
     callback: handlePickerEscape,
     focusId: instanceId,
-    dependencies: [handlePickerEscape],
+    dependencies: [handlePickerEscape, displayDatePicker],
+    options: { preventDefault: displayDatePicker },
   });
 
   const { userTimezone } = useUserTimezone();
