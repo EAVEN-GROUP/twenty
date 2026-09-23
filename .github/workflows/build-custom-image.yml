@@ -1,0 +1,61 @@
+name: Build custom Twenty image
+
+# Manual/tag-triggered only (never on every commit): push a tag matching
+# "eaven-*" on the eaven-custom branch, or trigger manually with a tag input.
+on:
+  push:
+    tags:
+      - 'eaven-*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to publish to ghcr.io/eaven-group/twenty'
+        required: true
+        default: 'manual-test'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The frontend build stage runs with NODE_OPTIONS=--max-old-space-size=8192
+      # (see packages/twenty-docker/twenty/Dockerfile), but GitHub-hosted
+      # ubuntu-latest runners only have ~7GB RAM. Add swap so the build doesn't OOM.
+      - name: Add swap for the memory-heavy frontend build
+        run: |
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tag
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: packages/twenty-docker/twenty/Dockerfile
+          target: twenty
+          push: true
+          build-args: |
+            APP_VERSION=${{ steps.vars.outputs.tag }}
+          tags: ghcr.io/eaven-group/twenty:${{ steps.vars.outputs.tag }}
