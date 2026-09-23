@@ -38,12 +38,14 @@ export const RecordTableCellFirstRowFirstColumn = ({
   isDragging,
   hasRightBorder = true,
   hasBottomBorder = true,
+  rowTintColor,
 }: {
   children?: ReactNode;
   isSelected?: boolean;
   isDragging?: boolean;
   hasRightBorder?: boolean;
   hasBottomBorder?: boolean;
+  rowTintColor?: string;
 }) => {
   const { theme } = useContext(ThemeContext);
 
@@ -51,7 +53,7 @@ export const RecordTableCellFirstRowFirstColumn = ({
 
   const tdBackgroundColor = isSelected
     ? theme.accent.quaternary
-    : theme.background.primary;
+    : (rowTintColor ?? theme.background.primary);
 
   const borderColor = theme.border.color.light;
 

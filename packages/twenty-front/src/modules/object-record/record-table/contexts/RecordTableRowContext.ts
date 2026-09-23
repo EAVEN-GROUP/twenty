@@ -7,6 +7,7 @@ export type RecordTableRowContextValue = {
   rowIndex: number;
   isSelected: boolean;
   isRecordReadOnly?: boolean;
+  backgroundColor?: string;
 };
 
 export const [RecordTableRowContextProvider, useRecordTableRowContextOrThrow] =

@@ -11,7 +11,8 @@ import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
 
 export const RecordTableFieldsCells = () => {
-  const { isSelected, rowIndex } = useRecordTableRowContextOrThrow();
+  const { isSelected, rowIndex, backgroundColor } =
+    useRecordTableRowContextOrThrow();
 
   const { isDragging } = useRecordTableRowDraggableContextOrThrow();
 
@@ -45,6 +46,7 @@ export const RecordTableFieldsCells = () => {
           <RecordTableCellFirstRowFirstColumn
             isSelected={isSelected}
             isDragging={isDragging}
+            rowTintColor={backgroundColor}
           >
             <RecordTableCell />
           </RecordTableCellFirstRowFirstColumn>
@@ -53,6 +55,7 @@ export const RecordTableFieldsCells = () => {
             isSelected={isSelected}
             isDragging={isDragging}
             widthClassName={getRecordTableColumnFieldWidthClassName(0)}
+            rowTintColor={backgroundColor}
           >
             <RecordTableCell />
           </RecordTableCellStyleWrapper>
@@ -70,6 +73,7 @@ export const RecordTableFieldsCells = () => {
             widthClassName={getRecordTableColumnFieldWidthClassName(
               recordFieldIndex + 1,
             )}
+            rowTintColor={backgroundColor}
           >
             <RecordTableCell />
           </RecordTableCellStyleWrapper>

@@ -3,6 +3,7 @@ import { useIsRecordReadOnly } from '@/object-record/read-only/hooks/useIsRecord
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { RecordTableRowContextProvider } from '@/object-record/record-table/contexts/RecordTableRowContext';
 import { RecordTableRowDiv } from '@/object-record/record-table/record-table-row/components/RecordTableRowDiv';
+import { useRecordTableRowBackgroundColor } from '@/object-record/record-table/record-table-row/hooks/useRecordTableRowBackgroundColor';
 import { isRowSelectedComponentFamilyState } from '@/object-record/record-table/record-table-row/states/isRowSelectedComponentFamilyState';
 import { isRecordTableRowActiveComponentFamilyState } from '@/object-record/record-table/states/isRecordTableRowActiveComponentFamilyState';
 import { isRecordTableRowFocusActiveComponentState } from '@/object-record/record-table/states/isRecordTableRowFocusActiveComponentState';
@@ -50,6 +51,8 @@ export const RecordTableTr = forwardRef<HTMLDivElement, RecordTableTrProps>(
       objectMetadataId: objectMetadataItem.id,
     });
 
+    const backgroundColor = useRecordTableRowBackgroundColor(recordId);
+
     return (
       <RecordTableRowContextProvider
         value={{
@@ -62,6 +65,7 @@ export const RecordTableTr = forwardRef<HTMLDivElement, RecordTableTrProps>(
           objectNameSingular: objectMetadataItem.nameSingular,
           isSelected: isRowSelected,
           isRecordReadOnly,
+          backgroundColor,
         }}
       >
         <RecordTableRowDiv

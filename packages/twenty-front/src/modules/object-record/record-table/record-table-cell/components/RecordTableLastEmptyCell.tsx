@@ -3,13 +3,14 @@ import { useRecordTableRowContextOrThrow } from '@/object-record/record-table/co
 import { RecordTableCellStyleWrapper } from '@/object-record/record-table/record-table-cell/components/RecordTableCellStyleWrapper';
 
 export const RecordTableLastEmptyCell = () => {
-  const { isSelected } = useRecordTableRowContextOrThrow();
+  const { isSelected, backgroundColor } = useRecordTableRowContextOrThrow();
 
   return (
     <RecordTableCellStyleWrapper
       isSelected={isSelected}
       hasRightBorder={false}
       widthClassName={RECORD_TABLE_COLUMN_LAST_EMPTY_COLUMN_WIDTH_CLASS_NAME}
+      rowTintColor={backgroundColor}
     />
   );
 };

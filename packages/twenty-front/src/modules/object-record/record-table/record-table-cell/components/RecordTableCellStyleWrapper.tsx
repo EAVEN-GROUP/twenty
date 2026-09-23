@@ -34,6 +34,7 @@ export const RecordTableCellStyleWrapper = ({
   hasRightBorder = true,
   hasBottomBorder = true,
   widthClassName,
+  rowTintColor,
   ...divProps
 }: {
   className?: string;
@@ -43,12 +44,13 @@ export const RecordTableCellStyleWrapper = ({
   hasRightBorder?: boolean;
   hasBottomBorder?: boolean;
   widthClassName: string;
+  rowTintColor?: string;
 } & React.ComponentProps<'div'>) => {
   const { theme } = useContext(ThemeContext);
 
   const tdBackgroundColor = isSelected
     ? theme.accent.quaternary
-    : theme.background.primary;
+    : (rowTintColor ?? theme.background.primary);
 
   const borderColor = theme.border.color.light;
 
