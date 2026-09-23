@@ -39,8 +39,36 @@ npx nx database:reset twenty-server
 npx nx run twenty-front:graphql:generate      # after GraphQL schema changes (--configuration=metadata for metadata schema)
 ```
 
+## Release workflow (eaven-custom fork)
+
+`main` on this fork stays an untouched, fast-forward-only mirror of `upstream/main` — never commit to it. It exists purely as the diff base for periodically merging upstream into `eaven-custom`. All custom work, tags, and releases happen directly on `eaven-custom`.
+
+```bash
+# Release: commit lands on eaven-custom, then tag to trigger the build
+git push origin eaven-custom
+git tag -a eaven-vX.Y.Z-N -m "..."   # X.Y.Z = upstream base tag this build sits on, N = custom build number
+git push origin eaven-vX.Y.Z-N
+
+# Watch the build (packages/twenty-docker/twenty/Dockerfile, target `twenty`)
+gh run list --workflow=build-custom-image.yml -R EAVEN-GROUP/twenty --limit 3
+gh run view <run-id> -R EAVEN-GROUP/twenty
+```
+
+- Triggered only by pushing a tag matching `eaven-*` (or manual `workflow_dispatch`), never on every commit. Publishes to `ghcr.io/eaven-group/twenty:<tag>` — a **private** package.
+- Deploy is manual, on the VPS, in a separate session — not something to run from a Claude Code session against prod (an auto-mode guard blocks production-deploy actions outright, and deploys are meant to stay a deliberate human step regardless):
+  ```bash
+  ssh eaven-prod
+  cd /opt/twenty
+  # first time only: docker login ghcr.io -u <user>   (PAT with read:packages — package is private)
+  sed -i 's/^TAG=.*/TAG=eaven-vX.Y.Z-N/' .env
+  docker compose pull && docker compose up -d
+  docker compose logs -f server   # watch for healthy startup
+  ```
+  Rollback: set `TAG=` back to the previous working tag in `.env`, `docker compose up -d` again.
+
 ## Gotchas
 
+- **`APP_VERSION` must be valid semver or the server refuses to boot** (crash-loops with `ConfigVariableException`). The CI workflow derives it from the `eaven-*` tag by stripping the prefix (`eaven-v2.39.0-2` → `2.39.0-2`) — keep that in mind before hand-editing the build arg or the tag format.
 - **`twenty-shared/dist` is per-branch state nothing tracks.** After switching branches or editing `twenty-shared`, run `npx nx build twenty-shared --skip-nx-cache` before trusting any typecheck or test failure in a dependent package.
 - **Nx caching can serve a stale pass.** To verify a fix, run `npx tsgo -p tsconfig.json --noEmit` in the package directly rather than `nx typecheck`.
 - **Do not commit translation catalogs unless translations are the task.** `lingui extract`/`compile` regenerate `packages/twenty-server/src/engine/core-modules/i18n/locales/*.po` and `locales/generated/*` with thousands of lines of churn as a side effect of touching any `msg` string. The i18n pipeline maintains them; leave them out of your commit.
