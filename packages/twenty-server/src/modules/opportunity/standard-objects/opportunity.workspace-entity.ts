@@ -18,6 +18,7 @@ export class OpportunityWorkspaceEntity extends BaseWorkspaceEntity {
   closeDate: Date | null;
   stage: string;
   position: number;
+  rowTintColor: string | null;
   createdBy: ActorMetadata;
   updatedBy: ActorMetadata;
   pointOfContact: EntityRelation<PersonWorkspaceEntity> | null;

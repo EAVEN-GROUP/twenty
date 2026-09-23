@@ -11,7 +11,7 @@ import {
 import { type ThemeColor, MAIN_COLOR_NAMES } from 'twenty-ui/theme';
 
 type ThemeColorPickerMenuProps = {
-  selectedColor: ThemeColor;
+  selectedColor?: ThemeColor;
   onSelectColor: (color: ThemeColor) => void;
 };
 

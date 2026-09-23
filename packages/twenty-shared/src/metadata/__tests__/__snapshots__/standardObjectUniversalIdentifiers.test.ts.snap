@@ -2140,6 +2140,9 @@ exports[`STANDARD_OBJECTS universal identifiers should never change without an e
       "position": {
         "universalIdentifier": "fd8241af-7055-5004-9cfb-edb96f1cfbb4",
       },
+      "rowTintColor": {
+        "universalIdentifier": "0ef91ced-03d4-47a1-9fa5-c682e25cd989",
+      },
       "searchVector": {
         "universalIdentifier": "05bbfee3-ec29-5d44-a1b0-105955b320af",
       },

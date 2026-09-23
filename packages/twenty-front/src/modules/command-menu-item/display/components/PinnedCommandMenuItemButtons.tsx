@@ -9,7 +9,7 @@ import { NodeDimension } from '@/ui/utilities/dimensions/components/NodeDimensio
 import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
 import { motion } from 'framer-motion';
-import { useContext, useMemo } from 'react';
+import { type ReactNode, useContext, useMemo } from 'react';
 import { ThemeContext } from 'twenty-ui/theme-constants';
 import { useIsMobile } from 'twenty-ui/utilities';
 import {
@@ -48,11 +48,14 @@ const StyledItemsContainer = styled.div<{ shouldReverse: boolean }>`
 
 export const PinnedCommandMenuItemButtons = ({
   containerWidth,
+  leadingItem,
 }: {
   // Provided when an ancestor already knows the width available to the
   // buttons; the row then shrinks to fit instead of stretching over the free
   // space to measure it, so sibling actions stay adjacent to the buttons.
   containerWidth?: number;
+  // Rendered left of the pinned buttons in headers, right of them in the footer.
+  leadingItem?: ReactNode;
 }) => {
   const { theme } = useContext(ThemeContext);
   const { commandMenuItems, containerType } = useContext(CommandMenuContext);
@@ -133,6 +136,7 @@ export const PinnedCommandMenuItemButtons = ({
           />
         </StyledCommandMenuItemContainer>
       ))}
+      {leadingItem}
     </StyledItemsContainer>
   );
 

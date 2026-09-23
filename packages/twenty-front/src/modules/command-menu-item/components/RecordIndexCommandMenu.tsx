@@ -5,6 +5,7 @@ import { PinnedCommandMenuItemButtons } from '@/command-menu-item/display/compon
 import { CommandMenuItemEditButton } from '@/command-menu-item/edit/components/CommandMenuItemEditButton';
 import { contextStoreCurrentObjectMetadataItemIdComponentState } from '@/context-store/states/contextStoreCurrentObjectMetadataItemIdComponentState';
 import { isLayoutCustomizationModeEnabledState } from '@/layout-customization/states/isLayoutCustomizationModeEnabledState';
+import { RecordIndexRowColorButton } from '@/object-record/record-index/components/RecordIndexRowColorButton';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -29,7 +30,9 @@ export const RecordIndexCommandMenu = () => {
             containerType={CommandMenuItemContainerType.IndexPageHeader}
             isInPreviewMode={isLayoutCustomizationModeEnabled && !isInSidePanel}
           >
-            <PinnedCommandMenuItemButtons />
+            <PinnedCommandMenuItemButtons
+              leadingItem={<RecordIndexRowColorButton />}
+            />
           </CommandMenuContextProvider>
           <CommandMenuContextProvider
             displayType="dropdownItem"

@@ -296,6 +296,31 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  rowTintColor: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'rowTintColor',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Row tint color`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Theme color name used to tint the opportunity row in tables`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconColorSwatch',
+      isSystem: true,
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   createdBy: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

@@ -11,6 +11,7 @@ import { SyncMessageListRecordPageCommand } from 'src/database/commands/upgrade-
 import { AddDuplicateMessageListCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/2-39/2-39-workspace-command-1788639976437-add-duplicate-message-list-command-menu-item.command';
 import { AlignMessageCampaignCommandsCommand } from 'src/database/commands/upgrade-version-command/2-39/2-39-workspace-command-1788701316981-align-message-campaign-commands.command';
 import { AddDuplicateMessageCampaignCommandCommand } from 'src/database/commands/upgrade-version-command/2-39/2-39-workspace-command-1788701641813-add-duplicate-message-campaign-command.command';
+import { AddOpportunityRowTintColorFieldCommand } from 'src/database/commands/upgrade-version-command/2-39/2-39-workspace-command-1790195942170-add-opportunity-row-tint-color-field.command';
 import { TypeORMModule } from 'src/database/typeorm/typeorm.module';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
@@ -44,6 +45,7 @@ import { WorkspaceSchemaMigrationRunnerActionHandlersModule } from 'src/engine/w
     AddDuplicateMessageListCommandMenuItemCommand,
     AlignMessageCampaignCommandsCommand,
     AddDuplicateMessageCampaignCommandCommand,
+    AddOpportunityRowTintColorFieldCommand,
   ],
 })
 export class V2_39_UpgradeVersionCommandModule {}

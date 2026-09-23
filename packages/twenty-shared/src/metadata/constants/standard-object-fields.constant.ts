@@ -860,6 +860,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     company: { universalIdentifier: '20202020-cbac-457e-b565-adece5fc815f' },
     owner: { universalIdentifier: '20202020-be7e-4d1e-8e19-3d5c7c4b9f2a' },
+    rowTintColor: {
+      universalIdentifier: '0ef91ced-03d4-47a1-9fa5-c682e25cd989',
+    },
     taskTargets: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
