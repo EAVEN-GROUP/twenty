@@ -73,6 +73,19 @@ it('focuses a leading select trigger instead of skipping to a later field', asyn
   );
 });
 
+it('focuses a leading multi-select button', async () => {
+  render(
+    <Form>
+      <button type="button">Tags</button>
+      <input aria-label="Name" />
+    </Form>,
+  );
+
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'Tags' })).toHaveFocus(),
+  );
+});
+
 it('focuses fields that render after the form opened', async () => {
   const { rerender } = render(<Form fieldCount={0}>{null}</Form>);
   await new Promise(requestAnimationFrame);

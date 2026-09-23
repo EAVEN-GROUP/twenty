@@ -25,7 +25,7 @@ export const useRecordCreationFormFieldEscape = ({
         currentFocusedItem?.componentInstance.componentType !==
           FocusComponentType.FORM_FIELD_INPUT ||
         !(target instanceof HTMLElement) ||
-        formFieldsRef.current?.contains(target) !== true
+        !formFieldsRef.current?.contains(target)
       ) {
         return;
       }

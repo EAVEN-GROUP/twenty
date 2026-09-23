@@ -17,11 +17,15 @@ const SIDE_PANEL_SURFACE: WorkspaceSurfaceContextValue = {
   ownsRouteLocation: true,
 };
 
-const renderSelect = (
-  surface?: WorkspaceSurfaceContextValue,
+const renderSelect = ({
+  surface,
   disabled = false,
   withSearchInput = false,
-) => {
+}: {
+  surface?: WorkspaceSurfaceContextValue;
+  disabled?: boolean;
+  withSearchInput?: boolean;
+} = {}) => {
   const onChange = jest.fn();
 
   const Wrapper = ({ children }: { children: ReactNode }) => (
@@ -65,7 +69,7 @@ describe('Select on a side panel surface', () => {
     ['side-panel', SIDE_PANEL_SURFACE],
   ])('selects an option with the keyboard on %s', async (_, surface) => {
     const user = userEvent.setup();
-    const { onChange } = renderSelect(surface);
+    const { onChange } = renderSelect({ surface });
 
     await user.click(screen.getByText('Option A'));
     expect(await screen.findByText('Option B')).toBeInTheDocument();
@@ -81,7 +85,7 @@ describe('Select on a side panel surface', () => {
     ['side-panel', SIDE_PANEL_SURFACE],
   ])('selects an option with a click on %s', async (_, surface) => {
     const user = userEvent.setup();
-    const { onChange } = renderSelect(surface);
+    const { onChange } = renderSelect({ surface });
 
     await user.click(screen.getByText('Option A'));
     await user.click(await screen.findByText('Option B'));
@@ -94,7 +98,7 @@ it.each(['{Enter}', ' '])(
   'opens a select reached with Tab using %s, selects and continues',
   async (key) => {
     const user = userEvent.setup();
-    const { onChange } = renderSelect(SIDE_PANEL_SURFACE);
+    const { onChange } = renderSelect({ surface: SIDE_PANEL_SURFACE });
     await user.tab();
     expect(screen.getByRole('button', { name: 'Option A' })).toHaveFocus();
     await user.keyboard(key);
@@ -113,14 +117,17 @@ it.each(['{Enter}', ' '])(
 
 it('skips disabled selects when tabbing', async () => {
   const user = userEvent.setup();
-  renderSelect(SIDE_PANEL_SURFACE, true);
+  renderSelect({ surface: SIDE_PANEL_SURFACE, disabled: true });
   await user.tab();
   expect(screen.getByRole('textbox', { name: 'Next field' })).toHaveFocus();
 });
 
 it('continues to the next form field from an open searchable select', async () => {
   const user = userEvent.setup();
-  renderSelect(SIDE_PANEL_SURFACE, false, true);
+  renderSelect({
+    surface: SIDE_PANEL_SURFACE,
+    withSearchInput: true,
+  });
   await user.tab();
   await user.keyboard('{Enter}');
   expect(await screen.findByText('Option B')).toBeInTheDocument();
@@ -131,7 +138,10 @@ it('continues to the next form field from an open searchable select', async () =
 
 it('returns focus after selecting from a searchable select', async () => {
   const user = userEvent.setup();
-  const { onChange } = renderSelect(SIDE_PANEL_SURFACE, false, true);
+  const { onChange } = renderSelect({
+    surface: SIDE_PANEL_SURFACE,
+    withSearchInput: true,
+  });
   await user.tab();
   await user.keyboard('{Enter}');
   expect(await screen.findByText('Option B')).toBeInTheDocument();
@@ -146,7 +156,10 @@ it('returns focus after selecting from a searchable select', async () => {
 
 it('returns to the trigger with Shift+Tab from an open searchable select', async () => {
   const user = userEvent.setup();
-  renderSelect(SIDE_PANEL_SURFACE, false, true);
+  renderSelect({
+    surface: SIDE_PANEL_SURFACE,
+    withSearchInput: true,
+  });
   await user.tab();
   await user.keyboard('{Enter}');
   expect(await screen.findByText('Option B')).toBeInTheDocument();
@@ -156,7 +169,10 @@ it('returns to the trigger with Shift+Tab from an open searchable select', async
 
 it('restores focus after Escape without reopening the menu', async () => {
   const user = userEvent.setup();
-  renderSelect(SIDE_PANEL_SURFACE, false, true);
+  renderSelect({
+    surface: SIDE_PANEL_SURFACE,
+    withSearchInput: true,
+  });
   await user.tab();
   await user.keyboard('{Enter}');
   expect(await screen.findByText('Option B')).toBeInTheDocument();
@@ -169,7 +185,7 @@ it('restores focus after Escape without reopening the menu', async () => {
 
 it('keeps Space on the focused trigger of an open select from scrolling the page', async () => {
   const user = userEvent.setup();
-  renderSelect(SIDE_PANEL_SURFACE);
+  renderSelect({ surface: SIDE_PANEL_SURFACE });
   await user.tab();
   await user.keyboard('{Enter}');
   expect(await screen.findByText('Option B')).toBeInTheDocument();

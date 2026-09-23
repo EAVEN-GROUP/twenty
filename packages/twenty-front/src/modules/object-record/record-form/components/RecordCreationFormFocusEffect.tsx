@@ -4,6 +4,7 @@ import { isDefined } from 'twenty-shared/utils';
 const FOCUSABLE_FIELD_SELECTOR = [
   'input:not([disabled]):not([readonly]):not([type="hidden"])',
   'textarea:not([disabled]):not([readonly])',
+  'button:not([disabled])',
   '[contenteditable="true"]',
   '[tabindex="0"]:not([aria-disabled="true"])',
 ].join(', ');
