@@ -82,7 +82,6 @@ export const DropdownInternalContainer = ({
 
   const { closeDropdown } = useCloseDropdown();
 
-  // Layout cleanup runs before the portal is removed, while focus is still inside it
   useLayoutEffect(() => {
     const floatingElement = floatingContext.elements.floating;
     const triggerElement = floatingUiRefs.domReference.current;
