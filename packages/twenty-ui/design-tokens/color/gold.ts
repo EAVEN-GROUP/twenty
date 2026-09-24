@@ -34,13 +34,13 @@ export const GOLD_COLOR_TOKENS = {
       light: 'color(display-p3 0.715 0.66 0.565)',
       dark: 'color(display-p3 0.407 0.384 0.342)',
     }),
-    gold9: token('color(display-p3 0.579 0.517 0.41)'),
+    gold9: token('#9b8254'),
     gold10: token({
-      light: 'color(display-p3 0.538 0.479 0.38)',
-      dark: 'color(display-p3 0.628 0.566 0.463)',
+      light: '#897143',
+      dark: '#a88e60',
     }),
     gold11: token({
-      light: 'color(display-p3 0.433 0.386 0.305)',
+      light: '#70624b',
       dark: 'color(display-p3 0.784 0.728 0.635)',
     }),
     gold12: token({

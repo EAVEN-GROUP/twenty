@@ -34,13 +34,13 @@ export const GRASS_COLOR_TOKENS = {
       light: 'color(display-p3 0.477 0.72 0.482)',
       dark: 'color(display-p3 0.302 0.47 0.305)',
     }),
-    grass9: token('color(display-p3 0.38 0.647 0.378)'),
+    grass9: token('#00ac44'),
     grass10: token({
-      light: 'color(display-p3 0.344 0.598 0.342)',
-      dark: 'color(display-p3 0.426 0.694 0.426)',
+      light: '#00973b',
+      dark: '#24b951',
     }),
     grass11: token({
-      light: 'color(display-p3 0.263 0.488 0.261)',
+      light: '#07782f',
       dark: 'color(display-p3 0.535 0.807 0.542)',
     }),
     grass12: token({

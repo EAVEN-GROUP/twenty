@@ -34,13 +34,13 @@ export const TOMATO_COLOR_TOKENS = {
       light: 'color(display-p3 0.875 0.575 0.502)',
       dark: 'color(display-p3 0.629 0.322 0.248)',
     }),
-    tomato9: token('color(display-p3 0.831 0.345 0.231)'),
+    tomato9: token('#f2470b'),
     tomato10: token({
-      light: 'color(display-p3 0.802 0.313 0.2)',
-      dark: 'color(display-p3 0.862 0.415 0.298)',
+      light: '#d63b00',
+      dark: '#ff5727',
     }),
     tomato11: token({
-      light: 'color(display-p3 0.755 0.259 0.152)',
+      light: '#b93200',
       dark: 'color(display-p3 1 0.585 0.455)',
     }),
     tomato12: token({

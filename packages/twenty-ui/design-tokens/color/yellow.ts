@@ -34,13 +34,16 @@ export const YELLOW_COLOR_TOKENS = {
       light: 'color(display-p3 0.811 0.689 0.313)',
       dark: 'color(display-p3 0.497 0.42 0.182)',
     }),
-    yellow9: token('color(display-p3 1 0.92 0.22)'),
+    yellow9: token({
+      light: '#d6ae00',
+      dark: '#b49100',
+    }),
     yellow10: token({
-      light: 'color(display-p3 0.977 0.868 0.291)',
-      dark: 'color(display-p3 1 1 0.456)',
+      light: '#c09c00',
+      dark: '#c09e20',
     }),
     yellow11: token({
-      light: 'color(display-p3 0.6 0.44 0)',
+      light: '#876d00',
       dark: 'color(display-p3 0.948 0.885 0.392)',
     }),
     yellow12: token({

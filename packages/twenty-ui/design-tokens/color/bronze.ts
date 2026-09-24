@@ -34,13 +34,13 @@ export const BRONZE_COLOR_TOKENS = {
       light: 'color(display-p3 0.741 0.647 0.606)',
       dark: 'color(display-p3 0.426 0.374 0.347)',
     }),
-    bronze9: token('color(display-p3 0.611 0.507 0.455)'),
+    bronze9: token('#9f7562'),
     bronze10: token({
-      light: 'color(display-p3 0.563 0.461 0.414)',
-      dark: 'color(display-p3 0.66 0.556 0.504)',
+      light: '#8d6452',
+      dark: '#ac816e',
     }),
     bronze11: token({
-      light: 'color(display-p3 0.471 0.373 0.336)',
+      light: '#7c5f52',
       dark: 'color(display-p3 0.81 0.707 0.655)',
     }),
     bronze12: token({

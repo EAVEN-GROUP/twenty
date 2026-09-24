@@ -66,12 +66,12 @@ export const GraphWidgetAggregateChart = ({
           </StyledTrendPercentageValue>
           {trendPercentage >= 0 ? (
             <IconTrendingUp
-              color={theme.color.turquoise8}
+              color={theme.color.turquoise9}
               size={theme.icon.size.md}
             />
           ) : (
             <IconTrendingDown
-              color={theme.color.red8}
+              color={theme.color.red9}
               size={theme.icon.size.md}
             />
           )}

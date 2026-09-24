@@ -34,13 +34,13 @@ export const TURQUOISE_COLOR_TOKENS = {
       light: 'color(display-p3 0.433 0.716 0.671)',
       dark: 'color(display-p3 0.245 0.489 0.453)',
     }),
-    turquoise9: token('color(display-p3 0.297 0.637 0.581)'),
+    turquoise9: token('#00a598'),
     turquoise10: token({
-      light: 'color(display-p3 0.275 0.599 0.542)',
-      dark: 'color(display-p3 0.319 0.69 0.62)',
+      light: '#009185',
+      dark: '#24b2a5',
     }),
     turquoise11: token({
-      light: 'color(display-p3 0.08 0.5 0.43)',
+      light: '#00766d',
       dark: 'color(display-p3 0.388 0.835 0.719)',
     }),
     turquoise12: token({

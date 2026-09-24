@@ -34,13 +34,13 @@ export const VIOLET_COLOR_TOKENS = {
       light: 'color(display-p3 0.654 0.602 0.902)',
       dark: 'color(display-p3 0.399 0.346 0.656)',
     }),
-    violet9: token('color(display-p3 0.417 0.341 0.784)'),
+    violet9: token('#7140e4'),
     violet10: token({
-      light: 'color(display-p3 0.381 0.306 0.741)',
-      dark: 'color(display-p3 0.477 0.402 0.823)',
+      light: '#6229cf',
+      dark: '#7c4ff2',
     }),
     violet11: token({
-      light: 'color(display-p3 0.383 0.317 0.702)',
+      light: '#5b3cb0',
       dark: 'color(display-p3 0.72 0.65 1)',
     }),
     violet12: token({

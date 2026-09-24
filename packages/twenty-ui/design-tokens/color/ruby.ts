@@ -34,13 +34,13 @@ export const RUBY_COLOR_TOKENS = {
       light: 'color(display-p3 0.851 0.588 0.639)',
       dark: 'color(display-p3 0.652 0.295 0.359)',
     }),
-    ruby9: token('color(display-p3 0.83 0.323 0.408)'),
+    ruby9: token('#e6215b'),
     ruby10: token({
-      light: 'color(display-p3 0.795 0.286 0.375)',
-      dark: 'color(display-p3 0.857 0.392 0.455)',
+      light: '#cd004c',
+      dark: '#f53567',
     }),
     ruby11: token({
-      light: 'color(display-p3 0.728 0.211 0.311)',
+      light: '#c8004a',
       dark: 'color(display-p3 1 0.57 0.59)',
     }),
     ruby12: token({

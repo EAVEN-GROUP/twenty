@@ -31,23 +31,23 @@ export const GRAY_COLOR_TOKENS = {
       dark: 'color(display-p3 0.298 0.298 0.298)',
     }),
     gray8: token({
-      light: 'color(display-p3 0.702 0.702 0.702)',
+      light: 'color(display-p3 0.58 0.58 0.58)',
       dark: 'color(display-p3 0.4 0.4 0.4)',
     }),
     gray9: token({
-      light: 'color(display-p3 0.6 0.6 0.6)',
+      light: 'color(display-p3 0.451 0.451 0.451)',
       dark: 'color(display-p3 0.506 0.506 0.506)',
     }),
     gray10: token({
-      light: 'color(display-p3 0.514 0.514 0.514)',
+      light: 'color(display-p3 0.38 0.38 0.38)',
       dark: 'color(display-p3 0.482 0.482 0.482)',
     }),
     gray11: token({
-      light: 'color(display-p3 0.4 0.4 0.4)',
+      light: 'color(display-p3 0.302 0.302 0.302)',
       dark: 'color(display-p3 0.702 0.702 0.702)',
     }),
     gray12: token({
-      light: 'color(display-p3 0.2 0.2 0.2)',
+      light: 'color(display-p3 0.067 0.067 0.067)',
       dark: 'color(display-p3 0.922 0.922 0.922)',
     }),
   },

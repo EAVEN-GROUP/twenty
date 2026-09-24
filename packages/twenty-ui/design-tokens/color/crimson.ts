@@ -34,13 +34,13 @@ export const CRIMSON_COLOR_TOKENS = {
       light: 'color(display-p3 0.834 0.592 0.694)',
       dark: 'color(display-p3 0.638 0.289 0.429)',
     }),
-    crimson9: token('color(display-p3 0.843 0.298 0.507)'),
+    crimson9: token('#e31d75'),
     crimson10: token({
-      light: 'color(display-p3 0.807 0.266 0.468)',
-      dark: 'color(display-p3 0.864 0.364 0.539)',
+      light: '#c90065',
+      dark: '#f23281',
     }),
     crimson11: token({
-      light: 'color(display-p3 0.731 0.195 0.388)',
+      light: '#c40062',
       dark: 'color(display-p3 1 0.56 0.66)',
     }),
     crimson12: token({

@@ -34,13 +34,16 @@ export const MINT_COLOR_TOKENS = {
       light: 'color(display-p3 0.42 0.724 0.649)',
       dark: 'color(display-p3 0.258 0.49 0.441)',
     }),
-    mint9: token('color(display-p3 0.62 0.908 0.834)'),
+    mint9: token({
+      light: '#35c5a1',
+      dark: '#00ae8c',
+    }),
     mint10: token({
-      light: 'color(display-p3 0.585 0.871 0.797)',
-      dark: 'color(display-p3 0.725 0.954 0.898)',
+      light: '#0db28f',
+      dark: '#26bb98',
     }),
     mint11: token({
-      light: 'color(display-p3 0.203 0.463 0.397)',
+      light: '#00775f',
       dark: 'color(display-p3 0.482 0.825 0.733)',
     }),
     mint12: token({

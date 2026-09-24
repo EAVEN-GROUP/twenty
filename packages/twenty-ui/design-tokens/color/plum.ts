@@ -34,13 +34,13 @@ export const PLUM_COLOR_TOKENS = {
       light: 'color(display-p3 0.775 0.58 0.832)',
       dark: 'color(display-p3 0.54 0.341 0.595)',
     }),
-    plum9: token('color(display-p3 0.624 0.313 0.708)'),
+    plum9: token('#b62fbf'),
     plum10: token({
-      light: 'color(display-p3 0.587 0.29 0.667)',
-      dark: 'color(display-p3 0.666 0.365 0.748)',
+      light: '#a211ac',
+      dark: '#c33fcd',
     }),
     plum11: token({
-      light: 'color(display-p3 0.543 0.263 0.619)',
+      light: '#952d9d',
       dark: 'color(display-p3 0.86 0.602 0.933)',
     }),
     plum12: token({

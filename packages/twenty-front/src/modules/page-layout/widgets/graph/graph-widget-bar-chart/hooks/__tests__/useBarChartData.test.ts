@@ -327,9 +327,9 @@ describe('useBarChartData', () => {
     );
 
     const expectedShadesByKey = {
-      costs: 'green4',
-      revenue: 'green6',
-      sales: 'green8',
+      costs: 'green7',
+      revenue: 'green8',
+      sales: 'green10',
     };
 
     expect(shadesByKey(firstOrderResult.current.enrichedKeys)).toEqual(

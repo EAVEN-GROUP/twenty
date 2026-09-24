@@ -34,13 +34,13 @@ export const IRIS_COLOR_TOKENS = {
       light: 'color(display-p3 0.61 0.619 0.918)',
       dark: 'color(display-p3 0.35 0.345 0.673)',
     }),
-    iris9: token('color(display-p3 0.357 0.357 0.81)'),
+    iris9: token('#594beb'),
     iris10: token({
-      light: 'color(display-p3 0.318 0.318 0.774)',
-      dark: 'color(display-p3 0.428 0.416 0.843)',
+      light: '#4b35d6',
+      dark: '#6359f9',
     }),
     iris11: token({
-      light: 'color(display-p3 0.337 0.326 0.748)',
+      light: '#483fbe',
       dark: 'color(display-p3 0.685 0.662 1)',
     }),
     iris12: token({

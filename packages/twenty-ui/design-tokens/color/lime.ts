@@ -34,13 +34,16 @@ export const LIME_COLOR_TOKENS = {
       light: 'color(display-p3 0.585 0.707 0.378)',
       dark: 'color(display-p3 0.365 0.456 0.25)',
     }),
-    lime9: token('color(display-p3 0.78 0.928 0.466)'),
+    lime9: token({
+      light: '#8fc823',
+      dark: '#75a800',
+    }),
     lime10: token({
-      light: 'color(display-p3 0.734 0.896 0.397)',
-      dark: 'color(display-p3 0.865 0.995 0.519)',
+      light: '#7eb400',
+      dark: '#81b521',
     }),
     lime11: token({
-      light: 'color(display-p3 0.386 0.482 0.227)',
+      light: '#55771c',
       dark: 'color(display-p3 0.771 0.893 0.485)',
     }),
     lime12: token({

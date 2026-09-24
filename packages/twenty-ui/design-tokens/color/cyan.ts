@@ -34,13 +34,13 @@ export const CYAN_COLOR_TOKENS = {
       light: 'color(display-p3 0.388 0.715 0.798)',
       dark: 'color(display-p3 0.23 0.496 0.6)',
     }),
-    cyan9: token('color(display-p3 0.282 0.627 0.765)'),
+    cyan9: token('#00a0bb'),
     cyan10: token({
-      light: 'color(display-p3 0.264 0.583 0.71)',
-      dark: 'color(display-p3 0.331 0.675 0.801)',
+      light: '#008ca4',
+      dark: '#24adc8',
     }),
     cyan11: token({
-      light: 'color(display-p3 0.08 0.48 0.63)',
+      light: '#007184',
       dark: 'color(display-p3 0.446 0.79 0.887)',
     }),
     cyan12: token({

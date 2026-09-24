@@ -34,13 +34,13 @@ export const PINK_COLOR_TOKENS = {
       light: 'color(display-p3 0.825 0.59 0.751)',
       dark: 'color(display-p3 0.612 0.304 0.51)',
     }),
-    pink9: token('color(display-p3 0.775 0.297 0.61)'),
+    pink9: token('#e0309e'),
     pink10: token({
-      light: 'color(display-p3 0.748 0.27 0.581)',
-      dark: 'color(display-p3 0.808 0.356 0.645)',
+      light: '#cb0e8c',
+      dark: '#ef41aa',
     }),
     pink11: token({
-      light: 'color(display-p3 0.698 0.219 0.528)',
+      light: '#c00084',
       dark: 'color(display-p3 1 0.535 0.78)',
     }),
     pink12: token({

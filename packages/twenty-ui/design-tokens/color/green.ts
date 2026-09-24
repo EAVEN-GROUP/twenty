@@ -34,13 +34,13 @@ export const GREEN_COLOR_TOKENS = {
       light: 'color(display-p3 0.451 0.715 0.559)',
       dark: 'color(display-p3 0.27 0.479 0.351)',
     }),
-    green9: token('color(display-p3 0.332 0.634 0.442)'),
+    green9: token('#00a360'),
     green10: token({
-      light: 'color(display-p3 0.308 0.595 0.417)',
-      dark: 'color(display-p3 0.357 0.682 0.474)',
+      light: '#008e53',
+      dark: '#23b06c',
     }),
     green11: token({
-      light: 'color(display-p3 0.19 0.5 0.32)',
+      light: '#007845',
       dark: 'color(display-p3 0.434 0.828 0.573)',
     }),
     green12: token({

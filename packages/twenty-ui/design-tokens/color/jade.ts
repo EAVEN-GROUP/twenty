@@ -34,13 +34,13 @@ export const JADE_COLOR_TOKENS = {
       light: 'color(display-p3 0.44 0.72 0.629)',
       dark: 'color(display-p3 0.263 0.488 0.411)',
     }),
-    jade9: token('color(display-p3 0.319 0.63 0.521)'),
+    jade9: token('#009d7b'),
     jade10: token({
-      light: 'color(display-p3 0.299 0.592 0.488)',
-      dark: 'color(display-p3 0.338 0.68 0.555)',
+      light: '#00896a',
+      dark: '#23aa87',
     }),
     jade11: token({
-      light: 'color(display-p3 0.15 0.5 0.37)',
+      light: '#00765b',
       dark: 'color(display-p3 0.4 0.835 0.656)',
     }),
     jade12: token({

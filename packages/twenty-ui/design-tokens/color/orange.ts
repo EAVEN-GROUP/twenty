@@ -34,13 +34,16 @@ export const ORANGE_COLOR_TOKENS = {
       light: 'color(display-p3 0.877 0.597 0.379)',
       dark: 'color(display-p3 0.601 0.359 0.201)',
     }),
-    orange9: token('color(display-p3 0.9 0.45 0.2)'),
+    orange9: token({
+      light: '#ec6f00',
+      dark: '#e76d00',
+    }),
     orange10: token({
-      light: 'color(display-p3 0.87 0.409 0.164)',
-      dark: 'color(display-p3 0.98 0.51 0.23)',
+      light: '#d16100',
+      dark: '#f67a1f',
     }),
     orange11: token({
-      light: 'color(display-p3 0.76 0.34 0)',
+      light: '#b05100',
       dark: 'color(display-p3 1 0.63 0.38)',
     }),
     orange12: token({

@@ -34,13 +34,16 @@ export const AMBER_COLOR_TOKENS = {
       light: 'color(display-p3 0.85 0.65 0.3)',
       dark: 'color(display-p3 0.535 0.399 0.189)',
     }),
-    amber9: token('color(display-p3 1 0.77 0.26)'),
+    amber9: token({
+      light: '#eda100',
+      dark: '#c78600',
+    }),
     amber10: token({
-      light: 'color(display-p3 0.959 0.741 0.274)',
-      dark: 'color(display-p3 1 0.87 0.15)',
+      light: '#d59000',
+      dark: '#d49320',
     }),
     amber11: token({
-      light: 'color(display-p3 0.64 0.4 0)',
+      light: '#966400',
       dark: 'color(display-p3 1 0.8 0.29)',
     }),
     amber12: token({

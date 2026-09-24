@@ -34,13 +34,13 @@ export const PURPLE_COLOR_TOKENS = {
       light: 'color(display-p3 0.719 0.583 0.874)',
       dark: 'color(display-p3 0.49 0.349 0.649)',
     }),
-    purple9: token('color(display-p3 0.523 0.318 0.751)'),
+    purple9: token('#9737d5'),
     purple10: token({
-      light: 'color(display-p3 0.483 0.289 0.7)',
-      dark: 'color(display-p3 0.57 0.373 0.791)',
+      light: '#851dc1',
+      dark: '#a346e3',
     }),
     purple11: token({
-      light: 'color(display-p3 0.473 0.281 0.687)',
+      light: '#7c31ae',
       dark: 'color(display-p3 0.8 0.62 1)',
     }),
     purple12: token({

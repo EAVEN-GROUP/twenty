@@ -34,13 +34,13 @@ export const SKY_COLOR_TOKENS = {
       light: 'color(display-p3 0.457 0.696 0.829)',
       dark: 'color(display-p3 0.232 0.48 0.665)',
     }),
-    sky9: token('color(display-p3 0.585 0.877 0.983)'),
+    sky9: token('#009edb'),
     sky10: token({
-      light: 'color(display-p3 0.555 0.845 0.959)',
-      dark: 'color(display-p3 0.718 0.925 0.991)',
+      light: '#008bc1',
+      dark: '#23abe8',
     }),
     sky11: token({
-      light: 'color(display-p3 0.193 0.448 0.605)',
+      light: '#00709d',
       dark: 'color(display-p3 0.536 0.772 0.924)',
     }),
     sky12: token({
