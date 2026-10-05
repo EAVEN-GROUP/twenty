@@ -1,4 +1,4 @@
-import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { useAggregateRecordsForRecordTableColumnFooter } from '@/object-record/record-table/record-table-footer/hooks/useAggregateRecordsForRecordTableColumnFooter';
 import { styled } from '@linaria/react';
 import { Trans } from '@lingui/react/macro';
@@ -30,7 +30,7 @@ const StyledValueContainer = styled.div`
     display: none;
   }
 
-  height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  height: ${RECORD_TABLE_HEADER_HEIGHT}px;
   justify-content: flex-end;
   overflow-x: auto;
   padding: 0 8px;

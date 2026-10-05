@@ -7,12 +7,12 @@ export const BOX_SHADOW_TOKENS = {
   }),
   light: token({
     light:
-      '0px 2px 4px 0px color(display-p3 0 0 0 / 0.039), 0px 0px 4px 0px color(display-p3 0 0 0 / 0.078)',
+      '0px 1px 6px 0px rgba(13, 31, 45, 0.05), 0px 0px 2px 0px rgba(13, 31, 45, 0.06)',
     dark: '0px 2px 4px 0px rgba(0, 0, 0, 0.04), 0px 0px 4px 0px rgba(0, 0, 0, 0.08)',
   }),
   strong: token({
     light:
-      '2px 4px 16px 0px color(display-p3 0 0 0 / 0.161), 0px 2px 4px 0px color(display-p3 0 0 0 / 0.078)',
+      '0px 4px 20px 0px rgba(13, 31, 45, 0.08), 0px 1px 4px 0px rgba(13, 31, 45, 0.06)',
     dark: '2px 4px 16px 0px rgba(0, 0, 0, 0.16), 0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
   }),
   underline: token({

@@ -1,4 +1,4 @@
-import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { styled } from '@linaria/react';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
@@ -8,20 +8,19 @@ const StyledHeaderCell = styled.div<{
   isResizing: boolean;
   isReadOnly: boolean;
 }>`
-  background-color: ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.tertiary};
   border-bottom: ${({ shouldDisplayBorderBottom }) =>
     shouldDisplayBorderBottom
-      ? `1px solid ${themeCssVariables.border.color.light}`
+      ? `1px solid ${themeCssVariables.border.color.medium}`
       : 'none'};
-  border-right: 1px solid ${themeCssVariables.border.color.light};
 
   color: ${themeCssVariables.font.color.tertiary};
 
   cursor: ${({ isResizing, isReadOnly }) =>
     isReadOnly ? 'default' : isResizing ? 'col-resize' : 'pointer'};
-  height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  height: ${RECORD_TABLE_HEADER_HEIGHT}px;
 
-  max-height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  max-height: ${RECORD_TABLE_HEADER_HEIGHT}px;
   padding: 0;
 
   position: relative;
@@ -32,16 +31,16 @@ const StyledHeaderCell = styled.div<{
     &:hover {
       background: ${({ isResizing, isReadOnly }) =>
         isReadOnly || isResizing
-          ? themeCssVariables.background.primary
-          : themeCssVariables.background.secondary};
+          ? themeCssVariables.background.tertiary
+          : themeCssVariables.background.quaternary};
     }
   }
 
   &:active {
     background: ${({ isResizing, isReadOnly }) =>
       isReadOnly || isResizing
-        ? themeCssVariables.background.primary
-        : themeCssVariables.background.tertiary};
+        ? themeCssVariables.background.tertiary
+        : themeCssVariables.background.quaternary};
   }
 
   user-select: none;

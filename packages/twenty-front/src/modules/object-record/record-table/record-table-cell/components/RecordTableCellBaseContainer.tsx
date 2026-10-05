@@ -4,6 +4,7 @@ import { useContext, type ReactNode } from 'react';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { isFieldIdentifierDisplay } from '@/object-record/record-field/ui/meta-types/display/utils/isFieldIdentifierDisplay';
 import { RECORD_CHIP_CLICK_OUTSIDE_ID } from '@/object-record/record-table/constants/RecordChipClickOutsideId';
+import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
 import { RECORD_TABLE_CELL_CONTENT_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableCellContentClassName';
 import { RecordTableCellContext } from '@/object-record/record-table/contexts/RecordTableCellContext';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
@@ -21,7 +22,7 @@ const StyledBaseContainer = styled.div<{
   box-sizing: border-box;
   cursor: ${({ isReadOnly }) => (isReadOnly ? 'default' : 'pointer')};
   display: flex;
-  height: 32px;
+  height: ${RECORD_TABLE_ROW_HEIGHT}px;
   position: relative;
 
   user-select: none;

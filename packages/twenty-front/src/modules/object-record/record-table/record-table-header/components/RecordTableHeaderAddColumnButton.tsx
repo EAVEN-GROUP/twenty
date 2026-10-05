@@ -4,7 +4,7 @@ import { hasRecordGroupsComponentSelector } from '@/object-record/record-group/s
 import { HIDDEN_TABLE_COLUMN_DROPDOWN_ID } from '@/object-record/record-table/constants/HiddenTableColumnDropdownId';
 import { RECORD_TABLE_COLUMN_ADD_COLUMN_BUTTON_WIDTH } from '@/object-record/record-table/constants/RecordTableColumnAddColumnButtonWidth';
 import { RECORD_TABLE_COLUMN_ADD_COLUMN_BUTTON_WIDTH_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableColumnAddColumnButtonWidthClassName';
-import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { RecordTableHeaderPlusButtonContent } from '@/object-record/record-table/record-table-header/components/RecordTableHeaderPlusButtonContent';
 import { RecordTableHeaderResizeHandler } from '@/object-record/record-table/record-table-header/components/RecordTableHeaderResizeHandler';
@@ -24,26 +24,26 @@ import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 const StyledPlusIconHeaderCell = styled.div<{
   shouldDisplayBorderBottom: boolean;
 }>`
-  background-color: ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.tertiary};
   border-bottom: ${({ shouldDisplayBorderBottom }) =>
     shouldDisplayBorderBottom
-      ? `1px solid ${themeCssVariables.border.color.light}`
+      ? `1px solid ${themeCssVariables.border.color.medium}`
       : 'none'};
 
   color: ${themeCssVariables.font.color.tertiary};
 
   cursor: pointer;
 
-  height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  height: ${RECORD_TABLE_HEADER_HEIGHT}px;
 
-  max-height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  max-height: ${RECORD_TABLE_HEADER_HEIGHT}px;
 
   width: ${RECORD_TABLE_COLUMN_ADD_COLUMN_BUTTON_WIDTH}px;
   z-index: 1;
 
   @media (hover: hover) {
     &:hover {
-      background: ${themeCssVariables.background.secondary};
+      background: ${themeCssVariables.background.quaternary};
     }
   }
 `;
@@ -51,7 +51,7 @@ const StyledPlusIconHeaderCell = styled.div<{
 const StyledPlusIconContainer = styled.div`
   align-items: center;
   display: flex;
-  height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  height: ${RECORD_TABLE_HEADER_HEIGHT}px;
   justify-content: center;
   width: 100%;
 `;

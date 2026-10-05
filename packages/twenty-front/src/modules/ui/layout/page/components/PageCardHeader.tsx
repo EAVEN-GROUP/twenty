@@ -1,5 +1,4 @@
 import { useNavigationDrawerExpanded } from '@/navigation/hooks/useNavigationDrawerExpanded';
-import { SIDE_PANEL_TOP_BAR_HEIGHT } from '@/side-panel/constants/SidePanelTopBarHeight';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useWorkspaceSurfaceHeaderPortal } from '@/ui/layout/hooks/useWorkspaceSurfaceHeaderPortal';
 import {
@@ -7,6 +6,7 @@ import {
   type BreadcrumbProps,
 } from '@/ui/navigation/bread-crumb/components/Breadcrumb';
 import { PAGE_ACTION_CONTAINER_CLICK_OUTSIDE_ID } from '@/ui/layout/page/constants/PageActionContainerClickOutsideId';
+import { PAGE_CARD_HEADER_MIN_HEIGHT } from '@/ui/layout/page/constants/PageCardHeaderMinHeight';
 import { NavigationDrawerCollapseButton } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton';
 import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
 import { styled } from '@linaria/react';
@@ -20,6 +20,7 @@ type PageCardHeaderProps = {
   breadcrumb?: ReactNode;
   icon?: ReactNode;
   title?: ReactNode;
+  subtitle?: ReactNode;
   tag?: ReactNode;
   actionButton?: ReactNode;
   centerTitle?: boolean;
@@ -28,7 +29,7 @@ type PageCardHeaderProps = {
 
 const StyledHeader = styled.div<{ centerTitle?: boolean }>`
   align-items: center;
-  background-color: ${themeCssVariables.background.secondary};
+  background-color: ${themeCssVariables.background.primary};
   border-bottom: 1px solid ${themeCssVariables.border.color.medium};
   box-sizing: border-box;
   column-gap: ${themeCssVariables.spacing[2]};
@@ -37,8 +38,8 @@ const StyledHeader = styled.div<{ centerTitle?: boolean }>`
     centerTitle
       ? 'minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr)'
       : 'minmax(0, auto) minmax(min-content, 1fr)'};
-  min-height: ${SIDE_PANEL_TOP_BAR_HEIGHT}px;
-  padding: 0 ${themeCssVariables.spacing[3]};
+  min-height: ${PAGE_CARD_HEADER_MIN_HEIGHT}px;
+  padding: 0 ${themeCssVariables.spacing[5]};
   width: 100%;
 `;
 
@@ -61,6 +62,18 @@ const StyledTitle = styled.div<{ titleColor?: string }>`
   font-weight: ${themeCssVariables.font.weight.semiBold};
   gap: ${themeCssVariables.spacing[1]};
   min-width: 0;
+`;
+
+const StyledTitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+`;
+
+const StyledSubtitle = styled.div`
+  color: ${themeCssVariables.font.color.tertiary};
+  font-size: ${themeCssVariables.font.size.xs};
+  font-weight: ${themeCssVariables.font.weight.regular};
 `;
 
 const StyledCenteredTitle = styled(StyledTitle)`
@@ -99,6 +112,7 @@ export const PageCardHeader = ({
   breadcrumb,
   icon,
   title,
+  subtitle,
   tag,
   actionButton,
   centerTitle = false,
@@ -163,7 +177,10 @@ export const PageCardHeader = ({
           ? breadcrumb
           : isDefined(links) && <Breadcrumb links={links} />}
         {!shouldCenterTitle && hasTitleContent && (
-          <StyledTitle titleColor={titleColor}>{titleContent}</StyledTitle>
+          <StyledTitleBlock>
+            <StyledTitle titleColor={titleColor}>{titleContent}</StyledTitle>
+            {isDefined(subtitle) && <StyledSubtitle>{subtitle}</StyledSubtitle>}
+          </StyledTitleBlock>
         )}
       </StyledLeft>
       {shouldCenterTitle && (

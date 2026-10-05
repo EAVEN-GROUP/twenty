@@ -27,7 +27,7 @@ const StyledContainer = styled.div`
 export const RecordTableCellCheckbox = () => {
   const { t } = useLingui();
 
-  const { isSelected } = useRecordTableRowContextOrThrow();
+  const { isSelected, backgroundColor } = useRecordTableRowContextOrThrow();
   const { isDragging } = useRecordTableRowDraggableContextOrThrow();
 
   const { setCurrentRowSelected } = useSetCurrentRowSelected();
@@ -48,6 +48,7 @@ export const RecordTableCellCheckbox = () => {
       isDragging={isDragging}
       hasRightBorder={false}
       widthClassName={RECORD_TABLE_COLUMN_CHECKBOX_WIDTH_CLASS_NAME}
+      rowTintColor={backgroundColor}
     >
       <StyledContainer onClick={handleClick} data-select-disable>
         <Checkbox hoverable checked={isSelected} aria-label={t`Select row`} />

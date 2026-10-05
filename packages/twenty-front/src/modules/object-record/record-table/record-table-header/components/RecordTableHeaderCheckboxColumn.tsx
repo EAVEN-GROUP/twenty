@@ -6,7 +6,7 @@ import { themeCssVariables } from 'twenty-ui/theme-constants';
 
 import { RECORD_TABLE_COLUMN_CHECKBOX_WIDTH } from '@/object-record/record-table/constants/RecordTableColumnCheckboxWidth';
 import { RECORD_TABLE_COLUMN_CHECKBOX_WIDTH_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableColumnCheckboxWidthClassName';
-import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { useResetTableRowSelection } from '@/object-record/record-table/hooks/internal/useResetTableRowSelection';
 import { useSelectAllRows } from '@/object-record/record-table/hooks/internal/useSelectAllRows';
@@ -19,21 +19,21 @@ import { Checkbox } from 'twenty-ui/input';
 
 const StyledContainer = styled.div`
   align-items: center;
-  background-color: ${themeCssVariables.background.primary};
-  border-bottom: 1px solid ${themeCssVariables.border.color.light};
+  background-color: ${themeCssVariables.background.tertiary};
+  border-bottom: 1px solid ${themeCssVariables.border.color.medium};
   display: flex;
-  height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  height: ${RECORD_TABLE_HEADER_HEIGHT}px;
   justify-content: center;
   min-width: 24px;
   padding-right: ${themeCssVariables.spacing[1]};
 `;
 
 const StyledColumnHeaderCell = styled.div`
-  background-color: ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.tertiary};
 
   cursor: pointer;
 
-  max-height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  max-height: ${RECORD_TABLE_HEADER_HEIGHT}px;
 
   min-width: ${RECORD_TABLE_COLUMN_CHECKBOX_WIDTH}px;
 `;

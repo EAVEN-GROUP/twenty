@@ -6,6 +6,7 @@ import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
 import { RecordIndexPageHeaderIcon } from '@/object-record/record-index/components/RecordIndexPageHeaderIcon';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
+import { totalNumberOfRecordsToVirtualizeComponentState } from '@/object-record/record-table/virtualization/states/totalNumberOfRecordsToVirtualizeComponentState';
 import { SidePanelPageTitleSyncEffect } from '@/side-panel/components/SidePanelPageTitleSyncEffect';
 import { SidePanelToggleButton } from '@/side-panel/components/SidePanelToggleButton';
 import { PageCardHeader } from '@/ui/layout/page/components/PageCardHeader';
@@ -13,7 +14,7 @@ import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
-import { t } from '@lingui/core/macro';
+import { plural, t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
@@ -45,7 +46,12 @@ export const RecordIndexPageHeader = () => {
 
   const { formatNumber } = useNumberFormat();
 
-  const { objectNamePlural } = useRecordIndexContextOrThrow();
+  const { objectNamePlural, recordIndexId } = useRecordIndexContextOrThrow();
+
+  const totalNumberOfRecordsToVirtualize = useAtomComponentStateValue(
+    totalNumberOfRecordsToVirtualizeComponentState,
+    recordIndexId,
+  );
 
   const objectMetadataItem =
     findObjectMetadataItemByNamePlural(objectNamePlural);
@@ -80,6 +86,14 @@ export const RecordIndexPageHeader = () => {
           <RecordIndexPageHeaderIcon objectMetadataItem={objectMetadataItem} />
         }
         title={pageHeaderTitle}
+        subtitle={
+          isDefined(totalNumberOfRecordsToVirtualize)
+            ? plural(totalNumberOfRecordsToVirtualize, {
+                one: '# result',
+                other: '# results',
+              })
+            : undefined
+        }
         actionButton={
           isDefined(contextStoreCurrentViewId) ? (
             <>

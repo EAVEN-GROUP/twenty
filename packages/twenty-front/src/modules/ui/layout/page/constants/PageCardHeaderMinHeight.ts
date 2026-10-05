@@ -1,0 +1,1 @@
+export const PAGE_CARD_HEADER_MIN_HEIGHT = 56;

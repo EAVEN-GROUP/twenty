@@ -1,13 +1,15 @@
 .pill {
   align-items: center;
-  background: var(--t-background-transparent-light);
+  background: var(--t-background-tertiary);
+  border: 1px solid var(--t-border-color-medium);
   border-radius: var(--t-border-radius-pill);
+  box-sizing: border-box;
   corner-shape: round;
   color: var(--t-font-color-tertiary);
   display: inline-flex;
   font-size: var(--t-font-size-xs);
   font-style: normal;
-  font-weight: var(--t-font-weight-medium);
+  font-weight: var(--t-font-weight-semi-bold);
   gap: var(--t-spacing-1);
   height: var(--t-spacing-4);
   justify-content: flex-end;

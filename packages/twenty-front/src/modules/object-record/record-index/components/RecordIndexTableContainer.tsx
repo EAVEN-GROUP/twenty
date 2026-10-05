@@ -5,6 +5,20 @@ import { useRecordIndexContextOrThrow } from '@/object-record/record-index/conte
 import { RecordTableWithWrappers } from '@/object-record/record-table/components/RecordTableWithWrappers';
 import { isModalOpenedComponentState } from '@/ui/layout/modal/states/isModalOpenedComponentState';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { styled } from '@linaria/react';
+import { themeCssVariables } from 'twenty-ui/theme-constants';
+
+const StyledTableCard = styled.div`
+  background: ${themeCssVariables.background.primary};
+  border: 1px solid ${themeCssVariables.border.color.medium};
+  border-radius: ${themeCssVariables.border.radius.lg};
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+`;
 
 type RecordIndexTableContainerProps = {
   recordTableId: string;
@@ -24,11 +38,13 @@ export const RecordIndexTableContainer = ({
   return (
     <>
       <RecordIndexTableContainerEffect />
-      <RecordTableWithWrappers
-        recordTableId={recordTableId}
-        objectNameSingular={objectNameSingular}
-        viewBarId={viewBarInstanceId}
-      />
+      <StyledTableCard>
+        <RecordTableWithWrappers
+          recordTableId={recordTableId}
+          objectNameSingular={objectNameSingular}
+          viewBarId={viewBarInstanceId}
+        />
+      </StyledTableCard>
       {isModalOpened && <RecordIndexRemoveSortingModal />}
     </>
   );

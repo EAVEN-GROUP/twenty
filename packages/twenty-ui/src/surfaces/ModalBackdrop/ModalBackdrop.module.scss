@@ -1,6 +1,7 @@
 .backdrop {
   align-items: center;
   background: var(--t-background-overlay-primary);
+  backdrop-filter: blur(3px);
   display: flex;
   height: 100%;
   justify-content: center;

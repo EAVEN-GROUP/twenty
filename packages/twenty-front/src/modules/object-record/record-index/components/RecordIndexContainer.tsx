@@ -16,10 +16,13 @@ import { ViewType } from '@/views/types/ViewType';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
 const StyledContainer = styled.div`
+  background: ${themeCssVariables.grayScale.gray3};
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  padding: 0 ${themeCssVariables.spacing[5]} ${themeCssVariables.spacing[5]};
   width: 100%;
 `;
 

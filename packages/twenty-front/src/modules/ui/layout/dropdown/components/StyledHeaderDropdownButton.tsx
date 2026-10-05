@@ -12,7 +12,7 @@ export const StyledHeaderDropdownButton = styled.button<StyledDropdownButtonProp
     isUnfolded
       ? themeCssVariables.background.transparent.light
       : themeCssVariables.background.primary};
-  border: none;
+  border: 1px solid ${themeCssVariables.border.color.medium};
   border-radius: ${themeCssVariables.border.radius.md};
   color: ${({ isActive }) =>
     isActive

@@ -5,6 +5,7 @@ import { RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH_CLASS_NAME } from '@/object-rec
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
 import { TABLE_Z_INDEX } from '@/object-record/record-table/constants/TableZIndex';
+import { useRecordTableRowContextOrThrow } from '@/object-record/record-table/contexts/RecordTableRowContext';
 import { useRecordTableRowDraggableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableRowDraggableContext';
 import { RecordTableCellStyleWrapper } from '@/object-record/record-table/record-table-cell/components/RecordTableCellStyleWrapper';
 import { DragDropItemSortableHandleRefContext } from '@/ui/utilities/drag-and-drop/context/DragDropItemSortableHandleRefContext';
@@ -35,16 +36,18 @@ const StyledIconWrapper = styled.div<{ isDragging: boolean }>`
 
 export const RecordTableCellDragAndDrop = () => {
   const { isDragging } = useRecordTableRowDraggableContextOrThrow();
+  const { isSelected, backgroundColor } = useRecordTableRowContextOrThrow();
 
   const sortableHandleRef = useContext(DragDropItemSortableHandleRefContext);
 
   return (
     <RecordTableCellStyleWrapper
       data-select-disable
+      isSelected={isSelected}
       isDragging={isDragging}
       hasRightBorder={false}
-      hasBottomBorder={false}
       widthClassName={RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH_CLASS_NAME}
+      rowTintColor={backgroundColor}
     >
       <StyledContainer ref={sortableHandleRef}>
         <StyledIconWrapper className="icon" isDragging={isDragging}>

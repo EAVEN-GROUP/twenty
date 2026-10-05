@@ -303,6 +303,38 @@ export type ThemeType = {
       amber: string;
       yellow: string;
     };
+    border: {
+      gray: string;
+      mauve: string;
+      slate: string;
+      sage: string;
+      olive: string;
+      sand: string;
+      tomato: string;
+      red: string;
+      ruby: string;
+      crimson: string;
+      pink: string;
+      plum: string;
+      purple: string;
+      violet: string;
+      iris: string;
+      cyan: string;
+      turquoise: string;
+      sky: string;
+      blue: string;
+      jade: string;
+      green: string;
+      grass: string;
+      mint: string;
+      lime: string;
+      bronze: string;
+      gold: string;
+      brown: string;
+      orange: string;
+      amber: string;
+      yellow: string;
+    };
   };
   code: {
     text: {

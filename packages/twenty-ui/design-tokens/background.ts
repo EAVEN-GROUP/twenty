@@ -36,7 +36,7 @@ export const BACKGROUND_TOKENS = {
     success: token({ light: '#00a43319', dark: '#11ff992d' }),
   },
   overlayPrimary: token({
-    light: 'color(display-p3 0 0 0 / 0.722)',
+    light: 'rgba(13, 31, 45, 0.28)',
     dark: '#000000b8',
   }),
   overlaySecondary: token({

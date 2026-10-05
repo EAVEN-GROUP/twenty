@@ -29,9 +29,7 @@ const StyledMainCardWrapper = styled.div`
   box-sizing: border-box;
   display: flex;
   flex: 1 1 0;
-  margin-left: -3px;
   min-width: 0;
-  padding-left: 4px;
   width: 0;
 
   @media (max-width: ${MOBILE_VIEWPORT}px) {
@@ -51,7 +49,7 @@ const StyledMainCardWrapper = styled.div`
 // oxlint-disable-next-line twenty/no-hardcoded-colors
 const StyledCard = styled.div`
   background: ${themeCssVariables.background.primary};
-  border-radius: ${themeCssVariables.border.radius.lg} 0 0 0;
+  border-radius: 0;
   box-shadow:
     -4px 0 4px 0 rgba(0, 0, 0, 0.006),
     0 0 0 1px ${themeCssVariables.border.color.medium};

@@ -48,6 +48,12 @@ export const Tag = ({
       : (themeCssVariables.tag.text[color] ??
         themeCssVariables.font.color.secondary);
 
+  const tagBorder =
+    color === 'transparent'
+      ? 'transparent'
+      : (themeCssVariables.tag.border[color] ??
+        themeCssVariables.tag.border.gray);
+
   const isInteractive = isDefined(onClick);
 
   const tagContent = (
@@ -76,6 +82,7 @@ export const Tag = ({
   const sharedStyle = {
     '--tag-background': tagBackground,
     '--tag-text': tagText,
+    '--tag-border': tagBorder,
   } as React.CSSProperties;
 
   const sharedClassName = clsx(

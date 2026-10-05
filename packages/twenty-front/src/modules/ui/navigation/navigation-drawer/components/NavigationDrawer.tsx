@@ -31,6 +31,8 @@ const StyledAnimatedContainer = styled.div<{
   isExpanded: boolean;
   isResizing: boolean;
 }>`
+  background: ${themeCssVariables.background.primary};
+  border-right: 1px solid ${themeCssVariables.border.color.medium};
   height: 100%;
   max-height: 100%;
   overflow: hidden;
@@ -45,6 +47,7 @@ const StyledAnimatedContainer = styled.div<{
       : `${NAVIGATION_DRAWER_COLLAPSED_WIDTH}px`};
 
   @media (max-width: ${MOBILE_VIEWPORT}px) {
+    border-right: none;
     width: ${({ isExpanded }) =>
       isExpanded ? 'calc(100vw / var(--t-zoom, 1))' : '0'};
   }

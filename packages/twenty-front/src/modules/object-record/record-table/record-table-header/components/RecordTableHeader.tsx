@@ -1,4 +1,4 @@
-import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { TABLE_Z_INDEX } from '@/object-record/record-table/constants/TableZIndex';
 import { RecordTableHeaderCheckboxColumn } from '@/object-record/record-table/record-table-header/components/RecordTableHeaderCheckboxColumn';
 import { RecordTableHeaderDnd } from '@/object-record/record-table/record-table-header/components/RecordTableHeaderDnd';
@@ -11,14 +11,14 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { styled } from '@linaria/react';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
-// The header takes the first slot of the virtualized row grid, whose pitch is
-// RECORD_TABLE_ROW_HEIGHT + 1 (row plus its bottom border).
+// The header takes the first slot of the virtualized row grid, which is offset
+// by RECORD_TABLE_HEADER_HEIGHT + 1 (header plus its bottom border).
 const StyledHeaderContainer = styled.div`
-  background-color: ${themeCssVariables.background.primary};
-  box-shadow: 0 -1px 0 ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.tertiary};
+  box-shadow: 0 -1px 0 ${themeCssVariables.background.tertiary};
   display: flex;
   flex-direction: row;
-  height: ${RECORD_TABLE_ROW_HEIGHT + 1}px;
+  height: ${RECORD_TABLE_HEADER_HEIGHT + 1}px;
   position: sticky;
   top: 0;
   z-index: ${TABLE_Z_INDEX.headerRow};

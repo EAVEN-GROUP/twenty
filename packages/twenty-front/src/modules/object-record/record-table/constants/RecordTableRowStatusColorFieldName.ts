@@ -1,0 +1,1 @@
+export const RECORD_TABLE_ROW_STATUS_COLOR_FIELD_NAME = 'status';

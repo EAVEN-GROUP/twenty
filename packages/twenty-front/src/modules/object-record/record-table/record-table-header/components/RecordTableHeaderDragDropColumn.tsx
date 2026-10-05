@@ -1,7 +1,7 @@
 import { hasRecordGroupsComponentSelector } from '@/object-record/record-group/states/selectors/hasRecordGroupsComponentSelector';
 import { RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH } from '@/object-record/record-table/constants/RecordTableColumnDragAndDropWidth';
 import { RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableColumnDragAndDropWidthClassName';
-import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { isRecordTableRowActiveComponentFamilyState } from '@/object-record/record-table/states/isRecordTableRowActiveComponentFamilyState';
 import { isRecordTableRowFocusActiveComponentState } from '@/object-record/record-table/states/isRecordTableRowFocusActiveComponentState';
 import { isRecordTableRowFocusedComponentFamilyState } from '@/object-record/record-table/states/isRecordTableRowFocusedComponentFamilyState';
@@ -21,12 +21,12 @@ const StyledDragDropHeaderCell = styled.div<{
   background-color: ${({ backgroundColor }) => backgroundColor};
   border-bottom: ${({ shouldDisplayBorderBottom }) =>
     shouldDisplayBorderBottom
-      ? `1px solid ${themeCssVariables.background.primary}`
+      ? `1px solid ${themeCssVariables.border.color.medium}`
       : 'none'};
   cursor: pointer;
-  max-height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  max-height: ${RECORD_TABLE_HEADER_HEIGHT}px;
   max-width: ${RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH}px;
-  min-height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  min-height: ${RECORD_TABLE_HEADER_HEIGHT}px;
 
   min-width: ${RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH}px;
 
@@ -73,7 +73,7 @@ export const RecordTableHeaderDragDropColumn = () => {
         'header-cell',
         RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH_CLASS_NAME,
       )}
-      backgroundColor={theme.background.primary}
+      backgroundColor={theme.background.tertiary}
       shouldDisplayBorderBottom={shouldDisplayBorderBottom}
     />
   );

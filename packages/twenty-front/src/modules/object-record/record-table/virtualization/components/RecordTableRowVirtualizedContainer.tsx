@@ -1,3 +1,4 @@
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { RECORD_TABLE_ROW_HEIGHT } from '@/object-record/record-table/constants/RecordTableRowHeight';
 import { RecordTableRowVirtualizedDebugRowHelper } from '@/object-record/record-table/virtualization/components/RecordTableRowVirtualizedDebugRowHelper';
 import { RecordTableRowVirtualizedRouterLevel1 } from '@/object-record/record-table/virtualization/components/RecordTableRowVirtualizedRouterLevel1';
@@ -45,7 +46,7 @@ export const RecordTableRowVirtualizedContainer = ({
 
   const pixelsFromTop =
     realIndexByVirtualIndex * (RECORD_TABLE_ROW_HEIGHT + 1) +
-    (RECORD_TABLE_ROW_HEIGHT + 1);
+    (RECORD_TABLE_HEADER_HEIGHT + 1);
 
   return (
     <StyledVirtualizedRowContainer

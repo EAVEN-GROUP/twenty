@@ -36,7 +36,7 @@ export const RecordTableCellFirstRowFirstColumn = ({
   children,
   isSelected,
   isDragging,
-  hasRightBorder = true,
+  hasRightBorder = false,
   hasBottomBorder = true,
   rowTintColor,
 }: {
@@ -55,7 +55,7 @@ export const RecordTableCellFirstRowFirstColumn = ({
     ? theme.accent.quaternary
     : (rowTintColor ?? theme.background.primary);
 
-  const borderColor = theme.border.color.light;
+  const borderColor = theme.border.color.medium;
 
   const fontColor = theme.font.color.primary;
 

@@ -1,19 +1,19 @@
 .tag {
-  box-sizing: content-box;
+  box-sizing: border-box;
   align-items: center;
   background: var(--tag-background);
-  border-radius: var(--t-border-radius-sm-round);
+  border-radius: var(--t-border-radius-pill);
   corner-shape: round;
   color: var(--tag-text);
   display: inline-flex;
-  font-size: var(--t-font-size-md);
+  font-size: var(--t-font-size-xs);
   font-style: normal;
-  font-weight: var(--t-font-weight-regular);
+  font-weight: var(--t-font-weight-medium);
   height: var(--t-spacing-5);
   margin: 0;
   overflow: hidden;
   padding: 0 var(--t-spacing-2);
-  border: none;
+  border: 1px solid var(--tag-border, transparent);
   gap: var(--t-spacing-1);
   // 'none' is not a valid min-width value; kept for byte-equivalence with the
   // deprecated Linaria styles where the declaration was equally inert.
@@ -28,7 +28,7 @@
 }
 
 .weightMedium {
-  font-weight: var(--t-font-weight-medium);
+  font-weight: var(--t-font-weight-semi-bold);
 }
 
 .variantOutline {

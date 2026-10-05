@@ -3,13 +3,14 @@ import { useRecordTableRowContextOrThrow } from '@/object-record/record-table/co
 import { RecordTableCellStyleWrapper } from '@/object-record/record-table/record-table-cell/components/RecordTableCellStyleWrapper';
 
 export const RecordTablePlusButtonCellPlaceholder = () => {
-  const { isSelected } = useRecordTableRowContextOrThrow();
+  const { isSelected, backgroundColor } = useRecordTableRowContextOrThrow();
 
   return (
     <RecordTableCellStyleWrapper
       isSelected={isSelected}
       hasRightBorder={false}
       widthClassName={RECORD_TABLE_COLUMN_ADD_COLUMN_BUTTON_WIDTH_CLASS_NAME}
+      rowTintColor={backgroundColor}
     />
   );
 };

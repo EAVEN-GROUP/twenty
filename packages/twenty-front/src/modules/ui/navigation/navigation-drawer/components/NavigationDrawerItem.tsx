@@ -83,7 +83,7 @@ type StyledItemProps = Pick<
 const StyledItem = styled.button<StyledItemProps>`
   align-items: center;
   background: ${({ active }) =>
-    active ? themeCssVariables.background.transparent.light : 'transparent'};
+    active ? themeCssVariables.accent.accent3 : 'transparent'};
   border: ${({ isSelectedInEditMode }) =>
     isSelectedInEditMode
       ? `1px solid ${themeCssVariables.color.blue}`
@@ -95,7 +95,7 @@ const StyledItem = styled.button<StyledItemProps>`
       return themeCssVariables.font.color.tertiary;
     }
     if (active === true) {
-      return themeCssVariables.font.color.primary;
+      return themeCssVariables.accent.accent11;
     }
     if (isSoon) {
       return themeCssVariables.font.color.light;
@@ -159,8 +159,11 @@ const StyledLabelParent = styled.div`
   white-space: nowrap;
 `;
 
-const StyledItemLabel = styled.span`
-  font-weight: ${themeCssVariables.font.weight.medium};
+const StyledItemLabel = styled.span<{ isActive?: boolean }>`
+  font-weight: ${({ isActive }) =>
+    isActive === true
+      ? themeCssVariables.font.weight.semiBold
+      : themeCssVariables.font.weight.medium};
 `;
 
 const StyledItemSecondaryLabel = styled.span`
@@ -393,7 +396,7 @@ export const NavigationDrawerItem = ({
             <OverflowingTextWithTooltip
               text={
                 <>
-                  <StyledItemLabel>{label}</StyledItemLabel>
+                  <StyledItemLabel isActive={active}>{label}</StyledItemLabel>
                   {secondaryLabel && (
                     <StyledItemSecondaryLabel>
                       {' · '}

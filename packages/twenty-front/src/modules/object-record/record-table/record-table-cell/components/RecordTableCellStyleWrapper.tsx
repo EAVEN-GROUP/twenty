@@ -31,7 +31,7 @@ export const RecordTableCellStyleWrapper = ({
   children,
   isSelected,
   isDragging,
-  hasRightBorder = true,
+  hasRightBorder = false,
   hasBottomBorder = true,
   widthClassName,
   rowTintColor,
@@ -52,7 +52,7 @@ export const RecordTableCellStyleWrapper = ({
     ? theme.accent.quaternary
     : (rowTintColor ?? theme.background.primary);
 
-  const borderColor = theme.border.color.light;
+  const borderColor = theme.border.color.medium;
 
   const fontColor = theme.font.color.primary;
 

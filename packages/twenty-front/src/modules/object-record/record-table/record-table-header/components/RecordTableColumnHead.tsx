@@ -3,6 +3,7 @@ import { useContext } from 'react';
 
 import { fieldMetadataItemByIdSelector } from '@/object-metadata/states/fieldMetadataItemByIdSelector';
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
+import { RECORD_TABLE_HEADER_HEIGHT } from '@/object-record/record-table/constants/RecordTableHeaderHeight';
 import { RECORD_TABLE_CELL_CONTENT_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableCellContentClassName';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { useIcons } from 'twenty-ui/icon';
@@ -12,11 +13,14 @@ const StyledTitle = styled.div`
   align-items: center;
   display: flex;
   flex-direction: row;
-  font-weight: ${themeCssVariables.font.weight.medium};
+  font-size: ${themeCssVariables.font.size.xs};
+  font-weight: ${themeCssVariables.font.weight.semiBold};
   gap: ${themeCssVariables.spacing[1]};
-  height: ${themeCssVariables.spacing[8]};
+  height: ${RECORD_TABLE_HEADER_HEIGHT}px;
+  letter-spacing: 0.4px;
   padding-left: ${themeCssVariables.spacing[2]};
   padding-right: ${themeCssVariables.spacing[2]};
+  text-transform: uppercase;
 `;
 
 const StyledIcon = styled.div`

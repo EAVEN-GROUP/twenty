@@ -28,6 +28,11 @@ const StyledTitle = styled.div`
       color: ${themeCssVariables.font.color.tertiary};
     }
   }
+
+  .section-title-label {
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
 `;
 
 const StyledLabelContainer = styled.div`

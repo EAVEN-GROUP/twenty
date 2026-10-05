@@ -5,6 +5,7 @@ import { getLabelIdentifierFieldMetadataItem } from '@/object-metadata/utils/get
 import { hasObjectMetadataItemPositionField } from '@/object-metadata/utils/hasObjectMetadataItemPositionField';
 import { generateDepthRecordGqlFieldsFromFields } from '@/object-record/graphql/record-gql-fields/utils/generateDepthRecordGqlFieldsFromFields';
 import { getRecordTableRowColorField } from '@/object-record/record-table/utils/getRecordTableRowColorField';
+import { getRecordTableRowStatusColorField } from '@/object-record/record-table/utils/getRecordTableRowStatusColorField';
 import { getFieldRelations } from '@/object-record/record-field/ui/utils/junction/getFieldRelations';
 import { getJunctionObjectMetadataIds } from '@/object-record/record-field/ui/utils/junction/getJunctionObjectMetadataIds';
 import { visibleRecordFieldsComponentSelector } from '@/object-record/record-field/states/visibleRecordFieldsComponentSelector';
@@ -97,6 +98,8 @@ export const useRelevantRecordsGqlFields = ({
   const hasPosition = hasObjectMetadataItemPositionField(objectMetadataItem);
 
   const rowColorField = getRecordTableRowColorField(objectMetadataItem);
+  const rowStatusColorField =
+    getRecordTableRowStatusColorField(objectMetadataItem);
 
   return {
     id: true,
@@ -109,6 +112,9 @@ export const useRelevantRecordsGqlFields = ({
     ...(hasPosition ? { position: true } : {}),
     ...(isDefined(rowColorField)
       ? { [rowColorField.colorFieldMetadataItem.name]: true }
+      : {}),
+    ...(isDefined(rowStatusColorField)
+      ? { [rowStatusColorField.statusFieldMetadataItem.name]: true }
       : {}),
     ...allDepthOneGqlFields,
     ...junctionRelationGqlFields,
