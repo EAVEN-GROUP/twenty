@@ -66,3 +66,28 @@ export const SingleItem: Story = {
     );
   },
 };
+
+export const TopRight: Story = {
+  render: () => {
+    return (
+      <div style={{ width: 480 }}>
+        <GraphWidgetLegend
+          show={true}
+          placement="top-right"
+          items={[
+            {
+              id: 'answered-calls',
+              label: 'Answered Calls',
+              color: 'green',
+            },
+            {
+              id: 'meetings',
+              label: 'Meetings',
+              color: 'blue',
+            },
+          ]}
+        />
+      </div>
+    );
+  },
+};

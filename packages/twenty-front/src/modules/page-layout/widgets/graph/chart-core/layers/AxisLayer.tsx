@@ -6,8 +6,6 @@ import { type AxisLayerConfig } from '@/page-layout/widgets/graph/chart-core/typ
 import { getAxisLayerLayout } from '@/page-layout/widgets/graph/chart-core/utils/getAxisLayerLayout';
 import { type ChartMargins } from '@/page-layout/widgets/graph/types/ChartMargins';
 import { styled } from '@linaria/react';
-import { useContext } from 'react';
-import { ThemeContext } from 'twenty-ui/theme-constants';
 
 type AxisLayerProps = {
   bottomAxisTickRotation: number;
@@ -35,8 +33,6 @@ const StyledSvgOverlay = styled.svg`
   top: 0;
 `;
 
-const STROKE_ALIGNMENT_OFFSET = 0.5 as const;
-
 export const AxisLayer = ({
   bottomAxisTickRotation,
   categoryValues,
@@ -54,8 +50,6 @@ export const AxisLayer = ({
   yAxisLabel,
   axisConfig,
 }: AxisLayerProps) => {
-  const { theme } = useContext(ThemeContext);
-
   const tickFontSize = axisConfig.tickFontSize;
   const legendFontSize = axisConfig.legendFontSize;
 
@@ -88,24 +82,6 @@ export const AxisLayer = ({
   return (
     <StyledSvgOverlay width={chartWidth} height={chartHeight}>
       <g transform={`translate(${margins.left}, ${margins.top})`}>
-        <line
-          x1={0}
-          y1={innerHeight + STROKE_ALIGNMENT_OFFSET}
-          x2={innerWidth}
-          y2={innerHeight + STROKE_ALIGNMENT_OFFSET}
-          stroke={theme.border.color.light}
-          strokeWidth={1}
-        />
-
-        <line
-          x1={0}
-          y1={0}
-          x2={0}
-          y2={innerHeight}
-          stroke={theme.border.color.light}
-          strokeWidth={1}
-        />
-
         {shouldRenderZeroLine && (
           <ZeroLine
             isVertical={isVertical}

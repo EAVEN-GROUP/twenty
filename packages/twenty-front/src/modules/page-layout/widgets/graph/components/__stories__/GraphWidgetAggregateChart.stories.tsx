@@ -67,3 +67,10 @@ export const LargeNegativeChange: Story = {
     trendPercentage: -75,
   },
 };
+
+export const ColoredValue: Story = {
+  args: {
+    value: '3387',
+    color: 'blue',
+  },
+};

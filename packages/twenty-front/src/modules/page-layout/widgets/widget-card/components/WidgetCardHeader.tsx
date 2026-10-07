@@ -43,15 +43,24 @@ const StyledWidgetCardHeader = styled.div<{ shouldInset: boolean }>`
       : '0'};
 `;
 
-const StyledTitleContainer = styled.div`
+const StyledTitleContainer = styled.div<{ isFramed: boolean }>`
   align-items: center;
-  color: ${themeCssVariables.font.color.primary};
+  color: ${({ isFramed }) =>
+    isFramed
+      ? themeCssVariables.font.color.tertiary
+      : themeCssVariables.font.color.primary};
   display: flex;
   flex: 1;
-  font-size: ${themeCssVariables.font.size.md};
-  font-weight: ${themeCssVariables.font.weight.medium};
+  font-size: ${({ isFramed }) =>
+    isFramed ? themeCssVariables.font.size.xs : themeCssVariables.font.size.md};
+  font-weight: ${({ isFramed }) =>
+    isFramed
+      ? themeCssVariables.font.weight.semiBold
+      : themeCssVariables.font.weight.medium};
   gap: ${themeCssVariables.spacing[1]};
+  letter-spacing: ${({ isFramed }) => (isFramed ? '0.6px' : 'normal')};
   overflow: hidden;
+  text-transform: ${({ isFramed }) => (isFramed ? 'uppercase' : 'none')};
   user-select: none;
 `;
 
@@ -104,7 +113,7 @@ export const WidgetCardHeader = ({
       <AnimatePresence initial={false}>
         {!isEmpty && isInEditMode && <WidgetGrip className="drag-handle" />}
       </AnimatePresence>
-      <StyledTitleContainer>
+      <StyledTitleContainer isFramed={variant === 'framed'}>
         <OverflowingTextWithTooltip text={isEmpty ? t`Add Widget` : title} />
         {isDefined(widgetHeaderCount) && (
           <StyledCount>{formatNumber(widgetHeaderCount)}</StyledCount>

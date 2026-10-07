@@ -17,6 +17,7 @@ import { graphWidgetLineCrosshairXComponentState } from '@/page-layout/widgets/g
 import { graphWidgetLineTooltipComponentState } from '@/page-layout/widgets/graph/graph-widget-line-chart/states/graphWidgetLineTooltipComponentState';
 import { type LineChartSeriesWithColor } from '@/page-layout/widgets/graph/graph-widget-line-chart/types/LineChartSeriesWithColor';
 import { calculateValueRangeFromLineChartSeries } from '@/page-layout/widgets/graph/graph-widget-line-chart/utils/calculateValueRangeFromLineChartSeries';
+import { LINE_CHART_CONSTANTS } from '@/page-layout/widgets/graph/graph-widget-line-chart/constants/LineChartConstants';
 import { getLineChartLayout } from '@/page-layout/widgets/graph/graph-widget-line-chart/utils/getLineChartLayout';
 import { type GraphColorMode } from '@/page-layout/widgets/graph/types/GraphColorMode';
 import { computeEffectiveValueRange } from '@/page-layout/widgets/graph/utils/computeEffectiveValueRange';
@@ -146,6 +147,15 @@ export const GraphWidgetLineChart = ({
       rangeMin,
       rangeMax,
     });
+
+  const maximumSeriesLength = Math.max(
+    0,
+    ...nivoData.map((series) => series.data.length),
+  );
+
+  const shouldShowPointMarkers =
+    maximumSeriesLength <=
+    LINE_CHART_CONSTANTS.MAXIMUM_NUMBER_OF_DATA_POINTS_WITH_MARKERS;
 
   const hasClickableItems = isDefined(onSliceClick);
 
@@ -298,6 +308,9 @@ export const GraphWidgetLineChart = ({
 
   return (
     <StyledContainer id={id}>
+      {showLegend && data.length > 0 && (
+        <GraphWidgetLegend show items={legendItems} placement="top-right" />
+      )}
       <GraphWidgetChartContainer
         $isClickable={hasClickableItems}
         onMouseLeave={() => debouncedHideTooltip()}
@@ -326,11 +339,17 @@ export const GraphWidgetLineChart = ({
             clamp: true,
           }}
           curve={'monotoneX'}
-          lineWidth={1}
+          lineWidth={LINE_CHART_CONSTANTS.LINE_WIDTH}
           enablePoints={true}
-          pointSize={0}
+          pointSize={
+            shouldShowPointMarkers ? LINE_CHART_CONSTANTS.POINT_SIZE : 0
+          }
+          pointColor={{ from: 'series.color' }}
           enablePointLabel={false}
-          pointBorderWidth={0}
+          pointBorderWidth={
+            shouldShowPointMarkers ? LINE_CHART_CONSTANTS.POINT_BORDER_WIDTH : 0
+          }
+          pointBorderColor={theme.background.primary}
           colors={colors}
           axisTop={null}
           axisRight={null}
@@ -366,9 +385,6 @@ export const GraphWidgetLineChart = ({
         onMouseEnter={handleTooltipMouseEnter}
         onMouseLeave={handleTooltipMouseLeave}
       />
-      {showLegend && data.length > 0 && (
-        <GraphWidgetLegend show items={legendItems} />
-      )}
     </StyledContainer>
   );
 };

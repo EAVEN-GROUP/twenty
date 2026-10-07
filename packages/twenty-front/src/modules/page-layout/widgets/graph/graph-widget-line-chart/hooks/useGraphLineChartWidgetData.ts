@@ -1,5 +1,6 @@
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
+import { useDashboardPeriodScopedChartConfiguration } from '@/page-layout/hooks/useDashboardPeriodScopedChartConfiguration';
 import { type LineChartSeriesWithColor } from '@/page-layout/widgets/graph/graph-widget-line-chart/types/LineChartSeriesWithColor';
 import { type GraphColorMode } from '@/page-layout/widgets/graph/types/GraphColorMode';
 import { type RawDimensionValue } from '@/page-layout/widgets/graph/types/RawDimensionValue';
@@ -8,6 +9,7 @@ import { determineGraphColorMode } from '@/page-layout/widgets/graph/utils/deter
 import { extractLineChartDataConfiguration } from '@/page-layout/widgets/graph/utils/extractLineChartDataConfiguration';
 import { parseGraphColor } from '@/page-layout/widgets/graph/utils/parseGraphColor';
 import { useQuery } from '@apollo/client/react';
+import { useMemo } from 'react';
 import { isString } from '@sniptt/guards';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -45,7 +47,15 @@ export const useGraphLineChartWidgetData = ({
     objectId: objectMetadataItemId,
   });
 
-  const dataConfiguration = extractLineChartDataConfiguration(configuration);
+  const periodScopedConfiguration = useDashboardPeriodScopedChartConfiguration({
+    objectMetadataItemId,
+    configuration,
+  });
+
+  const dataConfiguration = useMemo(
+    () => extractLineChartDataConfiguration(periodScopedConfiguration),
+    [periodScopedConfiguration],
+  );
 
   const {
     data: queryData,

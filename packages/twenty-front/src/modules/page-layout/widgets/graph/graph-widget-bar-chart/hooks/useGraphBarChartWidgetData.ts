@@ -1,5 +1,6 @@
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { type FieldMetadataItemOption } from '@/object-metadata/types/FieldMetadataItem';
+import { useDashboardPeriodScopedChartConfiguration } from '@/page-layout/hooks/useDashboardPeriodScopedChartConfiguration';
 import { type BarChartSeriesWithColor } from '@/page-layout/widgets/graph/graph-widget-bar-chart/types/BarChartSeries';
 import { getEffectiveGroupMode } from '@/page-layout/widgets/graph/graph-widget-bar-chart/utils/getEffectiveGroupMode';
 import { type BarChartDatum } from '@/page-layout/widgets/graph/graph-widget-bar-chart/types/BarChartDatum';
@@ -24,6 +25,7 @@ import {
 type UseGraphBarChartWidgetDataProps = {
   objectMetadataItemId: string;
   configuration: BarChartConfiguration;
+  shouldApplyDashboardPeriod?: boolean;
 };
 
 type UseGraphBarChartWidgetDataResult = {
@@ -51,14 +53,21 @@ type UseGraphBarChartWidgetDataResult = {
 export const useGraphBarChartWidgetData = ({
   objectMetadataItemId,
   configuration,
+  shouldApplyDashboardPeriod = true,
 }: UseGraphBarChartWidgetDataProps): UseGraphBarChartWidgetDataResult => {
   const { objectMetadataItem } = useObjectMetadataItemById({
     objectId: objectMetadataItemId,
   });
 
+  const periodScopedConfiguration = useDashboardPeriodScopedChartConfiguration({
+    objectMetadataItemId,
+    configuration,
+    shouldApplyDashboardPeriod,
+  });
+
   const dataConfiguration = useMemo(
-    () => extractBarChartDataConfiguration(configuration),
-    [configuration],
+    () => extractBarChartDataConfiguration(periodScopedConfiguration),
+    [periodScopedConfiguration],
   );
 
   const {

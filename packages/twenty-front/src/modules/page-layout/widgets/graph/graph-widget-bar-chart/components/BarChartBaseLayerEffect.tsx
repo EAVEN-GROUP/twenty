@@ -53,7 +53,7 @@ export const BarChartBaseLayerEffect = ({
 }: BarChartBaseLayerEffectProps) => {
   const { theme } = useContext(ThemeContext);
 
-  const borderRadius = parseInt(theme.border.radius.sm);
+  const borderRadius = BAR_CHART_CONSTANTS.BAR_BORDER_RADIUS;
   const gridColor = theme.border.color.light;
   const isVertical = layout === BarChartLayout.VERTICAL;
   const durationMs =

@@ -6,6 +6,7 @@ import { CUMULATIVE_SETTING } from '@/side-panel/pages/page-layout/constants/set
 import { DATA_DISPLAY_X_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DataDisplayXSetting';
 import { DATA_DISPLAY_Y_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DataDisplayYSetting';
 import { DATA_LABELS_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DataLabelsSetting';
+import { DISPLAY_AS_PODIUM_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DisplayAsPodiumSetting';
 import { DATE_GRANULARITY_X_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DateGranularityXSetting';
 import { DATE_GRANULARITY_Y_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DateGranularityYSetting';
 import { FILTER_SETTING } from '@/side-panel/pages/page-layout/constants/settings/FilterSetting';
@@ -76,6 +77,7 @@ export const getBarChartSettings = (
         DATA_LABELS_SETTING,
         FORMAT_SETTING,
         SHOW_LEGEND_SETTING,
+        DISPLAY_AS_PODIUM_SETTING,
       ],
     },
   ];

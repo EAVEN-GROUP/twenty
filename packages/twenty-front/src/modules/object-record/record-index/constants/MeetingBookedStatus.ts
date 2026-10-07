@@ -1,0 +1,1 @@
+export const MEETING_BOOKED_STATUS = 'BOOKED';

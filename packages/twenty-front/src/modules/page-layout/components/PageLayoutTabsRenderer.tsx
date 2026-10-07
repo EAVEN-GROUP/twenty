@@ -1,6 +1,7 @@
 import { PageLayoutWidgetDndProvider } from '@/page-layout/components/dnd/PageLayoutWidgetDndProvider';
 import { PageLayoutLeftPanel } from '@/page-layout/components/PageLayoutLeftPanel';
 import { PageLayoutPrerenderedTabIdsResetEffect } from '@/page-layout/components/PageLayoutPrerenderedTabIdsResetEffect';
+import { PageLayoutPeriodToggle } from '@/page-layout/components/PageLayoutPeriodToggle';
 import { PageLayoutRecordIdentifierBar } from '@/page-layout/components/PageLayoutRecordIdentifierBar';
 import { PageLayoutScrollResetEffect } from '@/page-layout/components/PageLayoutScrollResetEffect';
 import { PageLayoutTabList } from '@/page-layout/components/PageLayoutTabList';
@@ -98,7 +99,9 @@ const StyledTabContentDisplay = styled.div<{ isActiveTab: boolean }>`
   display: ${({ isActiveTab }) => (isActiveTab ? 'contents' : 'none')};
 `;
 
-const StyledScrollWrapperContainer = styled.div`
+const StyledScrollWrapperContainer = styled.div<{ isDashboard: boolean }>`
+  background: ${({ isDashboard }) =>
+    isDashboard ? themeCssVariables.background.tertiary : 'transparent'};
   flex: 1;
   min-height: 0;
 
@@ -188,6 +191,8 @@ export const PageLayoutTabsRenderer = () => {
         })),
   );
 
+  const isDashboard = currentPageLayout.type === PageLayoutType.DASHBOARD;
+
   const shouldRenderRecordIdentifierBar =
     currentPageLayout.type === PageLayoutType.RECORD_PAGE &&
     isDefined(targetRecordIdentifier) &&
@@ -248,8 +253,11 @@ export const PageLayoutTabsRenderer = () => {
               }
             />
             {!shouldRenderRecordIdentifierBar && tabList}
+            {isDashboard && workspaceSurface.type === 'main' && (
+              <PageLayoutPeriodToggle />
+            )}
 
-            <StyledScrollWrapperContainer>
+            <StyledScrollWrapperContainer isDashboard={isDashboard}>
               <ScrollWrapper
                 className="page-layout-scroll-wrapper"
                 componentInstanceId={scrollWrapperInstanceId}

@@ -4,6 +4,7 @@ export const CHART_CONFIGURATION_SETTING_LABELS = {
   SOURCE: msg`Source`,
   DATA_LABELS: msg`Data labels`,
   CENTER_METRIC: msg`Show value in center`,
+  DISPLAY_AS_PODIUM: msg`Display as podium`,
   COLORS: msg`Colors`,
   FILTER: msg`Filter`,
   GROUP_BY: msg`Group by`,

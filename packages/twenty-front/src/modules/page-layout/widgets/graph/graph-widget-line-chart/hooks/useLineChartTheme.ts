@@ -12,14 +12,14 @@ export const useLineChartTheme = () => {
     axis: {
       domain: {
         line: {
-          stroke: theme.border.color.light,
-          strokeWidth: 1,
+          stroke: 'transparent',
+          strokeWidth: 0,
         },
       },
       ticks: {
         line: {
-          stroke: theme.border.color.light,
-          strokeWidth: 1,
+          stroke: 'transparent',
+          strokeWidth: 0,
         },
         text: {
           fill: theme.font.color.secondary,

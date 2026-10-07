@@ -72,7 +72,12 @@ export const ChartColorSelectionDropdownContent = () => {
     'PieChartConfiguration',
   );
 
-  if (!isBarOrLineChart && !isPieChart) {
+  const isAggregateChart = isWidgetConfigurationOfType(
+    configuration,
+    'AggregateChartConfiguration',
+  );
+
+  if (!isBarOrLineChart && !isPieChart && !isAggregateChart) {
     return null;
   }
 

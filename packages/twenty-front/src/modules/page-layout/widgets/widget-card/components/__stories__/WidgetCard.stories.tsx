@@ -37,8 +37,38 @@ export const Framed: Story = {
 
     await expect(
       cardStyle.getPropertyValue('--record-card-background-color').trim(),
-    ).toBe(cardStyle.getPropertyValue('--t-background-secondary').trim());
+    ).toBe(cardStyle.getPropertyValue('--t-background-primary').trim());
     await expect(cardStyle.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  },
+};
+
+export const Bare: Story = {
+  args: {
+    isBare: true,
+  },
+  play: async ({ canvasElement }) => {
+    const card = within(canvasElement).getByTestId('widget-card');
+    const cardStyle = getComputedStyle(card);
+
+    await expect(cardStyle.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(cardStyle.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(
+      cardStyle.getPropertyValue('--widget-card-content-overflow').trim(),
+    ).toBe('visible');
+  },
+};
+
+export const BareWhileEditing: Story = {
+  args: {
+    isBare: true,
+    isEditable: true,
+  },
+  play: async ({ canvasElement }) => {
+    const card = within(canvasElement).getByTestId('widget-card');
+    const cardStyle = getComputedStyle(card);
+
+    await expect(cardStyle.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    await expect(cardStyle.borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
   },
 };
 

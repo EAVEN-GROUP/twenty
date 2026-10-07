@@ -6,6 +6,7 @@ import { isWidgetCardFlushInViewMode } from '@/page-layout/widgets/utils/isWidge
 
 type WidgetCardStyledProps = {
   variant: WidgetCardVariant;
+  isBare?: boolean;
   isEditable: boolean;
   isEditing: boolean;
   isDragging: boolean;
@@ -14,24 +15,41 @@ type WidgetCardStyledProps = {
   hasClickHandler: boolean;
 };
 
+const isBareInViewMode = (
+  props: Pick<WidgetCardStyledProps, 'isBare' | 'isEditable'>,
+) => props.isBare === true && !props.isEditable;
+
 const computeBorderColor = (
   props: Pick<
     WidgetCardStyledProps,
-    'variant' | 'isEditable' | 'isEditing' | 'isDragging'
+    'variant' | 'isBare' | 'isEditable' | 'isEditing' | 'isDragging'
   >,
 ): string => {
   if (props.isEditable && (props.isEditing || props.isDragging)) {
     return themeCssVariables.color.blue;
   }
-  if (props.variant === 'framed') {
-    return themeCssVariables.border.color.light;
+  if (props.variant === 'framed' && !isBareInViewMode(props)) {
+    return themeCssVariables.border.color.medium;
   }
   return 'transparent';
 };
 
-const shouldUseSecondaryBackground = (
-  props: Pick<WidgetCardStyledProps, 'variant' | 'isEditable' | 'isDragging'>,
-) => (props.isEditable && props.isDragging) || props.variant === 'framed';
+type WidgetCardBackground = 'primary' | 'secondary' | 'none';
+
+const computeCardBackground = (
+  props: Pick<
+    WidgetCardStyledProps,
+    'variant' | 'isBare' | 'isEditable' | 'isDragging'
+  >,
+): WidgetCardBackground => {
+  if (props.isEditable && props.isDragging) {
+    return 'secondary';
+  }
+  if (isBareInViewMode(props)) {
+    return 'none';
+  }
+  return props.variant === 'framed' ? 'primary' : 'none';
+};
 
 // The card is the single owner of how far its header and body are inset:
 // WidgetCardHeader and WidgetCardContent both read these, widget bodies never
@@ -51,15 +69,24 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
     if (props.isEditable && props.isDragging) {
       return `linear-gradient(0deg, ${themeCssVariables.background.transparent.lighter} 0%, ${themeCssVariables.background.transparent.lighter} 100%), ${themeCssVariables.background.secondary}`;
     }
-    return shouldUseSecondaryBackground(props)
-      ? themeCssVariables.background.secondary
+    return computeCardBackground(props) === 'primary'
+      ? themeCssVariables.background.primary
       : 'transparent';
   }};
 
   // Declared only when the card actually paints a surface, so a transparent
   // card leaves the layout container's value in place for its content to read.
-  &[data-secondary-background='true'] {
+  &[data-card-background='primary'] {
+    --record-card-background-color: ${themeCssVariables.background.primary};
+  }
+
+  &[data-card-background='secondary'] {
     --record-card-background-color: ${themeCssVariables.background.secondary};
+  }
+
+  // A bare card has no frame to clip against, so a glow or shadow may spill out.
+  &[data-bare='true'] {
+    --widget-card-content-overflow: visible;
   }
 
   border: ${(props) =>
@@ -67,10 +94,12 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
       ? `1px solid ${computeBorderColor(props)}`
       : 'none'};
 
-  border-radius: ${({ variant, isEditable }) =>
-    variant === 'framed' || isEditable
-      ? themeCssVariables.border.radius.md
-      : '0'};
+  border-radius: ${({ variant, isEditable }) => {
+    if (variant === 'framed') {
+      return themeCssVariables.border.radius.lg;
+    }
+    return isEditable ? themeCssVariables.border.radius.md : '0';
+  }};
 
   box-sizing: border-box;
 
@@ -117,6 +146,7 @@ const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
 
 export type WidgetCardProps = {
   variant: WidgetCardVariant;
+  isBare?: boolean;
   isEditable: boolean;
   isEditing: boolean;
   isDragging: boolean;
@@ -133,6 +163,7 @@ export type WidgetCardProps = {
 
 export const WidgetCard = ({
   variant,
+  isBare,
   isEditable,
   isEditing,
   isDragging,
@@ -149,14 +180,17 @@ export const WidgetCard = ({
   return (
     <StyledWidgetCard
       variant={variant}
+      isBare={isBare}
       isEditable={isEditable}
       isEditing={isEditing}
       isDragging={isDragging}
       isResizing={isResizing}
       headerLess={headerLess}
       hasClickHandler={isDefined(onClick)}
-      data-secondary-background={shouldUseSecondaryBackground({
+      data-bare={isBareInViewMode({ isBare, isEditable })}
+      data-card-background={computeCardBackground({
         variant,
+        isBare,
         isEditable,
         isDragging,
       })}

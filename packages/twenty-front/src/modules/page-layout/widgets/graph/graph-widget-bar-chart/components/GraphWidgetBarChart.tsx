@@ -252,6 +252,9 @@ export const GraphWidgetBarChart = ({
 
   return (
     <StyledContainer id={id}>
+      {showLegend && data.length > 0 && keys.length > 0 && (
+        <GraphWidgetLegend items={legendItems} placement="top-right" show />
+      )}
       <GraphWidgetChartContainer
         ref={containerRef}
         $isClickable={hasClickableItems}
@@ -310,9 +313,6 @@ export const GraphWidgetBarChart = ({
         onMouseLeave={handleTooltipMouseLeave}
         onSliceClick={onSliceClick}
       />
-      {showLegend && data.length > 0 && keys.length > 0 && (
-        <GraphWidgetLegend items={legendItems} show />
-      )}
     </StyledContainer>
   );
 };

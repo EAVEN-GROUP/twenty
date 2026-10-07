@@ -50,7 +50,9 @@ export const useChartSettingsValues = ({
     configuration.__typename === 'LineChartConfiguration';
 
   const hasColorProperty =
-    isBarOrLineChart || configuration.__typename === 'PieChartConfiguration';
+    isBarOrLineChart ||
+    configuration.__typename === 'PieChartConfiguration' ||
+    configuration.__typename === 'AggregateChartConfiguration';
 
   const isPieChart = configuration.__typename === 'PieChartConfiguration';
 
@@ -251,6 +253,10 @@ export const useChartSettingsValues = ({
         return isPieChart
           ? (configuration.showCenterMetric ?? true)
           : undefined;
+      case CHART_CONFIGURATION_SETTING_IDS.DISPLAY_AS_PODIUM:
+        return configuration.__typename === 'BarChartConfiguration'
+          ? (configuration.displayAsPodium ?? false)
+          : false;
       case CHART_CONFIGURATION_SETTING_IDS.STACKED_BARS:
         return configuration.__typename === 'BarChartConfiguration'
           ? configuration.groupMode !== 'GROUPED'

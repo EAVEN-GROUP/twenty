@@ -32,6 +32,7 @@ const StyledNoAccessContainer = styled.div`
 type WidgetCardShellProps = {
   widget: PageLayoutWidget;
   variant: WidgetCardVariant;
+  isBare?: boolean;
   isEditable: boolean;
   isEditing: boolean;
   isDragging: boolean;
@@ -48,6 +49,7 @@ type WidgetCardShellProps = {
 export const WidgetCardShell = ({
   widget,
   variant,
+  isBare,
   isEditable,
   isEditing,
   isDragging,
@@ -84,6 +86,7 @@ export const WidgetCardShell = ({
       <WidgetCard
         headerLess={!showHeader}
         variant={variant}
+        isBare={isBare}
         isEditable={isEditable}
         onClick={onClick}
         isEditing={isEditing}

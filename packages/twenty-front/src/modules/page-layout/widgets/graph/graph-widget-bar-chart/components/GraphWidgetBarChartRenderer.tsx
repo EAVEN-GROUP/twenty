@@ -1,3 +1,4 @@
+import { GraphWidgetBarChartPodiumRenderer } from '@/page-layout/widgets/graph/graph-widget-bar-chart/components/GraphWidgetBarChartPodiumRenderer';
 import { useIsPageLayoutInEditMode } from '@/page-layout/hooks/useIsPageLayoutInEditMode';
 import { PageLayoutWidgetErrorDisplay } from '@/page-layout/widgets/components/PageLayoutWidgetErrorDisplay';
 import { WidgetSkeletonLoader } from '@/page-layout/widgets/components/WidgetSkeletonLoader';
@@ -28,7 +29,7 @@ const GraphWidgetBarChart = lazy(() =>
   ),
 );
 
-export const GraphWidgetBarChartRenderer = () => {
+const GraphWidgetBarChartStandardRenderer = () => {
   const widget = useCurrentWidget();
 
   assertBarChartWidgetOrThrow(widget);
@@ -165,5 +166,17 @@ export const GraphWidgetBarChartRenderer = () => {
         }
       />
     </Suspense>
+  );
+};
+
+export const GraphWidgetBarChartRenderer = () => {
+  const widget = useCurrentWidget();
+
+  assertBarChartWidgetOrThrow(widget);
+
+  return widget.configuration.displayAsPodium === true ? (
+    <GraphWidgetBarChartPodiumRenderer />
+  ) : (
+    <GraphWidgetBarChartStandardRenderer />
   );
 };

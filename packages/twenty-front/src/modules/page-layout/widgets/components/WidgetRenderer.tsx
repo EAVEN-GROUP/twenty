@@ -15,6 +15,7 @@ export const WidgetRenderer = ({ widget }: WidgetRendererProps) => {
     <WidgetCardShell
       widget={widget}
       variant={state.variant}
+      isBare={state.isBare}
       isEditable={isWidgetEditable}
       isEditing={state.isEditing}
       isDragging={state.isDragging}

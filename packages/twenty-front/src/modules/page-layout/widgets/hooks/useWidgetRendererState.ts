@@ -9,6 +9,7 @@ import { pageLayoutResizingWidgetIdComponentState } from '@/page-layout/states/p
 import { type PageLayoutWidget } from '@/page-layout/types/PageLayoutWidget';
 import { useWidgetPermissions } from '@/page-layout/widgets/hooks/useWidgetPermissions';
 import { widgetCardHoveredComponentFamilyState } from '@/page-layout/widgets/states/widgetCardHoveredComponentFamilyState';
+import { isPodiumWidget } from '@/page-layout/widgets/utils/isPodiumWidget';
 import { getWidgetCardVariant } from '@/page-layout/widgets/utils/getWidgetCardVariant';
 import { getWidgetHeaderActionDefinition } from '@/page-layout/widgets/utils/getWidgetHeaderActionDefinition';
 import { useOpenWidgetSettingsInSidePanel } from '@/side-panel/hooks/useOpenWidgetSettingsInSidePanel';
@@ -94,8 +95,11 @@ export const useWidgetRendererState = (widget: PageLayoutWidget) => {
     pageLayoutType: currentPageLayout.type,
   });
 
+  const isBare = isPodiumWidget(widget);
+
   return {
     isPageLayoutInEditMode,
+    isBare,
     isEditing,
     isDragging,
     isResizing,

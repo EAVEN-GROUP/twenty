@@ -1,6 +1,7 @@
 import { PageLayoutWidgetErrorDisplay } from '@/page-layout/widgets/components/PageLayoutWidgetErrorDisplay';
 import { WidgetSkeletonLoader } from '@/page-layout/widgets/components/WidgetSkeletonLoader';
 import { useGraphWidgetAggregateQuery } from '@/page-layout/widgets/graph/hooks/useGraphWidgetAggregateQuery';
+import { parseGraphColor } from '@/page-layout/widgets/graph/utils/parseGraphColor';
 import { assertAggregateChartWidgetOrThrow } from '@/page-layout/widgets/graph/utils/assertAggregateChartWidget';
 import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
 import { lazy, Suspense } from 'react';
@@ -38,6 +39,7 @@ export const GraphWidgetAggregateChartRenderer = () => {
         value={value ?? '-'}
         prefix={widget.configuration.prefix ?? undefined}
         suffix={widget.configuration.suffix ?? undefined}
+        color={parseGraphColor(widget.configuration.color)}
       />
     </Suspense>
   );

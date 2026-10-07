@@ -24,8 +24,11 @@ export type GraphWidgetLegendItem = {
   color: string;
 };
 
+type GraphWidgetLegendPlacement = 'bottom-center' | 'top-right';
+
 type GraphWidgetLegendProps = {
   items: GraphWidgetLegendItem[];
+  placement?: GraphWidgetLegendPlacement;
   show?: boolean;
 };
 
@@ -43,25 +46,30 @@ const StyledLegendMotionWrapperBase = styled.div`
 `;
 const StyledLegendMotionWrapper = motion.create(StyledLegendMotionWrapperBase);
 
-const StyledItemsWrapperBase = styled.div<{ centered?: boolean }>`
+const StyledItemsWrapperBase = styled.div<{ justification: string }>`
   display: flex;
   flex: 1;
   flex-wrap: nowrap;
   gap: ${themeCssVariables.spacing[3]};
-  justify-content: ${({ centered }) => (centered ? 'center' : 'flex-start')};
+  justify-content: ${({ justification }) => justification};
   min-width: 0;
 `;
 const StyledItemsWrapper = motion.create(StyledItemsWrapperBase);
 
-const StyledLegendContainer = styled.div<{ needsPagination: boolean }>`
+const StyledLegendContainer = styled.div<{
+  justification: string;
+  placement: GraphWidgetLegendPlacement;
+}>`
   align-items: center;
   display: flex;
   flex-wrap: nowrap;
   gap: ${themeCssVariables.spacing[3]};
-  justify-content: ${({ needsPagination }) =>
-    needsPagination ? 'flex-start' : 'center'};
+  justify-content: ${({ justification }) => justification};
   overflow: hidden;
-  padding-top: ${themeCssVariables.spacing[3]};
+  padding-bottom: ${({ placement }) =>
+    placement === 'top-right' ? themeCssVariables.spacing[3] : '0'};
+  padding-top: ${({ placement }) =>
+    placement === 'top-right' ? '0' : themeCssVariables.spacing[3]};
   width: 100%;
 `;
 
@@ -116,23 +124,42 @@ const StyledPaginationIndicator = styled.span`
   font-size: ${themeCssVariables.font.size.xs};
 `;
 
-const legendEnterExitVariants = {
-  hidden: {
-    y: 10,
-    opacity: 0,
-  },
-  visible: {
-    y: 0,
-    opacity: 1,
-  },
-  exit: {
-    y: 10,
-    opacity: 0,
-  },
+const getLegendEnterExitVariants = (placement: GraphWidgetLegendPlacement) => {
+  const offsetY = placement === 'top-right' ? -10 : 10;
+
+  return {
+    hidden: {
+      y: offsetY,
+      opacity: 0,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+    exit: {
+      y: offsetY,
+      opacity: 0,
+    },
+  };
+};
+
+const computeLegendJustification = ({
+  needsPagination,
+  placement,
+}: {
+  needsPagination: boolean;
+  placement: GraphWidgetLegendPlacement;
+}) => {
+  if (needsPagination) {
+    return 'flex-start';
+  }
+
+  return placement === 'top-right' ? 'flex-end' : 'center';
 };
 
 export const GraphWidgetLegend = ({
   items,
+  placement = 'bottom-center',
   show = true,
 }: GraphWidgetLegendProps) => {
   const { theme } = useContext(ThemeContext);
@@ -192,6 +219,10 @@ export const GraphWidgetLegend = ({
   );
 
   const needsPagination = items.length > itemsPerPage;
+  const justification = computeLegendJustification({
+    needsPagination,
+    placement,
+  });
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const safeCurrentPage = Math.min(currentPage, Math.max(0, totalPages - 1));
 
@@ -230,7 +261,7 @@ export const GraphWidgetLegend = ({
     <AnimatePresence mode="popLayout" initial={false}>
       {shouldShowLegend && (
         <StyledLegendMotionWrapper
-          variants={legendEnterExitVariants}
+          variants={getLegendEnterExitVariants(placement)}
           initial="hidden"
           animate="visible"
           exit="exit"
@@ -241,7 +272,8 @@ export const GraphWidgetLegend = ({
         >
           <StyledLegendContainer
             ref={containerRef}
-            needsPagination={needsPagination}
+            justification={justification}
+            placement={placement}
           >
             <NodeDimensionEffect
               elementRef={containerRef}
@@ -296,7 +328,7 @@ export const GraphWidgetLegend = ({
                     duration: theme.animation.duration.normal,
                     ease: 'easeInOut',
                   }}
-                  centered={!needsPagination}
+                  justification={justification}
                 >
                   {visibleItems.map((item) => {
                     const isHidden = graphWidgetHiddenLegendIds.includes(

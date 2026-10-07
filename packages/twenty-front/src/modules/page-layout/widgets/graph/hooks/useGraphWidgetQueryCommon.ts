@@ -1,6 +1,7 @@
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { flattenedFieldMetadataItemsSelector } from '@/object-metadata/states/flattenedFieldMetadataItemsSelector';
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
+import { useDashboardPeriodScopedChartConfiguration } from '@/page-layout/hooks/useDashboardPeriodScopedChartConfiguration';
 import { dropChartRecordFiltersWithDeletedFields } from '@/side-panel/pages/page-layout/utils/dropChartRecordFiltersWithDeletedFields';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import {
@@ -29,6 +30,11 @@ export const useGraphWidgetQueryCommon = ({
     objectId: objectMetadataItemId,
   });
 
+  const periodScopedConfiguration = useDashboardPeriodScopedChartConfiguration({
+    objectMetadataItemId,
+    configuration,
+  });
+
   const aggregateFieldId = configuration.aggregateFieldMetadataId;
 
   const aggregateField = objectMetadataItem.readableFields.find(
@@ -53,7 +59,7 @@ export const useGraphWidgetQueryCommon = ({
 
   const { recordFilters: sanitizedRecordFilters } =
     dropChartRecordFiltersWithDeletedFields({
-      chartFilters: configuration.filter ?? {},
+      chartFilters: periodScopedConfiguration.filter ?? {},
       validFieldMetadataIds: objectFieldMetadataIds,
     });
 
@@ -61,7 +67,8 @@ export const useGraphWidgetQueryCommon = ({
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
     recordFilters: sanitizedRecordFilters ?? [],
-    recordFilterGroups: configuration.filter?.recordFilterGroups ?? [],
+    recordFilterGroups:
+      periodScopedConfiguration.filter?.recordFilterGroups ?? [],
   });
 
   return {

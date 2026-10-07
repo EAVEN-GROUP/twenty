@@ -5,7 +5,8 @@ type BarChartStyleFields =
   | 'displayLegend'
   | 'axisNameDisplay'
   | 'description'
-  | 'color';
+  | 'color'
+  | 'displayAsPodium';
 
 export type BarChartDataConfiguration = Omit<
   BarChartConfiguration,
@@ -21,6 +22,7 @@ export const extractBarChartDataConfiguration = (
     axisNameDisplay: _axisNameDisplay,
     description: _description,
     color: _color,
+    displayAsPodium: _displayAsPodium,
     ...dataConfiguration
   } = configuration;
 

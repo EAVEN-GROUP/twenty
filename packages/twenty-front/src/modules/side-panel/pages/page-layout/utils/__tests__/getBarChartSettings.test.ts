@@ -15,6 +15,7 @@ import { OMIT_NULL_VALUES_SETTING } from '@/side-panel/pages/page-layout/constan
 import { PRIMARY_SORT_BY_SETTING } from '@/side-panel/pages/page-layout/constants/settings/PrimarySortBySetting';
 import { RANGE_MAX_SETTING } from '@/side-panel/pages/page-layout/constants/settings/RangeMaxSetting';
 import { RANGE_MIN_SETTING } from '@/side-panel/pages/page-layout/constants/settings/RangeMinSetting';
+import { DISPLAY_AS_PODIUM_SETTING } from '@/side-panel/pages/page-layout/constants/settings/DisplayAsPodiumSetting';
 import { SHOW_LEGEND_SETTING } from '@/side-panel/pages/page-layout/constants/settings/ShowLegendSetting';
 import { SORT_BY_GROUP_BY_FIELD_SETTING } from '@/side-panel/pages/page-layout/constants/settings/SortByGroupByFieldSetting';
 import { STACKED_BARS_SETTING } from '@/side-panel/pages/page-layout/constants/settings/StackedBarsSetting';
@@ -159,6 +160,7 @@ describe('getBarChartSettings', () => {
         DATA_LABELS_SETTING,
         FORMAT_SETTING,
         SHOW_LEGEND_SETTING,
+        DISPLAY_AS_PODIUM_SETTING,
       ]);
     });
   });
