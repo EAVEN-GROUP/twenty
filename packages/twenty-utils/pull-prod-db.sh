@@ -160,6 +160,10 @@ cleared_signing_keys="$(local_psql -d "$LOCAL_DB_NAME" -tAc 'WITH removed AS (DE
 cleared_two_factor_methods="$(local_psql -d "$LOCAL_DB_NAME" -tAc 'WITH removed AS (DELETE FROM core."twoFactorAuthenticationMethod" RETURNING 1) SELECT count(*) FROM removed;')"
 info "Removed $cleared_signing_keys signing key(s) and $cleared_two_factor_methods 2FA method(s)"
 
+# With no 2FA methods left, a workspace that enforces 2FA would force a new setup at login.
+relaxed_workspaces="$(local_psql -d "$LOCAL_DB_NAME" -tAc 'WITH updated AS (UPDATE core."workspace" SET "isTwoFactorAuthenticationEnforced" = false WHERE "isTwoFactorAuthenticationEnforced" RETURNING 1) SELECT count(*) FROM updated;')"
+info "Turned off enforced 2FA on $relaxed_workspaces local workspace(s)"
+
 if [ -n "$dev_login_email" ]; then
   info "Setting a local-only password for $dev_login_email"
   # Same algorithm and cost as hashPassword in auth.util.ts, so the server accepts it.
