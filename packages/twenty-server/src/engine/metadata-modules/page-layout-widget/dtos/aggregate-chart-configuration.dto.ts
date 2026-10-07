@@ -66,6 +66,11 @@ export class AggregateChartConfigurationDTO implements AggregateChartConfigurati
   @IsOptional()
   description?: string;
 
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  color?: string;
+
   @Field(() => GraphQLJSON, { nullable: true })
   @IsObject()
   @IsOptional()

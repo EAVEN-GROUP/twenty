@@ -1059,6 +1059,7 @@ type AggregateChartConfiguration {
   displayDataLabel: Boolean
   numberFormat: ChartNumberFormat
   description: String
+  color: String
   filter: JSON
   timezone: String
   firstDayOfTheWeek: Int
@@ -1228,6 +1229,7 @@ type BarChartConfiguration {
   groupMode: BarChartGroupMode
   layout: BarChartLayout!
   isCumulative: Boolean
+  displayAsPodium: Boolean
   timezone: String
   firstDayOfTheWeek: Int
 }

@@ -65,6 +65,7 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
         groupMode
         layout
         isCumulative
+        displayAsPodium
         splitMultiValueFields
         timezone
         firstDayOfTheWeek
@@ -128,6 +129,7 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
         displayDataLabel
         numberFormat
         description
+        color
         filter
         prefix
         suffix

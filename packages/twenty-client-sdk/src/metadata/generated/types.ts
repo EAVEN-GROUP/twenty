@@ -2104,6 +2104,9 @@ export default {
             "description": [
                 1
             ],
+            "color": [
+                1
+            ],
             "filter": [
                 9
             ],
@@ -2384,6 +2387,9 @@ export default {
                 101
             ],
             "isCumulative": [
+                8
+            ],
+            "displayAsPodium": [
                 8
             ],
             "timezone": [

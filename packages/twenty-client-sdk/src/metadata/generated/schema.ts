@@ -757,6 +757,7 @@ export interface AggregateChartConfiguration {
     displayDataLabel?: Scalars['Boolean']
     numberFormat?: ChartNumberFormat
     description?: Scalars['String']
+    color?: Scalars['String']
     filter?: Scalars['JSON']
     timezone?: Scalars['String']
     firstDayOfTheWeek?: Scalars['Int']
@@ -879,6 +880,7 @@ export interface BarChartConfiguration {
     groupMode?: BarChartGroupMode
     layout: BarChartLayout
     isCumulative?: Scalars['Boolean']
+    displayAsPodium?: Scalars['Boolean']
     timezone?: Scalars['String']
     firstDayOfTheWeek?: Scalars['Int']
     __typename: 'BarChartConfiguration'
@@ -4252,6 +4254,7 @@ export interface AggregateChartConfigurationGenqlSelection{
     displayDataLabel?: boolean | number
     numberFormat?: boolean | number
     description?: boolean | number
+    color?: boolean | number
     filter?: boolean | number
     timezone?: boolean | number
     firstDayOfTheWeek?: boolean | number
@@ -4361,6 +4364,7 @@ export interface BarChartConfigurationGenqlSelection{
     groupMode?: boolean | number
     layout?: boolean | number
     isCumulative?: boolean | number
+    displayAsPodium?: boolean | number
     timezone?: boolean | number
     firstDayOfTheWeek?: boolean | number
     __typename?: boolean | number

@@ -185,6 +185,11 @@ export class BarChartConfigurationDTO implements BarChartConfiguration {
   @IsOptional()
   isCumulative?: boolean;
 
+  @Field(() => Boolean, { nullable: true })
+  @IsBoolean()
+  @IsOptional()
+  displayAsPodium?: boolean;
+
   @Field(() => String, { nullable: true, defaultValue: 'UTC' })
   @IsTimeZone()
   @IsOptional()

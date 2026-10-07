@@ -61,6 +61,7 @@ export type BarChartConfiguration = BaseChartConfiguration & {
   groupMode?: string;
   layout?: string;
   isCumulative?: boolean;
+  displayAsPodium?: boolean;
 };
 
 export type LineChartConfiguration = BaseChartConfiguration & {
