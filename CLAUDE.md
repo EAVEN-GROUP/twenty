@@ -26,6 +26,7 @@ Longer-form guides remain in `.cursor/rules/` (from the Cursor era).
 ```bash
 bash packages/twenty-utils/setup-dev-env.sh   # Postgres/Redis + DB init; only for tasks needing a running app
 yarn start                                    # front + server + worker
+bash packages/twenty-utils/pull-prod-db.sh    # replace the local DB with a prod dump (stop yarn start first; --help for --dev-login)
 
 npx jest path/to/file.spec.ts --config=packages/<pkg>/jest.config.mjs   # single test file (preferred)
 npx nx test twenty-server                     # package unit tests (same for twenty-front, ...)
