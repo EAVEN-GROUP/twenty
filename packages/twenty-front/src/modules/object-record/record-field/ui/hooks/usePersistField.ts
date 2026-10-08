@@ -1,6 +1,8 @@
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 
+import { createMeetingModalState } from '@/meetings/states/createMeetingModalState';
+import { shouldPromptMeetingForStatusChange } from '@/meetings/utils/shouldPromptMeetingForStatusChange';
 import { type FieldDefinition } from '@/object-record/record-field/ui/types/FieldDefinition';
 import {
   type FieldMetadata,
@@ -281,6 +283,17 @@ export const usePersistField = ({
           recordStoreFamilySelector.selectorFamily({ recordId, fieldName }),
           valueToPersist,
         );
+
+        if (
+          shouldPromptMeetingForStatusChange({
+            objectNameSingular: objectMetadataItem.nameSingular,
+            fieldName,
+            previousValue: currentValue,
+            nextValue: valueToPersist,
+          })
+        ) {
+          store.set(createMeetingModalState.atom, { personId: recordId });
+        }
       } else {
         throw new Error(
           `Invalid value to persist: ${JSON.stringify(

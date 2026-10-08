@@ -1,5 +1,7 @@
 import { type ReactNode, useCallback, useContext } from 'react';
 
+import { PersonMeetingsPanel } from '@/meetings/components/PersonMeetingsPanel';
+import { isPersonMeetingsField } from '@/meetings/utils/isPersonMeetingsField';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { getFieldMetadataItemById } from '@/object-metadata/utils/getFieldMetadataItemById';
@@ -235,12 +237,14 @@ export const RecordDetailRelationSectionDropdownToMany = ({
     return null;
   }
 
+  const isPersonMeetings = isPersonMeetingsField(fieldDefinition);
+
   return (
     <Dropdown
       dropdownId={dropdownId}
       dropdownPlacement="left-start"
       onClose={handleCloseRelationPickerDropdown}
-      onOpen={handleOpenRelationPickerDropdown}
+      onOpen={isPersonMeetings ? undefined : handleOpenRelationPickerDropdown}
       clickableComponent={
         dropdownTriggerClickableComponent ?? (
           <LightIconButton
@@ -251,28 +255,35 @@ export const RecordDetailRelationSectionDropdownToMany = ({
         )
       }
       dropdownComponents={
-        <MultipleRecordPicker
-          focusId={dropdownId}
-          componentInstanceId={dropdownId}
-          onCreate={
-            isJunctionRelation || isDefined(createNewRecordAndOpenSidePanel)
-              ? handleCreateNew
-              : undefined
-          }
-          isCreatePending={isCreatingJunctionRecord}
-          onChange={handleChange}
-          onSubmit={() => {
-            closeDropdown(dropdownId);
-          }}
-          onClickOutside={() => {
-            closeDropdown(dropdownId);
-          }}
-          layoutDirection={
-            dropdownPlacement?.includes('end')
-              ? 'search-bar-on-bottom'
-              : 'search-bar-on-top'
-          }
-        />
+        isPersonMeetings ? (
+          <PersonMeetingsPanel
+            personId={recordId}
+            onClose={() => closeDropdown(dropdownId)}
+          />
+        ) : (
+          <MultipleRecordPicker
+            focusId={dropdownId}
+            componentInstanceId={dropdownId}
+            onCreate={
+              isJunctionRelation || isDefined(createNewRecordAndOpenSidePanel)
+                ? handleCreateNew
+                : undefined
+            }
+            isCreatePending={isCreatingJunctionRecord}
+            onChange={handleChange}
+            onSubmit={() => {
+              closeDropdown(dropdownId);
+            }}
+            onClickOutside={() => {
+              closeDropdown(dropdownId);
+            }}
+            layoutDirection={
+              dropdownPlacement?.includes('end')
+                ? 'search-bar-on-bottom'
+                : 'search-bar-on-top'
+            }
+          />
+        )
       }
     />
   );

@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 
+import { PersonMeetingsFieldDisplay } from '@/meetings/components/PersonMeetingsFieldDisplay';
+import { isPersonMeetingsField } from '@/meetings/utils/isPersonMeetingsField';
 import { ActorFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/ActorFieldDisplay';
 import { ArrayFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/ArrayFieldDisplay';
 import { BooleanFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/BooleanFieldDisplay';
@@ -76,6 +78,8 @@ export const FieldDisplay = () => {
     <ChipFieldDisplay />
   ) : isFieldRelationManyToOne(fieldDefinition) ? (
     <RelationToOneFieldDisplay />
+  ) : isPersonMeetingsField(fieldDefinition) ? (
+    <PersonMeetingsFieldDisplay />
   ) : isFieldRelationOneToMany(fieldDefinition) ? (
     <RelationFromManyFieldDisplay />
   ) : isFieldMorphRelationManyToOne(fieldDefinition) ? (

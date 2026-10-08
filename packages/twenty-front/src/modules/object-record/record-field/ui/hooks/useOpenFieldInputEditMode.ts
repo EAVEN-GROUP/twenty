@@ -1,3 +1,4 @@
+import { isPersonMeetingsField } from '@/meetings/utils/isPersonMeetingsField';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { useOpenJunctionRelationFieldInput } from '@/object-record/record-field/ui/hooks/useOpenJunctionRelationFieldInput';
@@ -144,7 +145,10 @@ export const useOpenFieldInputEditMode = () => {
         return;
       }
 
-      if (isFieldRelationOneToMany(fieldDefinition)) {
+      if (
+        isFieldRelationOneToMany(fieldDefinition) &&
+        !isPersonMeetingsField(fieldDefinition)
+      ) {
         if (
           isDefined(fieldDefinition.metadata.relationObjectMetadataNameSingular)
         ) {

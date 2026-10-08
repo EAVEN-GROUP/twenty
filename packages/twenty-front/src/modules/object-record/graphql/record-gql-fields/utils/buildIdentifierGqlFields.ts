@@ -1,3 +1,4 @@
+import { getMeetingDateGqlFields } from '@/meetings/utils/getMeetingDateGqlFields';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { getImageIdentifierFieldMetadataItem } from '@/object-metadata/utils/getImageIdentifierFieldMetadataItem';
 import { getLabelIdentifierFieldMetadataItem } from '@/object-metadata/utils/getLabelIdentifierFieldMetadataItem';
@@ -26,5 +27,6 @@ export const buildIdentifierGqlFields = (
     ...(isDefined(imageIdentifierField) && {
       [imageIdentifierField.name]: true,
     }),
+    ...getMeetingDateGqlFields(objectMetadata),
   };
 };

@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 
+import { PersonMeetingsFieldInput } from '@/meetings/components/PersonMeetingsFieldInput';
+import { isPersonMeetingsField } from '@/meetings/utils/isPersonMeetingsField';
 import { AddressFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/AddressFieldInput';
 import { DateFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/DateFieldInput';
 import { EmailsFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/EmailsFieldInput';
@@ -54,6 +56,8 @@ export const FieldInput = () => {
     <>
       {isFieldRelationManyToOne(fieldDefinition) ? (
         <RelationManyToOneFieldInput />
+      ) : isPersonMeetingsField(fieldDefinition) ? (
+        <PersonMeetingsFieldInput />
       ) : isFieldRelationOneToMany(fieldDefinition) ? (
         <RelationOneToManyFieldInput />
       ) : isFieldMorphRelationManyToOne(fieldDefinition) ? (

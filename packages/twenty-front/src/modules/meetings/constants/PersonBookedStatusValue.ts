@@ -1,0 +1,1 @@
+export const PERSON_BOOKED_STATUS_VALUE = 'BOOKED';
