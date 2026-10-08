@@ -1,1 +1,1 @@
-export type DashboardPeriod = 'TODAY' | 'WEEK' | 'MONTH' | 'ALL';
+export type DashboardPeriod = 'TODAY' | 'WEEK' | 'MONTH' | 'ALL' | 'CUSTOM';

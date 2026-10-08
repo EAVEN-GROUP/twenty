@@ -1,5 +1,6 @@
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { DASHBOARD_PERIOD_DATE_FIELD_NAME_BY_OBJECT_NAME_SINGULAR } from '@/page-layout/constants/DashboardPeriodDateFieldNameByObjectNameSingular';
+import { pageLayoutCustomPeriodComponentState } from '@/page-layout/states/pageLayoutCustomPeriodComponentState';
 import { pageLayoutPeriodComponentState } from '@/page-layout/states/pageLayoutPeriodComponentState';
 import { mergeDashboardPeriodIntoChartFilter } from '@/page-layout/utils/mergeDashboardPeriodIntoChartFilter';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
@@ -22,6 +23,10 @@ export const useDashboardPeriodScopedChartConfiguration = <
 }: UseDashboardPeriodScopedChartConfigurationParams<TConfiguration>): TConfiguration => {
   const pageLayoutPeriod = useAtomComponentStateValue(
     pageLayoutPeriodComponentState,
+  );
+
+  const pageLayoutCustomPeriod = useAtomComponentStateValue(
+    pageLayoutCustomPeriodComponentState,
   );
 
   const { objectMetadataItem } = useObjectMetadataItemById({
@@ -59,11 +64,13 @@ export const useDashboardPeriodScopedChartConfiguration = <
         period: pageLayoutPeriod,
         dateField: { id: dateField.id, type: dateField.type },
         timezone,
+        customPeriod: pageLayoutCustomPeriod,
       }),
     };
   }, [
     configuration,
     dateField,
+    pageLayoutCustomPeriod,
     pageLayoutPeriod,
     shouldApplyDashboardPeriod,
     timezone,

@@ -5,4 +5,5 @@ export const DASHBOARD_PERIODS: DashboardPeriod[] = [
   'WEEK',
   'MONTH',
   'ALL',
+  'CUSTOM',
 ];
