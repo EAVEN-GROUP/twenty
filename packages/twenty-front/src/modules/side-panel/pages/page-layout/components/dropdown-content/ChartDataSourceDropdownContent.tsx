@@ -96,6 +96,7 @@ export const ChartDataSourceDropdownContent = () => {
           groupByFieldMetadataId: undefined,
           groupBySubFieldName: undefined,
           filter: {},
+          secondSeriesFilter: undefined,
           ratioAggregateConfig: undefined,
         },
       });

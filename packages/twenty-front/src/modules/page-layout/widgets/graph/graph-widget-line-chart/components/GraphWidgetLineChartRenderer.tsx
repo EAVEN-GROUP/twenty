@@ -8,6 +8,7 @@ import { assertLineChartWidgetOrThrow } from '@/page-layout/widgets/graph/utils/
 import { buildChartDrilldownQueryParams } from '@/page-layout/widgets/graph/utils/buildChartDrilldownQueryParams';
 import { generateChartAggregateFilterKey } from '@/page-layout/widgets/graph/utils/generateChartAggregateFilterKey';
 import { getChartValueFormatOptions } from '@/page-layout/widgets/graph/utils/getChartValueFormatOptions';
+import { hasChartSecondSeries } from '@/page-layout/widgets/graph/utils/hasChartSecondSeries';
 import { isFilteredViewRedirectionSupported } from '@/page-layout/widgets/graph/utils/isFilteredViewRedirectionSupported';
 import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
 import { useUserFirstDayOfTheWeek } from '@/ui/input/components/internal/date/hooks/useUserFirstDayOfTheWeek';
@@ -113,9 +114,14 @@ export const GraphWidgetLineChartRenderer = () => {
     const xValue = (point.data as LineChartDataPoint).x;
     const rawValue = formattedToRawLookup.get(xValue as string) ?? null;
 
+    const isSecondSeriesPoint =
+      hasChartSecondSeries(configuration) && point.seriesId === series[1]?.key;
+
     const queryParams = buildChartDrilldownQueryParams({
       objectMetadataItem,
-      configuration,
+      configuration: isSecondSeriesPoint
+        ? { ...configuration, filter: configuration.secondSeriesFilter }
+        : configuration,
       clickedData: {
         primaryBucketRawValue: rawValue,
       },

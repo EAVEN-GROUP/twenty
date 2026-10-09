@@ -27,7 +27,13 @@ type ColorOption = {
   colorName: ThemeColor | 'auto';
 };
 
-export const ChartColorSelectionDropdownContent = () => {
+type ChartColorSelectionDropdownContentProps = {
+  colorConfigKey?: 'color' | 'secondSeriesColor';
+};
+
+export const ChartColorSelectionDropdownContent = ({
+  colorConfigKey = 'color',
+}: ChartColorSelectionDropdownContentProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { pageLayoutId } = usePageLayoutIdFromContextStore();
   const { widgetInEditMode } = useWidgetInEditMode(pageLayoutId);
@@ -81,7 +87,12 @@ export const ChartColorSelectionDropdownContent = () => {
     return null;
   }
 
-  const currentColor = configuration.color;
+  const currentColor =
+    colorConfigKey === 'color'
+      ? configuration.color
+      : isBarOrLineChart
+        ? configuration.secondSeriesColor
+        : undefined;
 
   const colorOptions: ColorOption[] = [
     {
@@ -105,7 +116,7 @@ export const ChartColorSelectionDropdownContent = () => {
   const handleSelectColor = (colorName: ThemeColor | 'auto') => {
     updateCurrentWidgetConfig({
       configToUpdate: {
-        color: colorName,
+        [colorConfigKey]: colorName,
       },
     });
     closeDropdown();

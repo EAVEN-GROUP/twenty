@@ -19,6 +19,10 @@ export const SIDE_PANEL_SUB_PAGES_CONFIG = new Map<
   React.ReactNode
 >([
   [SidePanelSubPages.PageLayoutGraphFilter, <SidePanelChartFilterSubPage />],
+  [
+    SidePanelSubPages.PageLayoutGraphSecondSeriesFilter,
+    <SidePanelChartFilterSubPage filterConfigKey="secondSeriesFilter" />,
+  ],
   [SidePanelSubPages.PageLayoutFieldsLayout, <SidePanelFieldsLayoutSubPage />],
   [SidePanelSubPages.NewSidebarItemMainMenu, <SidePanelNewSidebarItemPage />],
   [

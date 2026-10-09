@@ -7,6 +7,7 @@ import { type RawDimensionValue } from '@/page-layout/widgets/graph/types/RawDim
 import { determineChartItemColor } from '@/page-layout/widgets/graph/utils/determineChartItemColor';
 import { determineGraphColorMode } from '@/page-layout/widgets/graph/utils/determineGraphColorMode';
 import { extractLineChartDataConfiguration } from '@/page-layout/widgets/graph/utils/extractLineChartDataConfiguration';
+import { hasChartSecondSeries } from '@/page-layout/widgets/graph/utils/hasChartSecondSeries';
 import { parseGraphColor } from '@/page-layout/widgets/graph/utils/parseGraphColor';
 import { useQuery } from '@apollo/client/react';
 import { useMemo } from 'react';
@@ -88,17 +89,32 @@ export const useGraphLineChartWidgetData = ({
 
   const configurationColor = parseGraphColor(configuration.color);
 
-  const colorMode = determineGraphColorMode({
-    configurationColor,
-    selectFieldOptions,
-  });
+  const hasSecondSeries = hasChartSecondSeries(configuration);
+
+  const secondSeriesColor = parseGraphColor(configuration.secondSeriesColor);
+
+  // With two series each one carries its own color, so the single color mode
+  // (shades of one color) must not apply.
+  const colorMode = hasSecondSeries
+    ? 'automaticPalette'
+    : determineGraphColorMode({
+        configurationColor,
+        selectFieldOptions,
+      });
 
   const series = queryData?.lineChartData?.series?.map(
-    (seriesItem: LineChartSeries): LineChartSeriesWithColor => {
+    (
+      seriesItem: LineChartSeries,
+      seriesIndex: number,
+    ): LineChartSeriesWithColor => {
       const rawValue = formattedToRawLookup.get(seriesItem.key);
 
+      const isSecondSeries = hasSecondSeries && seriesIndex === 1;
+
       const itemColor = determineChartItemColor({
-        configurationColor,
+        configurationColor: isSecondSeries
+          ? secondSeriesColor
+          : configurationColor,
         selectOptions: selectFieldOptions,
         rawValue: isString(rawValue) ? rawValue : undefined,
       });

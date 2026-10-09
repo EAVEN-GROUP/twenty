@@ -9,6 +9,7 @@ import { type RawDimensionValue } from '@/page-layout/widgets/graph/types/RawDim
 import { determineChartItemColor } from '@/page-layout/widgets/graph/utils/determineChartItemColor';
 import { determineGraphColorMode } from '@/page-layout/widgets/graph/utils/determineGraphColorMode';
 import { extractBarChartDataConfiguration } from '@/page-layout/widgets/graph/utils/extractBarChartDataConfiguration';
+import { hasChartSecondSeries } from '@/page-layout/widgets/graph/utils/hasChartSecondSeries';
 import { parseGraphColor } from '@/page-layout/widgets/graph/utils/parseGraphColor';
 import { useQuery } from '@apollo/client/react';
 import { isString } from '@sniptt/guards';
@@ -126,18 +127,33 @@ export const useGraphBarChartWidgetData = ({
 
   const configurationColor = parseGraphColor(configuration.color);
 
-  const colorMode = determineGraphColorMode({
-    configurationColor,
-    selectFieldOptions,
-  });
+  const hasSecondSeries = hasChartSecondSeries(configuration);
+
+  const secondSeriesColor = parseGraphColor(configuration.secondSeriesColor);
+
+  // With two series each one carries its own color, so the single color mode
+  // (shades of one color) must not apply.
+  const colorMode = hasSecondSeries
+    ? 'automaticPalette'
+    : determineGraphColorMode({
+        configurationColor,
+        selectFieldOptions,
+      });
 
   const series = effectiveQueryData?.barChartData?.series?.map(
-    (seriesItem: BarChartSeries): BarChartSeriesWithColor => {
+    (
+      seriesItem: BarChartSeries,
+      seriesIndex: number,
+    ): BarChartSeriesWithColor => {
       const rawValue = formattedToRawLookup.get(seriesItem.key);
 
+      const isSecondSeries = hasSecondSeries && seriesIndex === 1;
+
       const itemColor = determineChartItemColor({
-        configurationColor,
-        selectOptions: selectFieldOptions,
+        configurationColor: isSecondSeries
+          ? secondSeriesColor
+          : configurationColor,
+        selectOptions: hasSecondSeries ? null : selectFieldOptions,
         rawValue: isString(rawValue) ? rawValue : undefined,
       });
 

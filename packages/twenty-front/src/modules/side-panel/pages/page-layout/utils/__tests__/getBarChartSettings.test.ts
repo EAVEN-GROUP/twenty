@@ -65,11 +65,12 @@ describe('getBarChartSettings', () => {
     it('should have all expected groups in correct order', () => {
       const result = getBarChartSettings(BarChartLayout.VERTICAL);
 
-      expect(result).toHaveLength(4);
+      expect(result).toHaveLength(5);
       expect(result[0].heading).toBe(CHART_SETTINGS_HEADINGS.DATA);
-      expect(result[1].heading).toBe(CHART_SETTINGS_HEADINGS.X_AXIS);
-      expect(result[2].heading).toBe(CHART_SETTINGS_HEADINGS.Y_AXIS);
-      expect(result[3].heading).toBe(CHART_SETTINGS_HEADINGS.STYLE);
+      expect(result[1].heading).toBe(CHART_SETTINGS_HEADINGS.SERIES);
+      expect(result[2].heading).toBe(CHART_SETTINGS_HEADINGS.X_AXIS);
+      expect(result[3].heading).toBe(CHART_SETTINGS_HEADINGS.Y_AXIS);
+      expect(result[4].heading).toBe(CHART_SETTINGS_HEADINGS.STYLE);
     });
   });
 
@@ -114,11 +115,12 @@ describe('getBarChartSettings', () => {
     it('should have all expected groups in correct order', () => {
       const result = getBarChartSettings(BarChartLayout.HORIZONTAL);
 
-      expect(result).toHaveLength(4);
+      expect(result).toHaveLength(5);
       expect(result[0].heading).toBe(CHART_SETTINGS_HEADINGS.DATA);
-      expect(result[1].heading).toBe(CHART_SETTINGS_HEADINGS.X_AXIS);
-      expect(result[2].heading).toBe(CHART_SETTINGS_HEADINGS.Y_AXIS);
-      expect(result[3].heading).toBe(CHART_SETTINGS_HEADINGS.STYLE);
+      expect(result[1].heading).toBe(CHART_SETTINGS_HEADINGS.SERIES);
+      expect(result[2].heading).toBe(CHART_SETTINGS_HEADINGS.X_AXIS);
+      expect(result[3].heading).toBe(CHART_SETTINGS_HEADINGS.Y_AXIS);
+      expect(result[4].heading).toBe(CHART_SETTINGS_HEADINGS.STYLE);
     });
   });
 

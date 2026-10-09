@@ -4,6 +4,7 @@ import { type ChartSettingsItem } from '@/side-panel/pages/page-layout/types/Cha
 import { isWidgetConfigurationOfType } from '@/side-panel/pages/page-layout/utils/isWidgetConfigurationOfType';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { isFieldRelation } from '@/object-record/record-field/ui/types/guards/isFieldRelation';
+import { hasChartSecondSeries } from '@/page-layout/widgets/graph/utils/hasChartSecondSeries';
 import { isRelationNestedFieldDateKind } from '@/page-layout/widgets/graph/utils/isRelationNestedFieldDateKind';
 import { isNonEmptyString } from '@sniptt/guards';
 import {
@@ -56,6 +57,32 @@ export const shouldHideChartSetting = (
   const dependsOnGroupBy = item?.dependsOn?.includes(
     CHART_CONFIGURATION_SETTING_IDS.GROUP_BY,
   );
+
+  if (
+    isDefined(configuration) &&
+    (isWidgetConfigurationOfType(configuration, 'BarChartConfiguration') ||
+      isWidgetConfigurationOfType(configuration, 'LineChartConfiguration'))
+  ) {
+    const isSecondSeriesStyleSetting =
+      item.id === CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_LABEL ||
+      item.id === CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_COLOR;
+
+    const isSeriesSetting =
+      isSecondSeriesStyleSetting ||
+      item.id === CHART_CONFIGURATION_SETTING_IDS.SERIES_LABEL ||
+      item.id === CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_FILTER;
+
+    if (
+      isSeriesSetting &&
+      isDefined(configuration.secondaryAxisGroupByFieldMetadataId)
+    ) {
+      return true;
+    }
+
+    if (isSecondSeriesStyleSetting && !hasChartSecondSeries(configuration)) {
+      return true;
+    }
+  }
 
   if (isDefined(configuration) && isDefined(objectMetadataItem)) {
     const isBarOrLineChart =

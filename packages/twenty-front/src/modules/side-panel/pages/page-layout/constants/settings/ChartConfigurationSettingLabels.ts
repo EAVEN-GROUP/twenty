@@ -32,4 +32,8 @@ export const CHART_CONFIGURATION_SETTING_LABELS = {
   CUMULATIVE: msg`Cumulative`,
   SPLIT_MULTI_VALUE_FIELDS_X: msg`Split multiple values`,
   SPLIT_MULTI_VALUE_FIELDS_Y: msg`Split multiple values`,
+  SERIES_LABEL: msg`Series name`,
+  SECOND_SERIES_FILTER: msg`Second series filter`,
+  SECOND_SERIES_LABEL: msg`Second series name`,
+  SECOND_SERIES_COLOR: msg`Second series color`,
 };

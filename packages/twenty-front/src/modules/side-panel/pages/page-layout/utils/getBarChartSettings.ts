@@ -21,6 +21,7 @@ import { SORT_BY_GROUP_BY_FIELD_SETTING } from '@/side-panel/pages/page-layout/c
 import { SPLIT_MULTI_VALUE_FIELDS_X_SETTING } from '@/side-panel/pages/page-layout/constants/settings/SplitMultiValueFieldsXSetting';
 import { SPLIT_MULTI_VALUE_FIELDS_Y_SETTING } from '@/side-panel/pages/page-layout/constants/settings/SplitMultiValueFieldsYSetting';
 import { STACKED_BARS_SETTING } from '@/side-panel/pages/page-layout/constants/settings/StackedBarsSetting';
+import { SERIES_CHART_SETTINGS } from '@/side-panel/pages/page-layout/constants/SeriesChartSettings';
 import { type ChartSettingsGroup } from '@/side-panel/pages/page-layout/types/ChartSettingsGroup';
 import { IconAxisX, IconAxisY } from 'twenty-ui/icon';
 import { BarChartLayout } from '~/generated-metadata/graphql';
@@ -60,6 +61,7 @@ export const getBarChartSettings = (
       heading: CHART_SETTINGS_HEADINGS.DATA,
       items: [CHART_DATA_SOURCE_SETTING, FILTER_SETTING],
     },
+    SERIES_CHART_SETTINGS,
     {
       heading: CHART_SETTINGS_HEADINGS.X_AXIS,
       items: xAxisItems,

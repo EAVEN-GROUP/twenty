@@ -156,6 +156,10 @@ export const ChartSettings = ({ widget }: { widget: PageLayoutWidget }) => {
               ),
           );
 
+          if (visibleItems.length === 0) {
+            return null;
+          }
+
           const shouldShowBanner = group.heading.id === bannerTargetHeading.id;
 
           return (

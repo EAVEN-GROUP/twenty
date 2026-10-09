@@ -79,10 +79,20 @@ export const ChartSettingItem = ({
     });
   };
 
+  const isSecondSeriesFilterItem =
+    item.id === CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_FILTER;
+
   const handleFilterClick = () => {
-    navigateToSidePanelSubPage(SidePanelSubPages.PageLayoutGraphFilter);
+    navigateToSidePanelSubPage(
+      isSecondSeriesFilterItem
+        ? SidePanelSubPages.PageLayoutGraphSecondSeriesFilter
+        : SidePanelSubPages.PageLayoutGraphFilter,
+    );
   };
-  if (item.id === CHART_CONFIGURATION_SETTING_IDS.FILTER) {
+  if (
+    item.id === CHART_CONFIGURATION_SETTING_IDS.FILTER ||
+    isSecondSeriesFilterItem
+  ) {
     const filterValue = getChartSettingsValues(item.id);
     const filterDescription = isString(filterValue) ? filterValue : undefined;
 

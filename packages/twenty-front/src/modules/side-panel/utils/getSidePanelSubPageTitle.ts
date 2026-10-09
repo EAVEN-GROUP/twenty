@@ -8,6 +8,8 @@ export const getSidePanelSubPageTitle = (
   switch (subPage) {
     case SidePanelSubPages.PageLayoutGraphFilter:
       return t`Filters`;
+    case SidePanelSubPages.PageLayoutGraphSecondSeriesFilter:
+      return t`Second series filter`;
     case SidePanelSubPages.PageLayoutFieldsLayout:
       return t`Layout`;
     case SidePanelSubPages.PageLayoutRecordTableFilter:

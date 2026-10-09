@@ -159,6 +159,19 @@ export const useChartSettingsValues = ({
         })
       : undefined;
 
+  const getFilterRulesCountLabel = (
+    filter: Parameters<typeof getChartFilterRulesCount>[0],
+  ) => {
+    const filterRulesCount = getChartFilterRulesCount(filter);
+
+    return filterRulesCount > 0
+      ? plural(filterRulesCount, {
+          one: `${filterRulesCount} rule`,
+          other: `${filterRulesCount} rules`,
+        })
+      : undefined;
+  };
+
   const getChartSettingsValues = (
     itemId: CHART_CONFIGURATION_SETTING_IDS,
   ): boolean | string | undefined => {
@@ -240,15 +253,20 @@ export const useChartSettingsValues = ({
         return groupByOrderByLabel;
       case CHART_CONFIGURATION_SETTING_IDS.DATA_LABELS:
         return configuration.displayDataLabel ?? undefined;
-      case CHART_CONFIGURATION_SETTING_IDS.FILTER: {
-        const filterRulesCount = getChartFilterRulesCount(configuration.filter);
-        return filterRulesCount > 0
-          ? plural(filterRulesCount, {
-              one: `${filterRulesCount} rule`,
-              other: `${filterRulesCount} rules`,
-            })
+      case CHART_CONFIGURATION_SETTING_IDS.FILTER:
+        return getFilterRulesCountLabel(configuration.filter);
+      case CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_FILTER:
+        return isBarOrLineChart
+          ? getFilterRulesCountLabel(configuration.secondSeriesFilter)
           : undefined;
-      }
+      case CHART_CONFIGURATION_SETTING_IDS.SERIES_LABEL:
+        return isBarOrLineChart ? (configuration.seriesLabel ?? '') : '';
+      case CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_LABEL:
+        return isBarOrLineChart ? (configuration.secondSeriesLabel ?? '') : '';
+      case CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_COLOR:
+        return isBarOrLineChart && isDefined(configuration.secondSeriesColor)
+          ? capitalize(configuration.secondSeriesColor)
+          : undefined;
       case CHART_CONFIGURATION_SETTING_IDS.CENTER_METRIC:
         return isPieChart
           ? (configuration.showCenterMetric ?? true)

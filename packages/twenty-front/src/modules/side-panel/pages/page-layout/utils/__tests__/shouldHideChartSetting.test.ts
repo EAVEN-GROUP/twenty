@@ -636,4 +636,82 @@ describe('shouldHideChartSetting', () => {
       expect(resultY).toBe(true);
     });
   });
+  describe('series settings visibility', () => {
+    const secondSeriesFilter = {
+      recordFilters: [{ id: 'status-filter', fieldMetadataId: 'status-id' }],
+    };
+
+    const buildSeriesItem = (
+      id: CHART_CONFIGURATION_SETTING_IDS,
+    ): ChartSettingsItem => ({
+      id,
+      label: msg`Series setting`,
+      Icon: IconChartBar,
+      isBoolean: false,
+    });
+
+    const seriesLabelItem = buildSeriesItem(
+      CHART_CONFIGURATION_SETTING_IDS.SERIES_LABEL,
+    );
+    const secondSeriesFilterItem = buildSeriesItem(
+      CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_FILTER,
+    );
+    const secondSeriesLabelItem = buildSeriesItem(
+      CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_LABEL,
+    );
+    const secondSeriesColorItem = buildSeriesItem(
+      CHART_CONFIGURATION_SETTING_IDS.SECOND_SERIES_COLOR,
+    );
+
+    const isHidden = (
+      item: ChartSettingsItem,
+      configuration: Record<string, unknown>,
+    ) =>
+      shouldHideChartSetting(
+        item,
+        'object-id',
+        false,
+        configuration as ChartConfiguration,
+      );
+
+    it('should hide the second series name and color until a second filter exists', () => {
+      const lineChartConfig = { __typename: 'LineChartConfiguration' };
+
+      expect(isHidden(seriesLabelItem, lineChartConfig)).toBe(false);
+      expect(isHidden(secondSeriesFilterItem, lineChartConfig)).toBe(false);
+      expect(isHidden(secondSeriesLabelItem, lineChartConfig)).toBe(true);
+      expect(isHidden(secondSeriesColorItem, lineChartConfig)).toBe(true);
+    });
+
+    it('should show every series setting once the second filter has a rule', () => {
+      const barChartConfig = {
+        __typename: 'BarChartConfiguration',
+        secondSeriesFilter,
+      };
+
+      expect(isHidden(seriesLabelItem, barChartConfig)).toBe(false);
+      expect(isHidden(secondSeriesFilterItem, barChartConfig)).toBe(false);
+      expect(isHidden(secondSeriesLabelItem, barChartConfig)).toBe(false);
+      expect(isHidden(secondSeriesColorItem, barChartConfig)).toBe(false);
+    });
+
+    it('should hide every series setting when the chart is grouped on its secondary axis', () => {
+      const groupedLineChartConfig = {
+        __typename: 'LineChartConfiguration',
+        secondaryAxisGroupByFieldMetadataId: 'owner-field-id',
+        secondSeriesFilter,
+      };
+
+      expect(isHidden(seriesLabelItem, groupedLineChartConfig)).toBe(true);
+      expect(isHidden(secondSeriesFilterItem, groupedLineChartConfig)).toBe(
+        true,
+      );
+      expect(isHidden(secondSeriesLabelItem, groupedLineChartConfig)).toBe(
+        true,
+      );
+      expect(isHidden(secondSeriesColorItem, groupedLineChartConfig)).toBe(
+        true,
+      );
+    });
+  });
 });

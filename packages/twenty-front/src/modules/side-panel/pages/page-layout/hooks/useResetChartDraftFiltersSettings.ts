@@ -1,3 +1,4 @@
+import { CHART_FILTER_CONFIG_KEYS } from '@/side-panel/pages/page-layout/constants/ChartFilterConfigKeys';
 import { usePageLayoutIdFromContextStore } from '@/side-panel/pages/page-layout/hooks/usePageLayoutIdFromContextStore';
 import { useWidgetInEditMode } from '@/side-panel/pages/page-layout/hooks/useWidgetInEditMode';
 import { getChartFiltersSettingsInstanceId } from '@/side-panel/pages/page-layout/utils/getChartFiltersSettingsInstanceId';
@@ -21,35 +22,40 @@ export const useResetChartDraftFiltersSettings = () => {
         return;
       }
 
-      const { instanceId } = getChartFiltersSettingsInstanceId({
-        widgetId: widgetInEditMode.id,
-        objectMetadataItemId: objectMetadataItemId,
-      });
+      for (const filterConfigKey of CHART_FILTER_CONFIG_KEYS) {
+        const { instanceId } = getChartFiltersSettingsInstanceId({
+          widgetId: widgetInEditMode.id,
+          objectMetadataItemId: objectMetadataItemId,
+          filterConfigKey,
+        });
 
-      store.set(
-        hasInitializedCurrentRecordFilterGroupsComponentFamilyState.atomFamily({
-          familyKey: {},
-          instanceId,
-        }),
-        false,
-      );
+        store.set(
+          hasInitializedCurrentRecordFilterGroupsComponentFamilyState.atomFamily(
+            {
+              familyKey: {},
+              instanceId,
+            },
+          ),
+          false,
+        );
 
-      store.set(
-        hasInitializedCurrentRecordFiltersComponentFamilyState.atomFamily({
-          familyKey: {},
-          instanceId,
-        }),
-        false,
-      );
+        store.set(
+          hasInitializedCurrentRecordFiltersComponentFamilyState.atomFamily({
+            familyKey: {},
+            instanceId,
+          }),
+          false,
+        );
 
-      store.set(
-        currentRecordFiltersComponentState.atomFamily({ instanceId }),
-        [],
-      );
-      store.set(
-        currentRecordFilterGroupsComponentState.atomFamily({ instanceId }),
-        [],
-      );
+        store.set(
+          currentRecordFiltersComponentState.atomFamily({ instanceId }),
+          [],
+        );
+        store.set(
+          currentRecordFilterGroupsComponentState.atomFamily({ instanceId }),
+          [],
+        );
+      }
     },
     [widgetInEditMode, store],
   );

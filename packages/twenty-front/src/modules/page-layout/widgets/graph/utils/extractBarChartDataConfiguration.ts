@@ -6,6 +6,7 @@ type BarChartStyleFields =
   | 'axisNameDisplay'
   | 'description'
   | 'color'
+  | 'secondSeriesColor'
   | 'displayAsPodium';
 
 export type BarChartDataConfiguration = Omit<
@@ -22,6 +23,7 @@ export const extractBarChartDataConfiguration = (
     axisNameDisplay: _axisNameDisplay,
     description: _description,
     color: _color,
+    secondSeriesColor: _secondSeriesColor,
     displayAsPodium: _displayAsPodium,
     ...dataConfiguration
   } = configuration;

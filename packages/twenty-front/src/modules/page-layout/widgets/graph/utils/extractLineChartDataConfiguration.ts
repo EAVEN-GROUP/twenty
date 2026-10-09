@@ -5,7 +5,8 @@ type LineChartStyleFields =
   | 'displayLegend'
   | 'axisNameDisplay'
   | 'description'
-  | 'color';
+  | 'color'
+  | 'secondSeriesColor';
 
 export type LineChartDataConfiguration = Omit<
   LineChartConfiguration,
@@ -21,6 +22,7 @@ export const extractLineChartDataConfiguration = (
     axisNameDisplay: _axisNameDisplay,
     description: _description,
     color: _color,
+    secondSeriesColor: _secondSeriesColor,
     ...dataConfiguration
   } = configuration;
 

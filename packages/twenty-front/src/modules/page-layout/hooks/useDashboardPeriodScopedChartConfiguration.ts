@@ -2,7 +2,8 @@ import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMeta
 import { DASHBOARD_PERIOD_DATE_FIELD_NAME_BY_OBJECT_NAME_SINGULAR } from '@/page-layout/constants/DashboardPeriodDateFieldNameByObjectNameSingular';
 import { pageLayoutCustomPeriodComponentState } from '@/page-layout/states/pageLayoutCustomPeriodComponentState';
 import { pageLayoutPeriodComponentState } from '@/page-layout/states/pageLayoutPeriodComponentState';
-import { mergeDashboardPeriodIntoChartFilter } from '@/page-layout/utils/mergeDashboardPeriodIntoChartFilter';
+import { type DashboardPeriodScopableChartConfiguration } from '@/page-layout/types/DashboardPeriodScopableChartConfiguration';
+import { mergeDashboardPeriodIntoChartConfiguration } from '@/page-layout/utils/mergeDashboardPeriodIntoChartConfiguration';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useMemo } from 'react';
@@ -15,7 +16,7 @@ type UseDashboardPeriodScopedChartConfigurationParams<TConfiguration> = {
 };
 
 export const useDashboardPeriodScopedChartConfiguration = <
-  TConfiguration extends { filter?: unknown; timezone?: string | null },
+  TConfiguration extends DashboardPeriodScopableChartConfiguration,
 >({
   objectMetadataItemId,
   configuration,
@@ -55,18 +56,13 @@ export const useDashboardPeriodScopedChartConfiguration = <
       return configuration;
     }
 
-    return {
-      ...configuration,
-      filter: mergeDashboardPeriodIntoChartFilter({
-        chartFilter: configuration.filter as Parameters<
-          typeof mergeDashboardPeriodIntoChartFilter
-        >[0]['chartFilter'],
-        period: pageLayoutPeriod,
-        dateField: { id: dateField.id, type: dateField.type },
-        timezone,
-        customPeriod: pageLayoutCustomPeriod,
-      }),
-    };
+    return mergeDashboardPeriodIntoChartConfiguration({
+      configuration,
+      period: pageLayoutPeriod,
+      dateField: { id: dateField.id, type: dateField.type },
+      timezone,
+      customPeriod: pageLayoutCustomPeriod,
+    });
   }, [
     configuration,
     dateField,
