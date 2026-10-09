@@ -837,6 +837,10 @@ export interface LineChartConfiguration {
     filter?: Scalars['JSON']
     isStacked?: Scalars['Boolean']
     isCumulative?: Scalars['Boolean']
+    seriesLabel?: Scalars['String']
+    secondSeriesFilter?: Scalars['JSON']
+    secondSeriesLabel?: Scalars['String']
+    secondSeriesColor?: Scalars['String']
     timezone?: Scalars['String']
     firstDayOfTheWeek?: Scalars['Int']
     __typename: 'LineChartConfiguration'
@@ -881,6 +885,10 @@ export interface BarChartConfiguration {
     layout: BarChartLayout
     isCumulative?: Scalars['Boolean']
     displayAsPodium?: Scalars['Boolean']
+    seriesLabel?: Scalars['String']
+    secondSeriesFilter?: Scalars['JSON']
+    secondSeriesLabel?: Scalars['String']
+    secondSeriesColor?: Scalars['String']
     timezone?: Scalars['String']
     firstDayOfTheWeek?: Scalars['Int']
     __typename: 'BarChartConfiguration'
@@ -4323,6 +4331,10 @@ export interface LineChartConfigurationGenqlSelection{
     filter?: boolean | number
     isStacked?: boolean | number
     isCumulative?: boolean | number
+    seriesLabel?: boolean | number
+    secondSeriesFilter?: boolean | number
+    secondSeriesLabel?: boolean | number
+    secondSeriesColor?: boolean | number
     timezone?: boolean | number
     firstDayOfTheWeek?: boolean | number
     __typename?: boolean | number
@@ -4365,6 +4377,10 @@ export interface BarChartConfigurationGenqlSelection{
     layout?: boolean | number
     isCumulative?: boolean | number
     displayAsPodium?: boolean | number
+    seriesLabel?: boolean | number
+    secondSeriesFilter?: boolean | number
+    secondSeriesLabel?: boolean | number
+    secondSeriesColor?: boolean | number
     timezone?: boolean | number
     firstDayOfTheWeek?: boolean | number
     __typename?: boolean | number

@@ -190,6 +190,26 @@ export class BarChartConfigurationDTO implements BarChartConfiguration {
   @IsOptional()
   displayAsPodium?: boolean;
 
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  seriesLabel?: string;
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  @IsObject()
+  @IsOptional()
+  secondSeriesFilter?: ChartFilter;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  secondSeriesLabel?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  secondSeriesColor?: string;
+
   @Field(() => String, { nullable: true, defaultValue: 'UTC' })
   @IsTimeZone()
   @IsOptional()

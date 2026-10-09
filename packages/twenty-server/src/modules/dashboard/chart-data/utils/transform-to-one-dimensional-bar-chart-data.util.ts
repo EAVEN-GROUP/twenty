@@ -1,8 +1,10 @@
+import { isNonEmptyString } from '@sniptt/guards';
 import { CalendarStartDay } from 'twenty-shared/constants';
 import { FirstDayOfTheWeek } from 'twenty-shared/types';
 import {
   capitalize,
   convertCalendarStartDayNonIsoNumberToFirstDayOfTheWeek,
+  isDefined,
 } from 'twenty-shared/utils';
 
 import { FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
@@ -11,12 +13,15 @@ import { BarChartGroupMode } from 'src/engine/metadata-modules/page-layout-widge
 import { BarChartLayout } from 'src/engine/metadata-modules/page-layout-widget/enums/bar-chart-layout.enum';
 import { GraphOrderBy } from 'src/engine/metadata-modules/page-layout-widget/enums/graph-order-by.enum';
 import { BAR_CHART_MAXIMUM_NUMBER_OF_BARS } from 'src/modules/dashboard/chart-data/constants/bar-chart-maximum-number-of-bars.constant';
+import { CHART_SECOND_SERIES_DEFAULT_LABEL } from 'src/modules/dashboard/chart-data/constants/chart-second-series-default-label.constant';
+import { CHART_SECOND_SERIES_KEY } from 'src/modules/dashboard/chart-data/constants/chart-second-series-key.constant';
 import { BarChartDataDTO } from 'src/modules/dashboard/chart-data/dtos/bar-chart-data.dto';
 import { GroupByRawResult } from 'src/modules/dashboard/chart-data/types/group-by-raw-result.type';
 import { RelationLabelResolution } from 'src/modules/dashboard/chart-data/types/relation-label-resolution.type';
 import { applyCumulativeToOneDimensionalBarData } from 'src/modules/dashboard/chart-data/utils/apply-cumulative-to-one-dimensional-bar-data.util';
 import { applyGapFilling } from 'src/modules/dashboard/chart-data/utils/apply-gap-filling.util';
 import { buildFormattedToRawLookupDto } from 'src/modules/dashboard/chart-data/utils/build-formatted-to-raw-lookup-dto.util';
+import { buildSecondSeriesValues } from 'src/modules/dashboard/chart-data/utils/build-second-series-values.util';
 import { getAggregateOperationLabel } from 'src/modules/dashboard/chart-data/utils/get-aggregate-operation-label.util';
 import { getSelectOptions } from 'src/modules/dashboard/chart-data/utils/get-select-options.util';
 import { processOneDimensionalResults } from 'src/modules/dashboard/chart-data/utils/process-one-dimensional-results.util';
@@ -30,6 +35,7 @@ export const transformToOneDimensionalBarChartData = ({
   userTimezone,
   firstDayOfTheWeek,
   relationLabelResolution,
+  secondSeriesRawResults,
 }: {
   filteredRawResults: GroupByRawResult[];
   primaryAxisGroupByField: FlatFieldMetadata;
@@ -38,6 +44,7 @@ export const transformToOneDimensionalBarChartData = ({
   userTimezone: string;
   firstDayOfTheWeek: CalendarStartDay;
   relationLabelResolution: RelationLabelResolution | undefined;
+  secondSeriesRawResults?: GroupByRawResult[];
 }): BarChartDataDTO => {
   const layout = configuration.layout ?? BarChartLayout.VERTICAL;
   const isHorizontal = layout === BarChartLayout.HORIZONTAL;
@@ -106,17 +113,41 @@ export const transformToOneDimensionalBarChartData = ({
     ? applyCumulativeToOneDimensionalBarData(limitedSortedData)
     : limitedSortedData;
 
-  const data = transformedData.map((item) => ({
+  const secondSeriesValues = isDefined(secondSeriesRawResults)
+    ? buildSecondSeriesValues({
+        orderedRawDimensionValues: transformedData.map(
+          ({ rawValue }) => rawValue,
+        ),
+        secondSeriesRawResults,
+        isCumulative: configuration.isCumulative ?? false,
+      })
+    : undefined;
+
+  const data = transformedData.map((item, index) => ({
     [indexByKey]: item.formattedValue,
     [aggregateValueKey]: item.aggregateValue,
+    ...(isDefined(secondSeriesValues)
+      ? { [CHART_SECOND_SERIES_KEY]: secondSeriesValues[index] }
+      : {}),
   }));
 
   const series = [
     {
       key: aggregateValueKey,
-      label: aggregateField.label,
+      label: isNonEmptyString(configuration.seriesLabel)
+        ? configuration.seriesLabel
+        : aggregateField.label,
     },
   ];
+
+  if (isDefined(secondSeriesValues)) {
+    series.push({
+      key: CHART_SECOND_SERIES_KEY,
+      label: isNonEmptyString(configuration.secondSeriesLabel)
+        ? configuration.secondSeriesLabel
+        : CHART_SECOND_SERIES_DEFAULT_LABEL,
+    });
+  }
 
   const categoryLabel = primaryAxisGroupByField.label;
   const valueLabel = `${getAggregateOperationLabel(configuration.aggregateOperation)} of ${aggregateField.label}`;
@@ -127,7 +158,7 @@ export const transformToOneDimensionalBarChartData = ({
   return {
     data,
     indexBy: indexByKey,
-    keys: [aggregateValueKey],
+    keys: series.map(({ key }) => key),
     series,
     xAxisLabel,
     yAxisLabel,

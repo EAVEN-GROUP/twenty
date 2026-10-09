@@ -176,6 +176,7 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
         primaryAxisGroupByFieldMetadataId,
         secondaryAxisGroupByFieldMetadataId,
         filter,
+        secondSeriesFilter,
         ...rest
       } = configuration;
 
@@ -213,6 +214,11 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
           fieldMetadataUniversalIdentifierById,
           shouldThrowOnMissingIdentifier,
         }),
+        secondSeriesFilter: convertChartFilterToUniversalFilter({
+          filter: secondSeriesFilter,
+          fieldMetadataUniversalIdentifierById,
+          shouldThrowOnMissingIdentifier,
+        }),
       };
     }
 
@@ -222,6 +228,7 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
         primaryAxisGroupByFieldMetadataId,
         secondaryAxisGroupByFieldMetadataId,
         filter,
+        secondSeriesFilter,
         ...rest
       } = configuration;
 
@@ -256,6 +263,11 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
         secondaryAxisGroupByFieldMetadataUniversalIdentifier,
         filter: convertChartFilterToUniversalFilter({
           filter,
+          fieldMetadataUniversalIdentifierById,
+          shouldThrowOnMissingIdentifier,
+        }),
+        secondSeriesFilter: convertChartFilterToUniversalFilter({
+          filter: secondSeriesFilter,
           fieldMetadataUniversalIdentifierById,
           shouldThrowOnMissingIdentifier,
         }),

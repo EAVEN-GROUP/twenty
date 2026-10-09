@@ -167,6 +167,7 @@ export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
         primaryAxisGroupByFieldMetadataUniversalIdentifier,
         secondaryAxisGroupByFieldMetadataUniversalIdentifier,
         filter,
+        secondSeriesFilter,
         ...rest
       } = universalConfiguration;
 
@@ -201,6 +202,10 @@ export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
           filter,
           flatFieldMetadataMaps,
         }),
+        secondSeriesFilter: convertUniversalFilterToChartFilter({
+          filter: secondSeriesFilter,
+          flatFieldMetadataMaps,
+        }),
       };
     }
 
@@ -210,6 +215,7 @@ export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
         primaryAxisGroupByFieldMetadataUniversalIdentifier,
         secondaryAxisGroupByFieldMetadataUniversalIdentifier,
         filter,
+        secondSeriesFilter,
         ...rest
       } = universalConfiguration;
 
@@ -242,6 +248,10 @@ export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
         secondaryAxisGroupByFieldMetadataId,
         filter: convertUniversalFilterToChartFilter({
           filter,
+          flatFieldMetadataMaps,
+        }),
+        secondSeriesFilter: convertUniversalFilterToChartFilter({
+          filter: secondSeriesFilter,
           flatFieldMetadataMaps,
         }),
       };

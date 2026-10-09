@@ -2285,6 +2285,18 @@ export default {
             "isCumulative": [
                 8
             ],
+            "seriesLabel": [
+                1
+            ],
+            "secondSeriesFilter": [
+                9
+            ],
+            "secondSeriesLabel": [
+                1
+            ],
+            "secondSeriesColor": [
+                1
+            ],
             "timezone": [
                 1
             ],
@@ -2391,6 +2403,18 @@ export default {
             ],
             "displayAsPodium": [
                 8
+            ],
+            "seriesLabel": [
+                1
+            ],
+            "secondSeriesFilter": [
+                9
+            ],
+            "secondSeriesLabel": [
+                1
+            ],
+            "secondSeriesColor": [
+                1
             ],
             "timezone": [
                 1

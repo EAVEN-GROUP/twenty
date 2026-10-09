@@ -54,5 +54,17 @@ export const validateGraphFlatPageLayoutWidgetForUpdate = (
 
   errors.push(...chartFilterErrors);
 
+  const secondSeriesFilterErrors = validateChartFilter({
+    filter:
+      'secondSeriesFilter' in graphUniversalConfiguration
+        ? graphUniversalConfiguration.secondSeriesFilter
+        : undefined,
+    widgetTitle,
+    flatFieldMetadataMaps:
+      optimisticFlatEntityMapsAndRelatedFlatEntityMaps.flatFieldMetadataMaps,
+  });
+
+  errors.push(...secondSeriesFilterErrors);
+
   return errors;
 };

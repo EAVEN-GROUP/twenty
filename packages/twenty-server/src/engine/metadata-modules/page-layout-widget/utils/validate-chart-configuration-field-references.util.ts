@@ -228,8 +228,18 @@ export const validateChartConfigurationFieldReferencesOrThrow = ({
       break;
   }
 
-  if (isDefined(widgetConfiguration.filter?.recordFilters)) {
-    for (const recordFilter of widgetConfiguration.filter.recordFilters) {
+  const secondSeriesRecordFilters =
+    'secondSeriesFilter' in widgetConfiguration
+      ? (widgetConfiguration.secondSeriesFilter?.recordFilters ?? [])
+      : [];
+
+  const recordFiltersToValidate = [
+    ...(widgetConfiguration.filter?.recordFilters ?? []),
+    ...secondSeriesRecordFilters,
+  ];
+
+  if (recordFiltersToValidate.length > 0) {
+    for (const recordFilter of recordFiltersToValidate) {
       const filterField = findActiveFlatFieldMetadataById(
         recordFilter.fieldMetadataId,
         flatFieldMetadataMaps,

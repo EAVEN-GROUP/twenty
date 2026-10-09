@@ -1184,6 +1184,10 @@ type LineChartConfiguration {
   filter: JSON
   isStacked: Boolean
   isCumulative: Boolean
+  seriesLabel: String
+  secondSeriesFilter: JSON
+  secondSeriesLabel: String
+  secondSeriesColor: String
   timezone: String
   firstDayOfTheWeek: Int
 }
@@ -1230,6 +1234,10 @@ type BarChartConfiguration {
   layout: BarChartLayout!
   isCumulative: Boolean
   displayAsPodium: Boolean
+  seriesLabel: String
+  secondSeriesFilter: JSON
+  secondSeriesLabel: String
+  secondSeriesColor: String
   timezone: String
   firstDayOfTheWeek: Int
 }

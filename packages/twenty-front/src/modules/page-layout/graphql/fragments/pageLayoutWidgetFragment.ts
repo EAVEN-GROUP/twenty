@@ -66,6 +66,10 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
         layout
         isCumulative
         displayAsPodium
+        seriesLabel
+        secondSeriesFilter
+        secondSeriesLabel
+        secondSeriesColor
         splitMultiValueFields
         timezone
         firstDayOfTheWeek
@@ -96,6 +100,10 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
         filter
         isStacked
         isCumulative
+        seriesLabel
+        secondSeriesFilter
+        secondSeriesLabel
+        secondSeriesColor
         splitMultiValueFields
         timezone
         firstDayOfTheWeek

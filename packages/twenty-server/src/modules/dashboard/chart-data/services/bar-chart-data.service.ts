@@ -21,9 +21,11 @@ import {
 } from 'src/modules/dashboard/chart-data/exceptions/chart-data.exception';
 import { ChartDataQueryService } from 'src/modules/dashboard/chart-data/services/chart-data-query.service';
 import { ChartRelationLabelService } from 'src/modules/dashboard/chart-data/services/chart-relation-label.service';
+import { addMissingChartBuckets } from 'src/modules/dashboard/chart-data/utils/add-missing-chart-buckets.util';
 import { filterOutEmptyChartBuckets } from 'src/modules/dashboard/chart-data/utils/filter-out-empty-chart-buckets.util';
 import { filterOutUnresolvedRelationBuckets } from 'src/modules/dashboard/chart-data/utils/filter-out-unresolved-relation-buckets.util';
 import { getFieldMetadata } from 'src/modules/dashboard/chart-data/utils/get-field-metadata.util';
+import { hasChartSecondSeries } from 'src/modules/dashboard/chart-data/utils/has-chart-second-series.util';
 import { wrapChartDataQueryError } from 'src/modules/dashboard/chart-data/utils/wrap-chart-data-query-error.util';
 import { transformToOneDimensionalBarChartData } from 'src/modules/dashboard/chart-data/utils/transform-to-one-dimensional-bar-chart-data.util';
 import { transformToTwoDimensionalBarChartData } from 'src/modules/dashboard/chart-data/utils/transform-to-two-dimensional-bar-chart-data.util';
@@ -125,7 +127,7 @@ export class BarChartDataService {
       const { idByNameSingular: objectIdByNameSingular } =
         buildObjectIdByNameMaps(flatObjectMetadataMaps);
 
-      const rawResults = await this.chartDataQueryService.executeGroupByQuery({
+      const groupByQueryParams = {
         flatObjectMetadata,
         flatObjectMetadataMaps,
         flatFieldMetadataMaps,
@@ -135,7 +137,6 @@ export class BarChartDataService {
         groupBySubFieldName: configuration.primaryAxisGroupBySubFieldName,
         aggregateFieldMetadataId: configuration.aggregateFieldMetadataId,
         aggregateOperation: configuration.aggregateOperation,
-        filter: configuration.filter,
         dateGranularity: configuration.primaryAxisDateGranularity,
         userTimezone,
         firstDayOfTheWeek,
@@ -149,11 +150,37 @@ export class BarChartDataService {
           configuration.secondaryAxisGroupByDateGranularity,
         secondaryAxisOrderBy: configuration.secondaryAxisOrderBy,
         splitMultiValueFields: configuration.splitMultiValueFields,
+      };
+
+      const rawResults = await this.chartDataQueryService.executeGroupByQuery({
+        ...groupByQueryParams,
+        filter: configuration.filter,
       });
 
-      const filteredResults = filterOutEmptyChartBuckets({
-        rawResults,
-        shouldOmitEmptyBuckets: configuration.omitNullValues ?? false,
+      const secondSeriesRawResults = hasChartSecondSeries(configuration)
+        ? await this.chartDataQueryService.executeGroupByQuery({
+            ...groupByQueryParams,
+            filter: configuration.secondSeriesFilter,
+          })
+        : undefined;
+
+      const shouldOmitEmptyBuckets = configuration.omitNullValues ?? false;
+
+      const filteredSecondSeriesResults = isDefined(secondSeriesRawResults)
+        ? filterOutEmptyChartBuckets({
+            rawResults: secondSeriesRawResults,
+            shouldOmitEmptyBuckets,
+          })
+        : undefined;
+
+      // Buckets that only exist in the second series still need a point on
+      // the primary one, otherwise the two series would not share an axis.
+      const filteredResults = addMissingChartBuckets({
+        rawResults: filterOutEmptyChartBuckets({
+          rawResults,
+          shouldOmitEmptyBuckets,
+        }),
+        rawResultsWithExtraBuckets: filteredSecondSeriesResults ?? [],
       });
 
       const relationLabelResolutions =
@@ -203,6 +230,7 @@ export class BarChartDataService {
         userTimezone,
         firstDayOfTheWeek,
         relationLabelResolution: relationLabelResolutions.primary,
+        secondSeriesRawResults: filteredSecondSeriesResults,
       });
     } catch (error) {
       throw wrapChartDataQueryError(error, 'Bar chart data retrieval failed');

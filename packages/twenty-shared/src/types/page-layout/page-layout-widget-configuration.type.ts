@@ -62,6 +62,10 @@ export type BarChartConfiguration = BaseChartConfiguration & {
   layout?: string;
   isCumulative?: boolean;
   displayAsPodium?: boolean;
+  seriesLabel?: string;
+  secondSeriesFilter?: ChartFilter;
+  secondSeriesLabel?: string;
+  secondSeriesColor?: string;
 };
 
 export type LineChartConfiguration = BaseChartConfiguration & {
@@ -85,6 +89,10 @@ export type LineChartConfiguration = BaseChartConfiguration & {
   rangeMax?: number;
   isStacked?: boolean;
   isCumulative?: boolean;
+  seriesLabel?: string;
+  secondSeriesFilter?: ChartFilter;
+  secondSeriesLabel?: string;
+  secondSeriesColor?: string;
 };
 
 export type ViewConfiguration = {

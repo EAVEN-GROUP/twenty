@@ -21,9 +21,11 @@ import {
 } from 'src/modules/dashboard/chart-data/exceptions/chart-data.exception';
 import { ChartDataQueryService } from 'src/modules/dashboard/chart-data/services/chart-data-query.service';
 import { ChartRelationLabelService } from 'src/modules/dashboard/chart-data/services/chart-relation-label.service';
+import { addMissingChartBuckets } from 'src/modules/dashboard/chart-data/utils/add-missing-chart-buckets.util';
 import { filterOutEmptyChartBuckets } from 'src/modules/dashboard/chart-data/utils/filter-out-empty-chart-buckets.util';
 import { filterOutUnresolvedRelationBuckets } from 'src/modules/dashboard/chart-data/utils/filter-out-unresolved-relation-buckets.util';
 import { getFieldMetadata } from 'src/modules/dashboard/chart-data/utils/get-field-metadata.util';
+import { hasChartSecondSeries } from 'src/modules/dashboard/chart-data/utils/has-chart-second-series.util';
 import { buildLineChartSeriesIdPrefix } from 'src/modules/dashboard/chart-data/utils/build-line-chart-series-id-prefix.util';
 import { wrapChartDataQueryError } from 'src/modules/dashboard/chart-data/utils/wrap-chart-data-query-error.util';
 import { transformToOneDimensionalLineChartData } from 'src/modules/dashboard/chart-data/utils/transform-to-one-dimensional-line-chart-data.util';
@@ -128,7 +130,7 @@ export class LineChartDataService {
       const { idByNameSingular: objectIdByNameSingular } =
         buildObjectIdByNameMaps(flatObjectMetadataMaps);
 
-      const rawResults = await this.chartDataQueryService.executeGroupByQuery({
+      const groupByQueryParams = {
         flatObjectMetadata,
         flatObjectMetadataMaps,
         flatFieldMetadataMaps,
@@ -138,7 +140,6 @@ export class LineChartDataService {
         groupBySubFieldName: configuration.primaryAxisGroupBySubFieldName,
         aggregateFieldMetadataId: configuration.aggregateFieldMetadataId,
         aggregateOperation: configuration.aggregateOperation,
-        filter: configuration.filter,
         dateGranularity: configuration.primaryAxisDateGranularity,
         userTimezone,
         firstDayOfTheWeek,
@@ -152,16 +153,42 @@ export class LineChartDataService {
           configuration.secondaryAxisGroupByDateGranularity,
         secondaryAxisOrderBy: configuration.secondaryAxisOrderBy,
         splitMultiValueFields: configuration.splitMultiValueFields,
+      };
+
+      const rawResults = await this.chartDataQueryService.executeGroupByQuery({
+        ...groupByQueryParams,
+        filter: configuration.filter,
       });
+
+      const secondSeriesRawResults = hasChartSecondSeries(configuration)
+        ? await this.chartDataQueryService.executeGroupByQuery({
+            ...groupByQueryParams,
+            filter: configuration.secondSeriesFilter,
+          })
+        : undefined;
 
       const seriesIdPrefix = buildLineChartSeriesIdPrefix(
         objectMetadataId,
         configuration,
       );
 
-      const filteredResults = filterOutEmptyChartBuckets({
-        rawResults,
-        shouldOmitEmptyBuckets: configuration.omitNullValues ?? false,
+      const shouldOmitEmptyBuckets = configuration.omitNullValues ?? false;
+
+      const filteredSecondSeriesResults = isDefined(secondSeriesRawResults)
+        ? filterOutEmptyChartBuckets({
+            rawResults: secondSeriesRawResults,
+            shouldOmitEmptyBuckets,
+          })
+        : undefined;
+
+      // Buckets that only exist in the second series still need a point on
+      // the primary one, otherwise the two series would not share an axis.
+      const filteredResults = addMissingChartBuckets({
+        rawResults: filterOutEmptyChartBuckets({
+          rawResults,
+          shouldOmitEmptyBuckets,
+        }),
+        rawResultsWithExtraBuckets: filteredSecondSeriesResults ?? [],
       });
 
       const relationLabelResolutions =
@@ -213,6 +240,7 @@ export class LineChartDataService {
         firstDayOfTheWeek,
         seriesIdPrefix,
         relationLabelResolution: relationLabelResolutions.primary,
+        secondSeriesRawResults: filteredSecondSeriesResults,
       });
     } catch (error) {
       throw wrapChartDataQueryError(error, 'Line chart data retrieval failed');

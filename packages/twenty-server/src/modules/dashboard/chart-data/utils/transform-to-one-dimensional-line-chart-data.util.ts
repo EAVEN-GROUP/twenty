@@ -1,10 +1,16 @@
+import { isNonEmptyString } from '@sniptt/guards';
 import { CalendarStartDay } from 'twenty-shared/constants';
 import { FirstDayOfTheWeek } from 'twenty-shared/types';
-import { convertCalendarStartDayNonIsoNumberToFirstDayOfTheWeek } from 'twenty-shared/utils';
+import {
+  convertCalendarStartDayNonIsoNumberToFirstDayOfTheWeek,
+  isDefined,
+} from 'twenty-shared/utils';
 
 import { FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { LineChartConfigurationDTO } from 'src/engine/metadata-modules/page-layout-widget/dtos/line-chart-configuration.dto';
 import { GraphOrderBy } from 'src/engine/metadata-modules/page-layout-widget/enums/graph-order-by.enum';
+import { CHART_SECOND_SERIES_DEFAULT_LABEL } from 'src/modules/dashboard/chart-data/constants/chart-second-series-default-label.constant';
+import { CHART_SECOND_SERIES_KEY } from 'src/modules/dashboard/chart-data/constants/chart-second-series-key.constant';
 import { LINE_CHART_MAXIMUM_NUMBER_OF_DATA_POINTS } from 'src/modules/dashboard/chart-data/constants/line-chart-maximum-number-of-data-points.constant';
 import { LineChartDataDTO } from 'src/modules/dashboard/chart-data/dtos/line-chart-data.dto';
 import { GroupByRawResult } from 'src/modules/dashboard/chart-data/types/group-by-raw-result.type';
@@ -12,6 +18,7 @@ import { RelationLabelResolution } from 'src/modules/dashboard/chart-data/types/
 import { applyCumulativeToLineDataPoints } from 'src/modules/dashboard/chart-data/utils/apply-cumulative-to-line-data-points.util';
 import { applyGapFilling } from 'src/modules/dashboard/chart-data/utils/apply-gap-filling.util';
 import { buildFormattedToRawLookupDto } from 'src/modules/dashboard/chart-data/utils/build-formatted-to-raw-lookup-dto.util';
+import { buildSecondSeriesValues } from 'src/modules/dashboard/chart-data/utils/build-second-series-values.util';
 import { getAggregateOperationLabel } from 'src/modules/dashboard/chart-data/utils/get-aggregate-operation-label.util';
 import { getSelectOptions } from 'src/modules/dashboard/chart-data/utils/get-select-options.util';
 import { processOneDimensionalResults } from 'src/modules/dashboard/chart-data/utils/process-one-dimensional-results.util';
@@ -26,6 +33,7 @@ export const transformToOneDimensionalLineChartData = ({
   firstDayOfTheWeek,
   seriesIdPrefix,
   relationLabelResolution,
+  secondSeriesRawResults,
 }: {
   filteredRawResults: GroupByRawResult[];
   primaryAxisGroupByField: FlatFieldMetadata;
@@ -35,6 +43,7 @@ export const transformToOneDimensionalLineChartData = ({
   firstDayOfTheWeek: CalendarStartDay;
   seriesIdPrefix: string;
   relationLabelResolution: RelationLabelResolution | undefined;
+  secondSeriesRawResults?: GroupByRawResult[];
 }): LineChartDataDTO => {
   const isDescOrder =
     configuration.primaryAxisOrderBy === GraphOrderBy.FIELD_DESC;
@@ -105,10 +114,33 @@ export const transformToOneDimensionalLineChartData = ({
   const series = [
     {
       key: `${seriesIdPrefix}${aggregateField.name}`,
-      label: aggregateField.label,
+      label: isNonEmptyString(configuration.seriesLabel)
+        ? configuration.seriesLabel
+        : aggregateField.label,
       data: dataPoints,
     },
   ];
+
+  if (isDefined(secondSeriesRawResults)) {
+    const secondSeriesValues = buildSecondSeriesValues({
+      orderedRawDimensionValues: limitedSortedData.map(
+        ({ rawValue }) => rawValue,
+      ),
+      secondSeriesRawResults,
+      isCumulative: configuration.isCumulative ?? false,
+    });
+
+    series.push({
+      key: `${seriesIdPrefix}${CHART_SECOND_SERIES_KEY}`,
+      label: isNonEmptyString(configuration.secondSeriesLabel)
+        ? configuration.secondSeriesLabel
+        : CHART_SECOND_SERIES_DEFAULT_LABEL,
+      data: limitedSortedData.map(({ x }, index) => ({
+        x,
+        y: secondSeriesValues[index],
+      })),
+    });
+  }
 
   const xAxisLabel = primaryAxisGroupByField.label;
   const yAxisLabel = `${getAggregateOperationLabel(configuration.aggregateOperation)} of ${aggregateField.label}`;

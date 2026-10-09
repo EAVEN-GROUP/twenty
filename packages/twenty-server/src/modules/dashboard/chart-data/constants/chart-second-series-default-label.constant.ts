@@ -1,0 +1,1 @@
+export const CHART_SECOND_SERIES_DEFAULT_LABEL = 'Series 2';
