@@ -13,7 +13,7 @@ export const getLabelIdentifierFieldValue = (
 
   const recordIdentifierValue = record[labelIdentifierFieldMetadataItem.name];
   if (labelIdentifierFieldMetadataItem.type === FieldMetadataType.FULL_NAME) {
-    return `${recordIdentifierValue?.firstName ?? ''} ${recordIdentifierValue?.lastName ?? ''}`;
+    return `${recordIdentifierValue?.firstName ?? ''} ${recordIdentifierValue?.lastName ?? ''}`.trim();
   }
 
   return isDefined(recordIdentifierValue) ? `${recordIdentifierValue}` : '';

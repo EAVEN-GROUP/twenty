@@ -1,17 +1,20 @@
+import { CreateMeetingModalDateStep } from '@/meetings/components/CreateMeetingModalDateStep';
+import { CreateMeetingModalNameStep } from '@/meetings/components/CreateMeetingModalNameStep';
 import { CREATE_MEETING_MODAL_ID } from '@/meetings/constants/CreateMeetingModalId';
+import { PERSON_NAME_FIELD_NAME } from '@/meetings/constants/PersonNameFieldName';
 import { useCanCreateMeetings } from '@/meetings/hooks/useCanCreateMeetings';
 import { useCreateMeetingForPerson } from '@/meetings/hooks/useCreateMeetingForPerson';
+import { useUpdatePersonName } from '@/meetings/hooks/useUpdatePersonName';
 import { createMeetingModalState } from '@/meetings/states/createMeetingModalState';
-import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
-import { getObjectRecordIdentifier } from '@/object-metadata/utils/getObjectRecordIdentifier';
-import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
+import { type CreateMeetingModalStep } from '@/meetings/types/CreateMeetingModalStep';
+import { normalizePersonName } from '@/meetings/utils/normalizePersonName';
+import { type FieldFullNameValue } from '@/object-record/record-field/ui/types/FieldMetadata';
+import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
-import { DateTimePicker } from '@/ui/input/components/internal/date/components/DateTimePicker';
-import { ModalStatefulWrapper } from '@/ui/layout/modal/components/ModalStatefulWrapper';
 import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
+import { ModalStatefulWrapper } from '@/ui/layout/modal/components/ModalStatefulWrapper';
 import { useModal } from '@/ui/layout/modal/hooks/useModal';
 import { currentFocusIdSelector } from '@/ui/utilities/focus/states/currentFocusIdSelector';
-import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { styled } from '@linaria/react';
@@ -19,7 +22,6 @@ import { useLingui } from '@lingui/react/macro';
 import { useStore } from 'jotai';
 import { type KeyboardEvent, useEffect, useState } from 'react';
 import { type Temporal } from 'temporal-polyfill';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { Button } from 'twenty-ui/input';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
@@ -27,11 +29,6 @@ import { H1Title, H1TitleFontColor } from 'twenty-ui/typography';
 
 const StyledCenteredTitle = styled.div`
   text-align: center;
-`;
-
-const StyledPickerContainer = styled.div`
-  display: flex;
-  justify-content: center;
 `;
 
 const StyledModalActions = styled.div`
@@ -53,25 +50,28 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
   );
   const { enqueueErrorSnackBar } = useSnackBar();
   const setCreateMeetingModal = useSetAtomState(createMeetingModalState);
+
+  const [step, setStep] = useState<CreateMeetingModalStep>('name');
+  const [personName, setPersonName] = useState<FieldFullNameValue>(() =>
+    normalizePersonName(
+      store.get(
+        recordStoreFamilySelector.selectorFamily({
+          recordId: personId,
+          fieldName: PERSON_NAME_FIELD_NAME,
+        }),
+      ) as FieldFullNameValue | undefined,
+    ),
+  );
+  const [isSavingPersonName, setIsSavingPersonName] = useState(false);
   const [meetingDate, setMeetingDate] = useState<Temporal.ZonedDateTime | null>(
     null,
   );
 
+  const { updatePersonName } = useUpdatePersonName();
   const { createMeetingForPerson, loading } = useCreateMeetingForPerson();
 
-  const { objectMetadataItem: personObjectMetadataItem } =
-    useObjectMetadataItem({
-      objectNameSingular: CoreObjectNameSingular.Person,
-    });
-  const recordStore = useAtomFamilyStateValue(recordStoreFamilyState, personId);
-
-  const personName = isDefined(recordStore)
-    ? getObjectRecordIdentifier({
-        objectMetadataItem: personObjectMetadataItem,
-        record: recordStore,
-        allowRequestsToTwentyIcons: false,
-      }).name
-    : '';
+  const { firstName, lastName } = normalizePersonName(personName);
+  const personFullName = `${firstName} ${lastName}`.trim();
 
   useEffect(() => {
     openModal(CREATE_MEETING_MODAL_ID);
@@ -82,10 +82,11 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
     setCreateMeetingModal(null);
   };
 
-  // The calendar keeps keyboard focus on a day cell and swallows Escape before
-  // the modal hotkey sees it. Only act while the modal is the focused layer so
-  // an open month/year dropdown still closes first.
-  const handlePickerKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
+  // The modal popup stops Escape from reaching the modal hotkey whenever focus
+  // is inside it (name inputs, buttons, calendar days). Only act while the
+  // modal is the focused layer so an open month/year dropdown still closes
+  // first.
+  const handleKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
     if (
       event.key !== 'Escape' ||
       store.get(currentFocusIdSelector.atom) !== scopedModalInstanceId
@@ -95,6 +96,25 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
 
     event.stopPropagation();
     handleClose();
+  };
+
+  const handleNext = async () => {
+    if (isSavingPersonName) {
+      return;
+    }
+
+    setIsSavingPersonName(true);
+
+    try {
+      await updatePersonName({ personId, personName });
+      setStep('date');
+    } catch {
+      enqueueErrorSnackBar({
+        message: t`The name could not be saved.`,
+      });
+    } finally {
+      setIsSavingPersonName(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -115,10 +135,18 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
     }
   };
 
+  const title =
+    step === 'name'
+      ? t`Who is the meeting with?`
+      : personFullName.length > 0
+        ? t`Book a meeting with ${personFullName}`
+        : t`Book a meeting`;
+
   return (
     <ModalStatefulWrapper
       modalInstanceId={CREATE_MEETING_MODAL_ID}
       onClose={handleClose}
+      onEnter={step === 'name' ? handleNext : undefined}
       isClosable
       size="small"
       padding="large"
@@ -128,42 +156,61 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
       smallBorderRadius
       autoHeight
     >
-      <StyledCenteredTitle>
-        <H1Title
-          title={
-            personName.length > 0
-              ? t`Book a meeting with ${personName}`
-              : t`Book a meeting`
-          }
-          fontColor={H1TitleFontColor.Primary}
-        />
-      </StyledCenteredTitle>
-      <StyledPickerContainer onKeyDownCapture={handlePickerKeyDownCapture}>
-        <DateTimePicker
-          instanceId={`${CREATE_MEETING_MODAL_ID}-date-time-picker`}
-          date={meetingDate}
-          onChange={setMeetingDate}
-          clearable={false}
-        />
-      </StyledPickerContainer>
-      <StyledModalActions>
-        <Button
-          onClick={handleClose}
-          variant="secondary"
-          title={t`Skip`}
-          fullWidth
-          justify="center"
-        />
-        <Button
-          onClick={handleSubmit}
-          variant="primary"
-          accent="blue"
-          title={t`Book meeting`}
-          disabled={!isDefined(meetingDate) || loading}
-          fullWidth
-          justify="center"
-        />
-      </StyledModalActions>
+      <div onKeyDownCapture={handleKeyDownCapture}>
+        <StyledCenteredTitle>
+          <H1Title title={title} fontColor={H1TitleFontColor.Primary} />
+        </StyledCenteredTitle>
+        {step === 'name' ? (
+          <CreateMeetingModalNameStep
+            personName={personName}
+            onPersonNameChange={setPersonName}
+          />
+        ) : (
+          <CreateMeetingModalDateStep
+            meetingDate={meetingDate}
+            onMeetingDateChange={setMeetingDate}
+          />
+        )}
+        {step === 'name' ? (
+          <StyledModalActions>
+            <Button
+              onClick={handleClose}
+              variant="secondary"
+              title={t`Skip`}
+              fullWidth
+              justify="center"
+            />
+            <Button
+              onClick={handleNext}
+              variant="primary"
+              accent="blue"
+              title={t`Next`}
+              disabled={isSavingPersonName}
+              fullWidth
+              justify="center"
+            />
+          </StyledModalActions>
+        ) : (
+          <StyledModalActions>
+            <Button
+              onClick={() => setStep('name')}
+              variant="secondary"
+              title={t`Back`}
+              fullWidth
+              justify="center"
+            />
+            <Button
+              onClick={handleSubmit}
+              variant="primary"
+              accent="blue"
+              title={t`Book meeting`}
+              disabled={!isDefined(meetingDate) || loading}
+              fullWidth
+              justify="center"
+            />
+          </StyledModalActions>
+        )}
+      </div>
     </ModalStatefulWrapper>
   );
 };
