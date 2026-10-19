@@ -8,6 +8,7 @@ import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { isNonEmptyString } from '@sniptt/guards';
 import { useStore } from 'jotai';
 import { v4 } from 'uuid';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
@@ -24,13 +25,15 @@ export const useCreateMeetingForPerson = () => {
   const createMeetingForPerson = async ({
     personId,
     meetingDate,
+    meetingName,
   }: {
     personId: string;
     meetingDate: string;
+    meetingName?: string;
   }) => {
     await createOneRecord({
       id: v4(),
-      name: MEETING_DEFAULT_NAME,
+      name: isNonEmptyString(meetingName) ? meetingName : MEETING_DEFAULT_NAME,
       personId,
       meetingDate,
       status: MEETING_SCHEDULED_STATUS_VALUE,

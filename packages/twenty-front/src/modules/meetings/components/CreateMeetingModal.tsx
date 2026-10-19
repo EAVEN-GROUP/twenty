@@ -126,6 +126,7 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
       await createMeetingForPerson({
         personId,
         meetingDate: meetingDate.toInstant().toString(),
+        meetingName: personFullName,
       });
       handleClose();
     } catch {

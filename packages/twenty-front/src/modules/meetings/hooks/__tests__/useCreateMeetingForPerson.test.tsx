@@ -74,6 +74,34 @@ describe('useCreateMeetingForPerson', () => {
     });
   });
 
+  it('names the meeting after the given name', async () => {
+    const { result } = renderCreateMeetingForPerson('TO_CALL');
+
+    await result.current.createMeetingForPerson({
+      personId: PERSON_ID,
+      meetingDate: MEETING_DATE,
+      meetingName: 'Mario Rossi',
+    });
+
+    expect(mockCreateOneRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Mario Rossi' }),
+    );
+  });
+
+  it('falls back to the default name when no name is given', async () => {
+    const { result } = renderCreateMeetingForPerson('TO_CALL');
+
+    await result.current.createMeetingForPerson({
+      personId: PERSON_ID,
+      meetingDate: MEETING_DATE,
+      meetingName: '',
+    });
+
+    expect(mockCreateOneRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Meeting' }),
+    );
+  });
+
   it('leaves the person untouched when already booked', async () => {
     const { result } = renderCreateMeetingForPerson('BOOKED');
 
