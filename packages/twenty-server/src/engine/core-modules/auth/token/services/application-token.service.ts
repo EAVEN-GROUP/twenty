@@ -24,6 +24,8 @@ import {
   AuthExceptionCode,
 } from 'src/engine/core-modules/auth/auth.exception';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
+import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 
 const APPLICATION_REFRESH_TOKEN_INVALID_OR_EXPIRED_MESSAGE =
   'Application refresh token invalid or expired';
@@ -35,8 +37,8 @@ export class ApplicationTokenService {
     private readonly jwtWrapperService: JwtWrapperService,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
-    @InjectRepository(ApplicationEntity)
-    private readonly applicationRepository: Repository<ApplicationEntity>,
+    @InjectWorkspaceScopedRepository(ApplicationEntity)
+    private readonly applicationRepository: WorkspaceScopedRepository<ApplicationEntity>,
     private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
@@ -45,25 +47,28 @@ export class ApplicationTokenService {
     applicationId,
     userWorkspaceId,
     userId,
+    agentId,
+    expiresIn,
   }: {
     workspaceId: string;
     applicationId: string;
     userWorkspaceId?: string;
     userId?: string;
+    agentId?: string;
+    expiresIn?: string;
   }): Promise<AuthToken> {
     await this.validateWorkspaceAndApplication(workspaceId, applicationId);
-
-    const expiresIn = this.twentyConfigService.get(
-      'APPLICATION_ACCESS_TOKEN_EXPIRES_IN',
-    );
 
     return this.signApplicationToken({
       workspaceId,
       applicationId,
       userWorkspaceId,
       userId,
+      agentId,
       tokenType: JwtTokenTypeEnum.APPLICATION_ACCESS,
-      expiresIn,
+      expiresIn:
+        expiresIn ??
+        this.twentyConfigService.get('APPLICATION_ACCESS_TOKEN_EXPIRES_IN'),
     });
   }
 
@@ -93,8 +98,8 @@ export class ApplicationTokenService {
       );
     }
 
-    const application = await this.applicationRepository.findOne({
-      where: { id: applicationId, workspaceId },
+    const application = await this.applicationRepository.findOne(workspaceId, {
+      where: { id: applicationId },
     });
 
     assertIsDefinedOrThrow(
@@ -201,6 +206,41 @@ export class ApplicationTokenService {
     }
   }
 
+  async validateApplicationRefreshTokenForSessionOrThrow({
+    applicationRefreshToken,
+    workspaceId,
+    userId,
+    userWorkspaceId,
+  }: {
+    applicationRefreshToken: string;
+    workspaceId: string;
+    userId: string;
+    userWorkspaceId: string;
+  }): Promise<ApplicationRefreshTokenJwtPayload> {
+    const applicationRefreshTokenPayload =
+      await this.validateApplicationRefreshToken(applicationRefreshToken);
+
+    if (applicationRefreshTokenPayload.workspaceId !== workspaceId) {
+      throw new ApplicationException(
+        'Refresh token workspace does not match authenticated workspace',
+        ApplicationExceptionCode.FORBIDDEN,
+      );
+    }
+
+    const hasMismatchedUser = applicationRefreshTokenPayload.userId !== userId;
+    const hasMismatchedUserWorkspace =
+      applicationRefreshTokenPayload.userWorkspaceId !== userWorkspaceId;
+
+    if (hasMismatchedUser || hasMismatchedUserWorkspace) {
+      throw new ApplicationException(
+        'Refresh token does not match authenticated session',
+        ApplicationExceptionCode.FORBIDDEN,
+      );
+    }
+
+    return applicationRefreshTokenPayload;
+  }
+
   async validateApplicationAccessToken(
     token: string,
   ): Promise<ApplicationAccessTokenJwtPayload> {
@@ -269,8 +309,8 @@ export class ApplicationTokenService {
 
     assertIsDefinedOrThrow(workspace, WorkspaceNotFoundDefaultError);
 
-    const application = await this.applicationRepository.findOne({
-      where: { id: applicationId, workspaceId },
+    const application = await this.applicationRepository.findOne(workspaceId, {
+      where: { id: applicationId },
     });
 
     assertIsDefinedOrThrow(
@@ -287,6 +327,7 @@ export class ApplicationTokenService {
     applicationId,
     userWorkspaceId,
     userId,
+    agentId,
     tokenType,
     expiresIn,
     workspaceDeletionRequestTimestamp,
@@ -295,6 +336,7 @@ export class ApplicationTokenService {
     applicationId: string;
     userWorkspaceId?: string;
     userId?: string;
+    agentId?: string;
     tokenType:
       | JwtTokenTypeEnum.APPLICATION_ACCESS
       | JwtTokenTypeEnum.APPLICATION_REFRESH;
@@ -315,6 +357,7 @@ export class ApplicationTokenService {
         : {}),
       ...(userWorkspaceId ? { userWorkspaceId } : {}),
       ...(userId ? { userId } : {}),
+      ...(agentId ? { agentId } : {}),
     };
 
     return {

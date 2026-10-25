@@ -12,7 +12,6 @@ import { dropdownMaxWidthComponentState } from '@/ui/layout/dropdown/states/inte
 import { dropdownYPositionComponentState } from '@/ui/layout/dropdown/states/internal/dropdownYPositionComponentState';
 import { isDropdownOpenComponentState } from '@/ui/layout/dropdown/states/isDropdownOpenComponentState';
 import { type DropdownOffset } from '@/ui/layout/dropdown/types/DropdownOffset';
-import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
 import { type GlobalHotkeysConfig } from '@/ui/utilities/hotkey/types/GlobalHotkeysConfig';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
@@ -25,7 +24,12 @@ import {
   useFloating,
 } from '@floating-ui/react';
 import { styled } from '@linaria/react';
-import { type MouseEvent, type ReactNode, useCallback } from 'react';
+import {
+  type MouseEvent,
+  type ReactNode,
+  useCallback,
+  useLayoutEffect,
+} from 'react';
 import { flushSync } from 'react-dom';
 import { type Keys } from 'react-hotkeys-hook';
 import { isDefined } from 'twenty-shared/utils';
@@ -48,6 +52,7 @@ const StyledClickableComponent = styled.div<{
 export type DropdownProps = {
   clickableComponent?: ReactNode;
   clickableComponentWidth?: Width;
+  clickableComponentRole?: 'button' | 'presentation';
   dropdownComponents: ReactNode;
   hotkey?: {
     key: Keys;
@@ -55,8 +60,8 @@ export type DropdownProps = {
   globalHotkeysConfig?: Partial<GlobalHotkeysConfig>;
   dropdownId: string;
   dropdownPlacement?: Placement;
+  positionReference?: HTMLElement | null;
   dropdownOffset?: DropdownOffset;
-  dropdownStrategy?: 'fixed' | 'absolute';
   onClickOutside?: () => void;
   onClose?: () => void;
   onOpen?: () => void;
@@ -78,23 +83,21 @@ export const Dropdown = ({
   dropdownId,
   globalHotkeysConfig,
   dropdownPlacement = 'bottom-end',
-  dropdownStrategy = 'absolute',
+  positionReference,
   dropdownOffset,
   onClickOutside,
   onClose,
   onOpen,
   clickableComponentWidth = 'auto',
+  clickableComponentRole = 'button',
   excludedClickOutsideIds,
   isDropdownInModal = false,
   disableClickForClickableComponent = false,
   middlewareBoundaryPadding = {},
 }: DropdownProps) => {
-  const scopedDropdownId =
-    useWorkspaceSurfaceScopedComponentInstanceId(dropdownId);
-
   const isDropdownOpen = useAtomComponentStateValue(
     isDropdownOpenComponentState,
-    scopedDropdownId,
+    dropdownId,
   );
 
   const { toggleDropdown } = useToggleDropdown();
@@ -113,17 +116,17 @@ export const Dropdown = ({
 
   const setDropdownMaxHeight = useSetAtomComponentState(
     dropdownMaxHeightComponentState,
-    scopedDropdownId,
+    dropdownId,
   );
 
   const setDropdownMaxWidth = useSetAtomComponentState(
     dropdownMaxWidthComponentState,
-    scopedDropdownId,
+    dropdownId,
   );
 
   const setDropdownYPosition = useSetAtomComponentState(
     dropdownYPositionComponentState,
-    scopedDropdownId,
+    dropdownId,
   );
 
   const isMobile = useIsMobile();
@@ -173,8 +176,18 @@ export const Dropdown = ({
       }),
     ],
     whileElementsMounted: autoUpdate,
-    strategy: dropdownStrategy,
+    strategy: 'fixed',
   });
+
+  useLayoutEffect(() => {
+    if (!isDefined(positionReference)) {
+      return;
+    }
+    // Keep the original trigger for click-outside handling.
+    const trigger = refs.domReference.current;
+    refs.setPositionReference(positionReference);
+    return () => refs.setPositionReference(trigger);
+  }, [positionReference, refs]);
 
   const handleClickableComponentClick = useCallback(
     async (event: MouseEvent) => {
@@ -183,30 +196,38 @@ export const Dropdown = ({
       event.preventDefault();
 
       toggleDropdown({
-        dropdownComponentInstanceIdFromProps: scopedDropdownId,
+        dropdownComponentInstanceIdFromProps: dropdownId,
         globalHotkeysConfig,
       });
     },
     [
       globalHotkeysConfig,
       toggleDropdown,
-      scopedDropdownId,
+      dropdownId,
       disableClickForClickableComponent,
     ],
   );
 
+  const hasInteractiveClickableComponent = clickableComponentRole === 'button';
+
   return (
     <DropdownComponentInstanceContext.Provider
-      value={{ instanceId: scopedDropdownId }}
+      value={{ instanceId: dropdownId }}
     >
       {isDefined(clickableComponent) ? (
         <StyledClickableComponent
           ref={refs.setReference}
           onClick={handleClickableComponentClick}
-          aria-controls={`${scopedDropdownId}-options`}
-          aria-expanded={isDropdownOpen}
-          aria-haspopup={true}
-          role="button"
+          aria-controls={
+            hasInteractiveClickableComponent
+              ? `${dropdownId}-options`
+              : undefined
+          }
+          aria-expanded={
+            hasInteractiveClickableComponent ? isDropdownOpen : undefined
+          }
+          aria-haspopup={hasInteractiveClickableComponent || undefined}
+          role={clickableComponentRole}
           width={clickableComponentWidth}
         >
           {clickableComponent}
@@ -218,7 +239,7 @@ export const Dropdown = ({
         <DropdownInternalContainer
           floatingStyles={floatingStyles}
           dropdownComponents={dropdownComponents}
-          dropdownId={scopedDropdownId}
+          dropdownId={dropdownId}
           dropdownPlacement={placement}
           floatingUiRefs={refs}
           hotkey={hotkey}

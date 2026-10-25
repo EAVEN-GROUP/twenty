@@ -5,7 +5,7 @@ import { type RecordIndexStatCardConfig } from '@/object-record/record-index/typ
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const VALUE_COLOR_BY_TONE = {
   default: themeCssVariables.font.color.primary,

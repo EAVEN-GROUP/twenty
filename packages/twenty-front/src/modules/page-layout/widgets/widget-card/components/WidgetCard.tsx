@@ -1,7 +1,7 @@
 import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { type WidgetCardVariant } from '~/modules/page-layout/widgets/types/WidgetCardVariant';
+import { themeCssVariables } from 'twenty-ui/theme';
+import { type WidgetCardVariant } from '@/page-layout/widgets/types/WidgetCardVariant';
 import { isWidgetCardFlushInViewMode } from '@/page-layout/widgets/utils/isWidgetCardFlushInViewMode';
 
 type WidgetCardStyledProps = {
@@ -51,9 +51,7 @@ const computeCardBackground = (
   return props.variant === 'framed' ? 'primary' : 'none';
 };
 
-// The card is the single owner of how far its header and body are inset:
-// WidgetCardHeader and WidgetCardContent both read these, widget bodies never
-// declare their own inline padding.
+// WidgetCardHeader and WidgetCardContent read these insets; widget bodies never declare their own padding.
 // oxlint-disable-next-line twenty/sort-css-properties-alphabetically
 const StyledWidgetCard = styled.div<WidgetCardStyledProps>`
   --widget-card-padding-inline: ${({ variant, isEditable }) =>

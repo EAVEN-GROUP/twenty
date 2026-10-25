@@ -1,12 +1,12 @@
 import { styled } from '@linaria/react';
-import { forwardRef, useContext } from 'react';
+import { forwardRef } from 'react';
 import {
   IconRadiusBottomLeft,
   IconRadiusBottomRight,
   IconRadiusTopLeft,
   IconRadiusTopRight,
 } from 'twenty-ui/icon';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 type WidgetHandleAxis = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 type WidgetHorizontalHandleAxis = 'n' | 's';
 type WidgetVerticalHandleAxis = 'e' | 'w';
@@ -33,7 +33,6 @@ const StyledCornerIconWrapper = styled.div<{
 
   & > svg {
     color: transparent;
-    flex-shrink: 0;
     pointer-events: none;
     transform: ${({ position }) => {
       if (position === 'se') {
@@ -182,7 +181,7 @@ export const PageLayoutGridResizeHandle = forwardRef<
     },
     ref,
   ) => {
-    const { theme } = useContext(ThemeContext);
+    const theme = useTheme();
 
     return (
       <StyledResizeHandleWrapper

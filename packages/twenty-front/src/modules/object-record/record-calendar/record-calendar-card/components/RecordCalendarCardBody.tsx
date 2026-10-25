@@ -1,5 +1,6 @@
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { isRecordFieldReadOnly } from '@/object-record/read-only/utils/isRecordFieldReadOnly';
+import { useRecordRestrictedFieldNames } from '@/object-record/record-store/hooks/useRecordRestrictedFieldNames';
 import { StopPropagationContainer } from '@/object-record/record-board/record-board-card/components/StopPropagationContainer';
 import { useRecordCalendarContextOrThrow } from '@/object-record/record-calendar/contexts/RecordCalendarContext';
 import { recordCalendarCardHoverPositionComponentState } from '@/object-record/record-calendar/record-calendar-card/states/recordCalendarCardHoverPositionComponentState';
@@ -17,7 +18,7 @@ import { RecordInlineCell } from '@/object-record/record-inline-cell/components/
 import { getRecordFieldInputInstanceId } from '@/object-record/utils/getRecordFieldInputId';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { isDefined } from 'twenty-shared/utils';
 
 type RecordCalendarCardBodyProps = {
@@ -31,13 +32,14 @@ export const RecordCalendarCardBody = ({
   calendarDay,
   isRecordReadOnly,
 }: RecordCalendarCardBodyProps) => {
-  const { objectPermissions, objectMetadataItem } =
-    useRecordCalendarContextOrThrow();
+  const { objectMetadataItem } = useRecordCalendarContextOrThrow();
 
   const cardInstanceIdPrefix =
     getRecordCalendarCardInstanceIdPrefix(calendarDay);
 
   const { updateOneRecord } = useUpdateOneRecord();
+
+  const restrictedFieldNames = useRecordRestrictedFieldNames(recordId);
 
   const useUpdateOneRecordHook: RecordUpdateHook = () => {
     const updateEntity = ({ variables }: RecordUpdateHookParams) => {
@@ -94,6 +96,10 @@ export const RecordCalendarCardBody = ({
           return null;
         }
 
+        const isFieldRestricted = restrictedFieldNames.includes(
+          fieldMetadataItem.name,
+        );
+
         return (
           <StopPropagationContainer key={recordField.fieldMetadataItemId}>
             <FieldContext.Provider
@@ -101,13 +107,16 @@ export const RecordCalendarCardBody = ({
                 recordId,
                 maxWidth: 156,
                 isLabelIdentifier: false,
-                isRecordFieldReadOnly: isRecordFieldReadOnly({
-                  isRecordReadOnly,
-                  objectPermissions,
-                  fieldMetadataItem,
-                  fieldDefinition: correspondingFieldDefinition,
-                  objectPermissionsByObjectMetadataId,
-                }),
+                isForbidden: isFieldRestricted,
+                isRecordFieldReadOnly:
+                  isFieldRestricted ||
+                  isRecordFieldReadOnly({
+                    isRecordReadOnly,
+                    objectMetadataId: objectMetadataItem.id,
+                    fieldMetadataItem,
+                    fieldDefinition: correspondingFieldDefinition,
+                    objectPermissionsByObjectMetadataId,
+                  }),
                 fieldDefinition: correspondingFieldDefinition,
                 useUpdateRecord: useUpdateOneRecordHook,
                 isDisplayModeFixHeight: true,

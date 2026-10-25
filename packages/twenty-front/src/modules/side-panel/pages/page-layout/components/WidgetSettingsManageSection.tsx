@@ -1,6 +1,6 @@
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
-import { CommandMenuItemDropdown } from '@/command-menu/components/CommandMenuItemDropdown';
+import { CommandMenuItemDropdownTrigger } from '@/command-menu/components/CommandMenuItemDropdownTrigger';
 import { useDeletePageLayoutWidget } from '@/page-layout/hooks/useDeletePageLayoutWidget';
 import { useResetPageLayoutWidgetToDefault } from '@/page-layout/hooks/useResetPageLayoutWidgetToDefault';
 import { pageLayoutEditingWidgetIdComponentState } from '@/page-layout/states/pageLayoutEditingWidgetIdComponentState';
@@ -11,9 +11,12 @@ import { useOpenReplaceWidgetPicker } from '@/side-panel/pages/page-layout/hooks
 import { useTranslatedVisibilityLabel } from '@/side-panel/pages/page-layout/hooks/useTranslatedVisibilityLabel';
 import { useWidgetInEditMode } from '@/side-panel/pages/page-layout/hooks/useWidgetInEditMode';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { ConfirmationModal } from '@/ui/layout/modal/components/ConfirmationModal';
-import { useModal } from '@/ui/layout/modal/hooks/useModal';
+import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
+import { useOpenDropdown } from '@/ui/layout/dropdown/hooks/useOpenDropdown';
+import { ConfirmationDialog } from '@/ui/layout/dialog/components/ConfirmationDialog';
+import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
+import { TooltipDelay } from '@/ui/layout/tooltip/constants/TooltipDelay';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
@@ -25,7 +28,7 @@ import {
   IconSwitchHorizontal,
   IconTrash,
 } from 'twenty-ui/icon';
-import { AppTooltip } from 'twenty-ui/surfaces';
+import { Tooltip } from 'twenty-ui/primitives/surfaces';
 
 const RESET_WIDGET_TO_DEFAULT_MODAL_ID = 'reset-widget-to-default-modal';
 const RESET_WIDGET_TO_DEFAULT_MENU_ITEM_ID =
@@ -56,7 +59,8 @@ export const WidgetSettingsManageSection = ({
 
   const { openReplaceWidgetPicker } = useOpenReplaceWidgetPicker(pageLayoutId);
 
-  const { openModal } = useModal();
+  const { openDialog } = useDialog();
+  const { openDropdown } = useOpenDropdown();
 
   const visibilityLabel = useTranslatedVisibilityLabel(
     widgetInEditMode?.conditionalAvailabilityExpression,
@@ -75,7 +79,7 @@ export const WidgetSettingsManageSection = ({
     if (isResetToDefaultDisabled) {
       return;
     }
-    openModal(RESET_WIDGET_TO_DEFAULT_MODAL_ID);
+    openDialog(RESET_WIDGET_TO_DEFAULT_MODAL_ID);
   };
 
   const handleConfirmReset = () => {
@@ -91,46 +95,57 @@ export const WidgetSettingsManageSection = ({
       <SidePanelGroup heading={t`Manage`}>
         <SelectableListItem
           itemId={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.VISIBILITY_RESTRICTION}
+          onEnter={() =>
+            openDropdown({
+              dropdownComponentInstanceIdFromProps:
+                WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.VISIBILITY_RESTRICTION,
+            })
+          }
         >
-          <CommandMenuItemDropdown
-            id={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.VISIBILITY_RESTRICTION}
-            label={t`Visibility Restriction`}
-            Icon={IconEyeX}
+          <DropdownRoot
             dropdownId={
               WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.VISIBILITY_RESTRICTION
             }
-            dropdownComponents={
-              <DropdownContent>
-                <WidgetVisibilityDropdownContent />
-              </DropdownContent>
-            }
-            dropdownPlacement="bottom-end"
-            description={visibilityLabel}
-            contextualTextPosition="right"
-          />
-        </SelectableListItem>
-        <div id={RESET_WIDGET_TO_DEFAULT_MENU_ITEM_ID}>
-          <SelectableListItem
-            itemId={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.RESET_TO_DEFAULT}
-            onEnter={handleResetToDefault}
+            type="picker"
           >
-            <CommandMenuItem
-              id={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.RESET_TO_DEFAULT}
-              Icon={IconRefreshDot}
-              label={t`Reset to default`}
-              onClick={handleResetToDefault}
-              disabled={isResetToDefaultDisabled}
+            <CommandMenuItemDropdownTrigger
+              id={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.VISIBILITY_RESTRICTION}
+              label={t`Visibility Restriction`}
+              Icon={IconEyeX}
+              description={visibilityLabel}
+              contextualTextPosition="right"
             />
-          </SelectableListItem>
-        </div>
-        {isResetToDefaultDisabled && (
-          <AppTooltip
-            anchorSelect={`#${RESET_WIDGET_TO_DEFAULT_MENU_ITEM_ID}`}
-            content={t`No default configuration available for this widget`}
-            noArrow
-            place="bottom"
-          />
-        )}
+            <DropdownContent
+              side="bottom"
+              align="end"
+              collisionPadding={{ left: 0, right: 0 }}
+            >
+              <WidgetVisibilityDropdownContent />
+            </DropdownContent>
+          </DropdownRoot>
+        </SelectableListItem>
+        <Tooltip
+          delay={TooltipDelay.mediumDelay}
+          content={t`No default configuration available for this widget`}
+          side="bottom"
+          disabled={!isResetToDefaultDisabled}
+        >
+          <div id={RESET_WIDGET_TO_DEFAULT_MENU_ITEM_ID}>
+            <SelectableListItem
+              itemId={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.RESET_TO_DEFAULT}
+              onEnter={handleResetToDefault}
+            >
+              <CommandMenuItem
+                id={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.RESET_TO_DEFAULT}
+                Icon={IconRefreshDot}
+                label={t`Reset to default`}
+                onClick={handleResetToDefault}
+                disabled={isResetToDefaultDisabled}
+              />
+            </SelectableListItem>
+          </div>
+        </Tooltip>
+
         <SelectableListItem
           itemId={WIDGET_SETTINGS_SELECTABLE_ITEM_IDS.REPLACE_WIDGET}
           onEnter={openReplaceWidgetPicker}
@@ -155,13 +170,13 @@ export const WidgetSettingsManageSection = ({
           />
         </SelectableListItem>
       </SidePanelGroup>
-      <ConfirmationModal
-        modalInstanceId={RESET_WIDGET_TO_DEFAULT_MODAL_ID}
+      <ConfirmationDialog
+        dialogId={RESET_WIDGET_TO_DEFAULT_MODAL_ID}
         title={t`Reset to default`}
         subtitle={t`This will cancel all modifications done on the widget. This action cannot be undone.`}
         onConfirmClick={handleConfirmReset}
         confirmButtonText={t`Reset`}
-        confirmButtonAccent="danger"
+        confirmButtonColor="danger"
       />
     </>
   );

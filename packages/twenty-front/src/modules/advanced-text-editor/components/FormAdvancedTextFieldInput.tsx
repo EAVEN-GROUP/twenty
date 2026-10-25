@@ -2,23 +2,30 @@ import { AdvancedTextEditor } from '@/advanced-text-editor/components/AdvancedTe
 import { useAdvancedTextEditor } from '@/advanced-text-editor/hooks/useAdvancedTextEditor';
 import { type AdvancedTextEditorComponentProps } from '@/advanced-text-editor/types/AdvancedTextEditorComponentProps';
 import { type AdvancedTextEditorProfile } from '@/advanced-text-editor/types/AdvancedTextEditorProfile';
+import { type UploadErrorHandler } from '@/advanced-text-editor/types/UploadErrorHandler';
+import { type UploadedFile } from '@/advanced-text-editor/types/UploadedFile';
 import { type UploadedImage } from '@/advanced-text-editor/types/UploadedImage';
 import { serializeAdvancedTextEditorDocument } from '@/advanced-text-editor/utils/serializeAdvancedTextEditorDocument';
 import { FormFieldInputContainer } from '@/ui/input/components/FormFieldInputContainer';
 import { type VariablePickerComponent } from '@/ui/input/types/VariablePickerComponent';
 import { useFullScreenModal } from '@/ui/layout/fullscreen/hooks/useFullScreenModal';
-import { type BreadcrumbProps } from '@/ui/navigation/bread-crumb/components/Breadcrumb';
+import { type BreadcrumbProps } from '@/ui/navigation/bread-crumb/types/BreadcrumbProps';
 import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePushFocusItemToFocusStack';
 import { useRemoveFocusItemFromFocusStackById } from '@/ui/utilities/focus/hooks/useRemoveFocusItemFromFocusStackById';
+import { useRemoveFocusItemFromFocusStackOnUnmount } from '@/ui/utilities/focus/hooks/useRemoveFocusItemFromFocusStackOnUnmount';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
+import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { type Editor } from '@tiptap/core';
 import { type ComponentType, useEffect, useId, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
+import { LightIconButton } from 'twenty-ui/components/input';
 import { IconMaximize } from 'twenty-ui/icon';
-import { Field, LightIconButton } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Field } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { useIsMobile } from 'twenty-ui/utilities';
 
 const StyledAdvancedTextFieldContainerWrapper = styled.div<{
@@ -28,13 +35,11 @@ const StyledAdvancedTextFieldContainerWrapper = styled.div<{
   flex-direction: column;
   flex-grow: ${({ hasFieldChrome }) => (hasFieldChrome ? 0 : 1)};
   min-height: ${({ hasFieldChrome }) => (hasFieldChrome ? 'auto' : '0')};
+`;
 
-  /* Document editors stretch to their available height; field editors keep
-     their intrinsic height so they compose naturally inside forms. */
-  & > * {
-    flex-grow: ${({ hasFieldChrome }) => (hasFieldChrome ? 0 : 1)};
-    min-height: ${({ hasFieldChrome }) => (hasFieldChrome ? 'auto' : '0')};
-  }
+const documentChromeFieldInputContainerClassName = css`
+  flex-grow: 1;
+  min-height: 0;
 `;
 
 const StyledAdvancedTextFieldFieldContainer = styled.div`
@@ -97,7 +102,9 @@ type FormAdvancedTextFieldInputProps = {
   placeholder?: string;
   VariablePicker?: VariablePickerComponent;
   onImageUpload?: (file: File) => Promise<UploadedImage>;
-  onImageUploadError?: (error: Error, file: File) => void;
+  onImageUploadError?: UploadErrorHandler;
+  onFileUpload?: (file: File) => Promise<UploadedFile>;
+  onFileUploadError?: UploadErrorHandler;
   profile: AdvancedTextEditorProfile;
   EditorComponent?: ComponentType<AdvancedTextEditorComponentProps>;
   minHeight?: number;
@@ -117,6 +124,8 @@ export const FormAdvancedTextFieldInput = ({
   VariablePicker,
   onImageUpload,
   onImageUploadError,
+  onFileUpload,
+  onFileUploadError,
   profile,
   EditorComponent = AdvancedTextEditor,
   minHeight,
@@ -124,7 +133,7 @@ export const FormAdvancedTextFieldInput = ({
   fullScreenBreadcrumbs,
   onEditorReady,
 }: FormAdvancedTextFieldInputProps) => {
-  const { chrome, minHeight: profileMinHeight } = profile;
+  const { chrome, variant, minHeight: profileMinHeight } = profile;
 
   const editorMinHeight = minHeight ?? profileMinHeight;
   const isFullScreenEnabled = enableFullScreen ?? profile.enableFullScreen;
@@ -137,6 +146,10 @@ export const FormAdvancedTextFieldInput = ({
   const { pushFocusItemToFocusStack } = usePushFocusItemToFocusStack();
   const { removeFocusItemFromFocusStackById } =
     useRemoveFocusItemFromFocusStackById();
+  useRemoveFocusItemFromFocusStackOnUnmount({
+    focusId: instanceId,
+    isEnabled: true,
+  });
 
   const editor = useAdvancedTextEditor({
     profile,
@@ -163,6 +176,8 @@ export const FormAdvancedTextFieldInput = ({
     },
     onImageUpload,
     onImageUploadError,
+    onFileUpload,
+    onFileUploadError,
   });
 
   useEffect(() => {
@@ -173,22 +188,30 @@ export const FormAdvancedTextFieldInput = ({
     };
   }, [editor, onEditorReady]);
 
-  const handleEnterFullScreen = () => {
-    setIsFullScreen(true);
-  };
-
-  const handleExitFullScreen = () => {
-    setIsFullScreen(false);
+  const handleFullScreenChange = (isFullScreenOpen: boolean) => {
+    flushSync(() => {
+      setIsFullScreen(isFullScreenOpen);
+    });
+    editor?.commands.focus();
   };
 
   const handleVariableTagInsert = (variableName: string) => {
     if (!isDefined(editor)) {
       throw new Error(
-        'Expected the editor to be defined when a variable is selected',
+        doNotTranslate(
+          'Expected the editor to be defined when a variable is selected',
+        ),
       );
     }
 
-    editor.commands.insertVariableTag(variableName);
+    const focusedHtmlEditor = editor.storage.html?.focusedHtmlEditor;
+
+    const variableTargetEditor =
+      isDefined(focusedHtmlEditor) && !focusedHtmlEditor.isDestroyed
+        ? focusedHtmlEditor
+        : editor;
+
+    variableTargetEditor.chain().focus().insertVariableTag(variableName).run();
   };
 
   const defaultBreadcrumbs: BreadcrumbProps['links'] = [
@@ -201,7 +224,7 @@ export const FormAdvancedTextFieldInput = ({
 
   const { renderFullScreenModal } = useFullScreenModal({
     links: breadcrumbLinks,
-    onClose: handleExitFullScreen,
+    onClose: () => handleFullScreenChange(false),
     hasClosePageButton: !isMobile,
   });
 
@@ -217,6 +240,7 @@ export const FormAdvancedTextFieldInput = ({
               editor={editor}
               readonly={readonly}
               minHeight={editorMinHeight}
+              variant={variant}
             />
           </StyledFullScreenEditorContainer>
         </div>,
@@ -229,7 +253,13 @@ export const FormAdvancedTextFieldInput = ({
       <StyledAdvancedTextFieldContainerWrapper
         hasFieldChrome={chrome === 'field'}
       >
-        <FormFieldInputContainer>
+        <FormFieldInputContainer
+          className={
+            chrome === 'field'
+              ? undefined
+              : documentChromeFieldInputContainerClassName
+          }
+        >
           {label ? <Field.Label>{label}</Field.Label> : null}
 
           <StyledAdvancedTextFieldFieldContainer>
@@ -241,6 +271,7 @@ export const FormAdvancedTextFieldInput = ({
                   editor={editor}
                   readonly={readonly}
                   minHeight={editorMinHeight}
+                  variant={variant}
                 />
               )}
 
@@ -250,11 +281,13 @@ export const FormAdvancedTextFieldInput = ({
                 >
                   {!readonly && !isFullScreen && (
                     <LightIconButton
-                      Icon={IconMaximize}
-                      size="small"
-                      onClick={handleEnterFullScreen}
-                      accent="tertiary"
-                    />
+                      size="sm"
+                      onClick={() => handleFullScreenChange(true)}
+                      emphasis="subtle"
+                      aria-label={t`Expand to full screen`}
+                    >
+                      <IconMaximize />
+                    </LightIconButton>
                   )}
                 </StyledEditorActionButtonContainer>
               )}

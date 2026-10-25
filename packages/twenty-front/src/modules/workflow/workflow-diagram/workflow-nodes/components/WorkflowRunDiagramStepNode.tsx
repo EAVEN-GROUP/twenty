@@ -28,10 +28,11 @@ import { styled } from '@linaria/react';
 import { Position } from '@xyflow/react';
 import { useContext } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import { StepStatus } from 'twenty-shared/workflow';
 import { IconCheck, IconX, useIcons } from 'twenty-ui/icon';
-import { Loader } from 'twenty-ui/feedback';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Loader } from 'twenty-ui/primitives/feedback';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledNodeLabelWithCounterPart = styled.div`
   align-items: center;
@@ -121,7 +122,7 @@ export const WorkflowRunDiagramStepNode = ({
 
   const handleClick = () => {
     if (!isDefined(workflowVisualizerWorkflowId)) {
-      throw new Error('Workflow ID must be defined');
+      throw new Error(doNotTranslate('Workflow ID must be defined'));
     }
 
     if (!isInSidePanel) {

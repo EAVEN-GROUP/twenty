@@ -9,7 +9,7 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { ViewBar } from '@/views/components/ViewBar';
 import { ViewType } from '@/views/types/ViewType';
 import { styled } from '@linaria/react';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledViewBarSurface = styled.div`
   background: ${themeCssVariables.grayScale.gray3};

@@ -1,44 +1,37 @@
 import { SettingsDiscoveryHeroCard } from '@/settings/components/SettingsDiscoveryHeroCard';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
+import { SETTINGS_DEVELOPERS_TABS } from '@/settings/developers/constants/SettingsDevelopersTabs';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { SettingsTabBar } from '@/settings/components/layout/SettingsTabBar';
 import { useSettingsActiveTabId } from '@/settings/components/layout/useSettingsActiveTabId';
-import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { useLingui } from '@lingui/react/macro';
+import { Navigate, useLocation } from 'react-router-dom';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import {
-  IconApps,
-  IconCode,
-  IconShoppingBag,
-  IconSparkle2,
-} from 'twenty-ui/icon';
-import { Section } from 'twenty-ui/layout';
-import { PermissionFlagType } from '~/generated-metadata/graphql';
+import { Section } from 'twenty-ui/components/layout';
+import { IconApps, IconShoppingBag, IconSparkle2 } from 'twenty-ui/icon';
 import coverDark from '~/pages/settings/applications/assets/cover-dark.png';
 import coverLight from '~/pages/settings/applications/assets/cover-light.png';
-import { SettingsApplicationsClaimErrorTabEffect } from '~/pages/settings/applications/components/SettingsApplicationsClaimErrorTabEffect';
 import { SettingsApplicationsAvailableTab } from '~/pages/settings/applications/tabs/SettingsApplicationsAvailableTab';
-import { SettingsApplicationsDeveloperTab } from '~/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab';
 import { SettingsApplicationsInstalledTab } from '~/pages/settings/applications/tabs/SettingsApplicationsInstalledTab';
 
 const APPLICATIONS_TAB_LIST_ID = 'applications-tab-list';
 const APPLICATIONS_HERO_INSTANCE_ID_PREFIX = 'settings-applications-hero';
-const DEVELOPER_TAB_ID = 'developer';
+// Docs and older links still point to the developer tab that moved to the Developers page
+const LEGACY_DEVELOPER_TAB_HASH = '#developer';
 
 export const SettingsApplications = () => {
   const { t } = useLingui();
-
-  const hasDeveloperAccess = useHasPermissionFlag(
-    PermissionFlagType.API_KEYS_AND_WEBHOOKS,
-  );
+  const location = useLocation();
 
   const tabs = [
-    { id: 'marketplace', title: t`Marketplace`, Icon: IconShoppingBag },
+    {
+      id: 'marketplace',
+      title: t`Marketplace`,
+      Icon: IconShoppingBag,
+      pill: t`Beta`,
+    },
     { id: 'installed', title: t`Installed`, Icon: IconApps },
-    ...(hasDeveloperAccess
-      ? [{ id: DEVELOPER_TAB_ID, title: t`Developer`, Icon: IconCode }]
-      : []),
   ];
 
   const activeTabId = useSettingsActiveTabId(
@@ -52,18 +45,26 @@ export const SettingsApplications = () => {
         return <SettingsApplicationsAvailableTab />;
       case 'installed':
         return <SettingsApplicationsInstalledTab />;
-      case 'developer':
-        return <SettingsApplicationsDeveloperTab />;
       default:
         return <SettingsApplicationsAvailableTab />;
     }
   };
+
+  if (location.hash === LEGACY_DEVELOPER_TAB_HASH) {
+    return (
+      <Navigate
+        to={`${getSettingsPath(SettingsPath.Developers)}${location.search}#${SETTINGS_DEVELOPERS_TABS.TABS_IDS.APPS}`}
+        replace
+      />
+    );
+  }
 
   return (
     <SettingsPageLayout
       title={t`Applications`}
       secondaryBar={
         <SettingsTabBar
+          aria-label={t`Applications`}
           tabs={tabs}
           componentInstanceId={APPLICATIONS_TAB_LIST_ID}
         />
@@ -76,13 +77,8 @@ export const SettingsApplications = () => {
         { children: t`Applications` },
       ]}
     >
-      <SettingsApplicationsClaimErrorTabEffect
-        tabListId={APPLICATIONS_TAB_LIST_ID}
-        developerTabId={DEVELOPER_TAB_ID}
-        hasDeveloperAccess={hasDeveloperAccess}
-      />
       <SettingsPageContainer>
-        <Section>
+        <Section.Root>
           <SettingsDiscoveryHeroCard
             lightSrc={coverLight}
             darkSrc={coverDark}
@@ -98,7 +94,7 @@ export const SettingsApplications = () => {
             ]}
             playButtonAriaLabel={t`Watch apps demo`}
           />
-        </Section>
+        </Section.Root>
         {renderActiveTabContent()}
       </SettingsPageContainer>
     </SettingsPageLayout>

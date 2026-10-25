@@ -23,7 +23,7 @@ import { PhoneCountryPickerDropdownButton } from '@/ui/input/components/internal
 import { useContext } from 'react';
 import { MULTI_ITEM_FIELD_DEFAULT_MAX_VALUES } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { stripSimpleQuotesFromString } from '~/utils/string/stripSimpleQuotesFromString';
 
@@ -75,11 +75,6 @@ const StyledCustomPhoneInputWrapper = styled.div`
     &:focus {
       outline: none;
     }
-  }
-
-  & svg {
-    border-radius: ${themeCssVariables.border.radius.xs};
-    height: 12px;
   }
 `;
 
@@ -218,7 +213,16 @@ export const PhonesFieldInput = () => {
           onDelete={handleDelete}
         />
       )}
-      renderInput={({ value, onChange, autoFocus, placeholder, hasError }) => {
+      renderInput={({
+        value,
+        onChange,
+        onKeyDown,
+        onFocus,
+        onBlur,
+        autoFocus,
+        placeholder,
+        hasError,
+      }) => {
         return (
           <StyledCustomPhoneInputContainer
             hasItem={!!phones.length}
@@ -230,6 +234,9 @@ export const PhonesFieldInput = () => {
                 placeholder={placeholder}
                 value={value as E164Number}
                 onChange={onChange as unknown as (newValue: E164Number) => void}
+                onKeyDown={onKeyDown}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 international={true}
                 withCountryCallingCode={true}
                 countrySelectComponent={PhoneCountryPickerDropdownButton}

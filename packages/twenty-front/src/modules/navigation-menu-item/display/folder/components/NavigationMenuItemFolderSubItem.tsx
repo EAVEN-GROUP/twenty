@@ -1,12 +1,12 @@
+import { NavigationMenuItemEditable } from '@/navigation-menu-item/edit/components/NavigationMenuItemEditable';
 import { useLingui } from '@lingui/react/macro';
 import { type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FeatureFlagKey, NavigationMenuItemType } from 'twenty-shared/types';
+import { NavigationMenuItemType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type NavigationMenuItem } from '~/generated-metadata/graphql';
 
 import { lastClickedNavigationMenuItemIdState } from '@/navigation-menu-item/common/states/lastClickedNavigationMenuItemIdState';
-import { getNavigationMenuItemColor } from '@/navigation-menu-item/common/utils/getNavigationMenuItemColor';
+import { useNavigateToNavigationMenuItemLink } from '@/navigation-menu-item/common/hooks/useNavigateToNavigationMenuItemLink';
 import { NavigationMenuItemIcon } from '@/navigation-menu-item/display/components/NavigationMenuItemIcon';
 import { useIdentifyActiveNavigationMenuItems } from '@/navigation-menu-item/display/hooks/useIdentifyActiveNavigationMenuItems';
 import { useIsNavigationMenuItemEditHighlighted } from '@/navigation-menu-item/display/hooks/useIsNavigationMenuItemEditHighlighted';
@@ -17,7 +17,6 @@ import { getNavigationMenuItemComputedLink } from '@/navigation-menu-item/displa
 import { isCoreWorkflowsObjectNavigationMenuItem } from '@/navigation-menu-item/display/utils/isCoreWorkflowsObjectNavigationMenuItem';
 import { getNavigationMenuItemLabel } from '@/navigation-menu-item/display/utils/getNavigationMenuItemLabel';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
-import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
 import type { EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { NavigationDrawerSubItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerSubItem';
 import { getNavigationSubItemLeftAdornment } from '@/ui/navigation/navigation-drawer/utils/getNavigationSubItemLeftAdornment';
@@ -53,15 +52,13 @@ export const NavigationMenuItemFolderSubItem = ({
   const { t } = useLingui();
   const isEditHighlightedInNavigationMenu =
     useIsNavigationMenuItemEditHighlighted(navigationMenuItem);
-  const isWorkflowCoreIndexPageEnabled = useIsFeatureEnabled(
-    FeatureFlagKey.IS_WORKFLOW_CORE_INDEX_PAGE_ENABLED,
-  );
   const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
   const views = useAtomStateValue(viewsSelector);
   const lastVisitedViewPerObjectMetadataItem = useAtomStateValue(
     lastVisitedViewPerObjectMetadataItemState,
   );
-  const navigate = useNavigate();
+  const { navigateToNavigationMenuItemLink } =
+    useNavigateToNavigationMenuItemLink();
   const setLastClickedNavigationMenuItemId = useSetAtomState(
     lastClickedNavigationMenuItemIdState,
   );
@@ -114,18 +111,18 @@ export const NavigationMenuItemFolderSubItem = ({
           })
       : () => {
           setLastClickedNavigationMenuItemId(navigationMenuItem.id);
-          navigate(computedLink);
+          navigateToNavigationMenuItemLink(computedLink);
         });
 
   const isCoreWorkflowsIndexItem = isCoreWorkflowsObjectNavigationMenuItem({
     navigationMenuItemType: navigationMenuItem.type,
     objectNameSingular,
-    isWorkflowCoreIndexPageEnabled,
   });
 
   const viewSecondaryLabel =
     navigationMenuItem.type === NavigationMenuItemType.VIEW
       ? getObjectNavigationMenuItemSecondaryLabel({
+          isView: true,
           objectMetadataItems,
           navigationMenuItemObjectNameSingular: objectNameSingular ?? '',
         })
@@ -136,28 +133,26 @@ export const NavigationMenuItemFolderSubItem = ({
     : viewSecondaryLabel;
 
   return (
-    <NavigationDrawerSubItem
-      secondaryLabel={secondaryLabel}
-      label={label}
-      Icon={() => (
-        <NavigationMenuItemIcon navigationMenuItem={navigationMenuItem} />
-      )}
-      iconColor={getNavigationMenuItemColor(
-        navigationMenuItem,
-        objectMetadataItem ?? undefined,
-      )}
-      to={isDragging || isEditable ? undefined : computedLink}
-      onClick={handleClick}
-      active={isActive}
-      isSelectedInEditMode={isEditHighlightedInNavigationMenu}
-      subItemState={getNavigationSubItemLeftAdornment({
-        index,
-        arrayLength,
-        selectedIndex,
-      })}
-      rightOptions={rightOptions}
-      isDragging={isDragging}
-      triggerEvent="CLICK"
-    />
+    <NavigationMenuItemEditable item={navigationMenuItem}>
+      <NavigationDrawerSubItem
+        secondaryLabel={secondaryLabel}
+        label={label}
+        Icon={() => (
+          <NavigationMenuItemIcon navigationMenuItem={navigationMenuItem} />
+        )}
+        to={isDragging || isEditable ? undefined : computedLink}
+        onClick={handleClick}
+        active={isActive}
+        isSelectedInEditMode={isEditHighlightedInNavigationMenu}
+        subItemState={getNavigationSubItemLeftAdornment({
+          index,
+          arrayLength,
+          selectedIndex,
+        })}
+        rightOptions={rightOptions}
+        isDragging={isDragging}
+        triggerEvent="CLICK"
+      />
+    </NavigationMenuItemEditable>
   );
 };

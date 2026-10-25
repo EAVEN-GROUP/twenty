@@ -6,23 +6,26 @@ import { useResetRecordIndexSelection } from '@/object-record/record-index/hooks
 import { useUpdateMultipleRecordsActions } from '@/object-record/record-update-multiple/hooks/useUpdateMultipleRecordsActions';
 import { getRecordTableRowColorField } from '@/object-record/record-table/utils/getRecordTableRowColorField';
 import { ThemeColorPickerMenu } from '@/ui/input/components/ThemeColorPickerMenu';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
-import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
-import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownMenuSeparator';
+import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
+import { TooltipDelay } from '@/ui/layout/tooltip/constants/TooltipDelay';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { IconColorSwatch, IconX } from 'twenty-ui/icon';
-import { IconButton } from 'twenty-ui/input';
-import { MenuItem } from 'twenty-ui/navigation';
-import { AppTooltip, TooltipDelay, TooltipPosition } from 'twenty-ui/surfaces';
+import { IconButton } from 'twenty-ui/components/input';
+import { Dropdown } from 'twenty-ui/components/navigation';
+import { Tooltip } from 'twenty-ui/primitives/surfaces';
 import { type ThemeColor } from 'twenty-ui/theme';
 
 const ROW_COLOR_DROPDOWN_ID = 'record-index-row-color-dropdown';
-const ROW_COLOR_BUTTON_ID = 'record-index-row-color-button';
+
+const StyledPopupScope = styled.div`
+  display: contents;
+`;
 
 type RecordIndexRowColorButtonContentProps = {
   objectNameSingular: string;
@@ -57,43 +60,44 @@ const RecordIndexRowColorButtonContent = ({
   };
 
   return (
-    <Dropdown
-      dropdownId={ROW_COLOR_DROPDOWN_ID}
-      dropdownPlacement="bottom-end"
-      clickableComponent={
-        <div id={ROW_COLOR_BUTTON_ID}>
-          <IconButton
-            Icon={IconColorSwatch}
-            size="small"
-            variant="primary"
-            accent="default"
-            disabled={isUpdating}
-            ariaLabel={t`Set row color`}
+    <Tooltip
+      content={t`Set row color`}
+      delay={TooltipDelay.longDelay}
+      side="bottom"
+      sideOffset={5}
+    >
+      <div>
+        <DropdownRoot dropdownId={ROW_COLOR_DROPDOWN_ID} type="picker">
+          <Dropdown.Trigger
+            render={
+              <IconButton
+                size="sm"
+                variant="outline"
+                color="neutral"
+                disabled={isUpdating}
+                aria-label={t`Set row color`}
+              >
+                <IconColorSwatch />
+              </IconButton>
+            }
           />
-          <AppTooltip
-            anchorSelect={`#${ROW_COLOR_BUTTON_ID}`}
-            content={t`Set row color`}
-            delay={TooltipDelay.longDelay}
-            place={TooltipPosition.Bottom}
-            offset={5}
-            noArrow
-          />
-        </div>
-      }
-      dropdownComponents={
-        <DropdownContent>
-          <ThemeColorPickerMenu onSelectColor={applyColor} />
-          <DropdownMenuSeparator />
-          <DropdownMenuItemsContainer>
-            <MenuItem
-              LeftIcon={IconX}
-              text={t`Remove color`}
-              onClick={() => applyColor(null)}
-            />
-          </DropdownMenuItemsContainer>
-        </DropdownContent>
-      }
-    />
+          <DropdownContent side="bottom" align="end">
+            <StyledPopupScope data-click-outside-id={ROW_COLOR_DROPDOWN_ID}>
+              <ThemeColorPickerMenu onSelectColor={applyColor} />
+              <Dropdown.Separator />
+              <Dropdown.Section>
+                <Dropdown.ActionItem
+                  startIcon={<IconX />}
+                  onClick={() => applyColor(null)}
+                >
+                  {t`Remove color`}
+                </Dropdown.ActionItem>
+              </Dropdown.Section>
+            </StyledPopupScope>
+          </DropdownContent>
+        </DropdownRoot>
+      </div>
+    </Tooltip>
   );
 };
 

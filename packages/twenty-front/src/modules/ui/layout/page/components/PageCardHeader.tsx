@@ -1,19 +1,17 @@
-import { useNavigationDrawerExpanded } from '@/navigation/hooks/useNavigationDrawerExpanded';
+import { useNavigationDrawerExpanded } from '@/ui/navigation/navigation-drawer/hooks/useNavigationDrawerExpanded';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useWorkspaceSurfaceHeaderPortal } from '@/ui/layout/hooks/useWorkspaceSurfaceHeaderPortal';
-import {
-  Breadcrumb,
-  type BreadcrumbProps,
-} from '@/ui/navigation/bread-crumb/components/Breadcrumb';
+import { Breadcrumb } from '@/ui/navigation/bread-crumb/components/Breadcrumb';
+import { type BreadcrumbProps } from '@/ui/navigation/bread-crumb/types/BreadcrumbProps';
 import { PAGE_ACTION_CONTAINER_CLICK_OUTSIDE_ID } from '@/ui/layout/page/constants/PageActionContainerClickOutsideId';
 import { PAGE_CARD_HEADER_MIN_HEIGHT } from '@/ui/layout/page/constants/PageCardHeaderMinHeight';
 import { NavigationDrawerCollapseButton } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton';
-import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
+import { useIsMobile } from 'twenty-ui/utilities';
 import { styled } from '@linaria/react';
 import { type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 type PageCardHeaderProps = {
   links?: BreadcrumbProps['links'];

@@ -1,60 +1,45 @@
 import { isDefined } from 'twenty-shared/utils';
 
-import { AGENT_CHAT_NEW_THREAD_DRAFT_KEY } from '@/ai/states/agentChatDraftsByThreadIdState';
-import { agentChatErrorComponentFamilyState } from '@/ai/states/agentChatErrorComponentFamilyState';
-import { agentChatIsAwaitingFirstChunkComponentFamilyState } from '@/ai/states/agentChatIsAwaitingFirstChunkComponentFamilyState';
-import { agentChatIsStreamingComponentFamilyState } from '@/ai/states/agentChatIsStreamingComponentFamilyState';
-import { agentChatMessagesLoadingState } from '@/ai/states/agentChatMessagesLoadingState';
-import { agentChatThreadsLoadingState } from '@/ai/states/agentChatThreadsLoadingState';
-import { agentChatHasMessageComponentSelector } from '@/ai/states/selectors/agentChatHasMessageComponentSelector';
+import { useIsOnNewAiChatSlot } from '@/ai/hooks/useIsOnNewAiChatSlot';
+import { agentChatErrorFamilyState } from '@/ai/states/agentChatErrorFamilyState';
+import { agentChatIsAwaitingFirstChunkFamilyState } from '@/ai/states/agentChatIsAwaitingFirstChunkFamilyState';
+import { agentChatIsStreamingFamilyState } from '@/ai/states/agentChatIsStreamingFamilyState';
+import { agentChatThreadsLoadingSelector } from '@/ai/states/selectors/agentChatThreadsLoadingSelector';
+import { agentChatHasMessageSelector } from '@/ai/states/selectors/agentChatHasMessageSelector';
 import { currentAiChatThreadState } from '@/ai/states/currentAiChatThreadState';
-import { skipMessagesSkeletonUntilLoadedState } from '@/ai/states/skipMessagesSkeletonUntilLoadedState';
-import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
-import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
-import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
+import { useIsMobile } from 'twenty-ui/utilities';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 
 export const useShouldShowAiChatEmptyState = () => {
   const currentAiChatThread = useAtomStateValue(currentAiChatThreadState);
-  const agentChatError = useAtomComponentFamilyStateValue(
-    agentChatErrorComponentFamilyState,
+  const agentChatError = useAtomFamilyStateValue(agentChatErrorFamilyState, {
+    threadId: currentAiChatThread,
+  });
+  const agentChatIsAwaitingFirstChunk = useAtomFamilyStateValue(
+    agentChatIsAwaitingFirstChunkFamilyState,
     { threadId: currentAiChatThread },
   );
-  const agentChatIsAwaitingFirstChunk = useAtomComponentFamilyStateValue(
-    agentChatIsAwaitingFirstChunkComponentFamilyState,
-    { threadId: currentAiChatThread },
-  );
-  const agentChatIsStreaming = useAtomComponentFamilyStateValue(
-    agentChatIsStreamingComponentFamilyState,
+  const agentChatIsStreaming = useAtomFamilyStateValue(
+    agentChatIsStreamingFamilyState,
     { threadId: currentAiChatThread },
   );
   const agentChatThreadsLoading = useAtomStateValue(
-    agentChatThreadsLoadingState,
-  );
-  const agentChatMessagesLoading = useAtomStateValue(
-    agentChatMessagesLoadingState,
-  );
-  const skipMessagesSkeletonUntilLoaded = useAtomStateValue(
-    skipMessagesSkeletonUntilLoadedState,
+    agentChatThreadsLoadingSelector,
   );
 
-  const hasMessages = useAtomComponentSelectorValue(
-    agentChatHasMessageComponentSelector,
-  );
+  const agentChatHasMessage = useAtomStateValue(agentChatHasMessageSelector);
 
   const isMobile = useIsMobile();
 
-  const isOnNewChatSlot =
-    currentAiChatThread === AGENT_CHAT_NEW_THREAD_DRAFT_KEY;
-  const skeletonShowing =
-    (agentChatThreadsLoading && isOnNewChatSlot) ||
-    (agentChatMessagesLoading && !skipMessagesSkeletonUntilLoaded);
+  const isOnNewAiChatSlot = useIsOnNewAiChatSlot();
 
   return (
+    isOnNewAiChatSlot &&
     !isMobile &&
-    !hasMessages &&
+    !agentChatHasMessage &&
     !isDefined(agentChatError) &&
-    !skeletonShowing &&
+    !agentChatThreadsLoading &&
     !agentChatIsAwaitingFirstChunk &&
     !agentChatIsStreaming
   );

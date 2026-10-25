@@ -56,7 +56,8 @@ export const useWidgetRendererState = (widget: PageLayoutWidget) => {
     widget.type === WidgetType.MESSAGE_CAMPAIGN_DETAILS ||
     widget.type === WidgetType.WORKFLOW ||
     widget.type === WidgetType.WORKFLOW_VERSION ||
-    widget.type === WidgetType.WORKFLOW_RUN;
+    widget.type === WidgetType.WORKFLOW_RUN ||
+    widget.type === WidgetType.CHAT;
   const hideHeaderInViewMode =
     isHeaderHiddenInViewMode && !isPageLayoutInEditMode;
 
@@ -93,6 +94,7 @@ export const useWidgetRendererState = (widget: PageLayoutWidget) => {
   const variant = getWidgetCardVariant({
     isSideColumnContext,
     pageLayoutType: currentPageLayout.type,
+    presentation,
   });
 
   const isBare = isPodiumWidget(widget);

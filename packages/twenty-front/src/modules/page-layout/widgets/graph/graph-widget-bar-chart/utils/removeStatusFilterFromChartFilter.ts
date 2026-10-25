@@ -1,9 +1,8 @@
-import { dropChartRecordFiltersWithDeletedFields } from '@/side-panel/pages/page-layout/utils/dropChartRecordFiltersWithDeletedFields';
+import { type ChartFilters } from '@/side-panel/pages/page-layout/types/ChartFilters';
+import { sanitizeChartRecordFilters } from '@/side-panel/pages/page-layout/utils/sanitizeChartRecordFilters';
 
 type RemoveStatusFilterFromChartFilterParams = {
-  chartFilter: Parameters<
-    typeof dropChartRecordFiltersWithDeletedFields
-  >[0]['chartFilters'];
+  chartFilter: ChartFilters;
   fieldMetadataIds: string[];
   statusFieldMetadataId: string | undefined;
 };
@@ -13,9 +12,9 @@ export const removeStatusFilterFromChartFilter = ({
   fieldMetadataIds,
   statusFieldMetadataId,
 }: RemoveStatusFilterFromChartFilterParams) =>
-  dropChartRecordFiltersWithDeletedFields({
+  sanitizeChartRecordFilters({
     chartFilters: chartFilter,
-    validFieldMetadataIds: new Set(
-      fieldMetadataIds.filter((id) => id !== statusFieldMetadataId),
-    ),
+    fieldMetadataItems: fieldMetadataIds
+      .filter((fieldMetadataId) => fieldMetadataId !== statusFieldMetadataId)
+      .map((fieldMetadataId) => ({ id: fieldMetadataId, isActive: true })),
   });

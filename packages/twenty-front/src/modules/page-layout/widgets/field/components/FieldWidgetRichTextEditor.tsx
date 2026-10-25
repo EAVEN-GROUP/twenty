@@ -1,14 +1,14 @@
-import { SKELETON_LOADER_HEIGHT_SIZES } from '@/activities/components/SkeletonLoader';
+import { SkeletonLine } from '@/ui/feedback/skeleton/components/SkeletonLine';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
 import { ScrollWrapper } from '@/ui/utilities/scroll/components/ScrollWrapper';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { styled } from '@linaria/react';
-import { lazy, Suspense, useContext } from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import { lazy, Suspense } from 'react';
+import { SKELETON_HEIGHT_SIZES } from 'twenty-ui/primitives/feedback';
 import { isUndefined } from '@sniptt/guards';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const RichTextFieldEditor = lazy(() =>
   import('@/object-record/record-field/ui/meta-types/input/components/RichTextFieldEditor').then(
@@ -41,16 +41,12 @@ const StyledSkeletonContainer = styled.div`
 `;
 
 const LoadingSkeleton = () => {
-  const { theme } = useContext(ThemeContext);
   return (
     <StyledSkeletonContainer>
-      <SkeletonTheme
-        baseColor={theme.background.tertiary}
-        highlightColor={theme.background.transparent.lighter}
+      <SkeletonLine
+        height={SKELETON_HEIGHT_SIZES.s}
         borderRadius={themeCssVariables.border.radius.md}
-      >
-        <Skeleton height={SKELETON_LOADER_HEIGHT_SIZES.standard.s} />
-      </SkeletonTheme>
+      />
     </StyledSkeletonContainer>
   );
 };

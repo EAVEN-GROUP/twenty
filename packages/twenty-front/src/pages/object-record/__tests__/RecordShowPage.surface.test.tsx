@@ -3,6 +3,10 @@ import { RecordShowPage } from '~/pages/object-record/RecordShowPage';
 import { render, screen } from '@testing-library/react';
 
 let mockObjectMetadataItems = [{ nameSingular: 'person' }];
+let mockParameters = {
+  objectNameSingular: 'person',
+  objectRecordId: 'record-1',
+};
 let mockRecordResource: {
   record: { id: string } | undefined;
   loading: boolean;
@@ -14,10 +18,18 @@ let mockRecordResource: {
 };
 
 jest.mock('react-router-dom', () => ({
-  useParams: () => ({
-    objectNameSingular: 'person',
-    objectRecordId: 'record-1',
-  }),
+  ...jest.requireActual('react-router-dom'),
+  useParams: () => mockParameters,
+  Navigate: ({ to }: { to: string }) => <div data-testid="navigate">{to}</div>,
+}));
+
+jest.mock('@/object-core/utils/findCoreObjectShowPage', () => ({
+  findCoreObjectShowPage: (objectNameSingular: string) =>
+    objectNameSingular === 'workflow'
+      ? ({ objectRecordId }: { objectRecordId: string }) => (
+          <div data-testid="core-object-show-page">{objectRecordId}</div>
+        )
+      : undefined,
 }));
 
 jest.mock('@/object-record/record-show/hooks/useRecordShowPage', () => ({
@@ -40,7 +52,7 @@ jest.mock('@/object-metadata/hooks/useObjectMetadataItems', () => ({
   }),
 }));
 
-jest.mock('@/app/routing/components/WorkspaceRouteUnavailable', () => ({
+jest.mock('@/ui/layout/page/components/WorkspaceRouteUnavailable', () => ({
   WorkspaceRouteUnavailable: () => <div data-testid="route-unavailable" />,
 }));
 
@@ -118,11 +130,42 @@ jest.mock('@/side-panel/components/SidePanelToggleButton', () => ({
 describe('RecordShowPage workspace surface composition', () => {
   beforeEach(() => {
     mockObjectMetadataItems = [{ nameSingular: 'person' }];
+    mockParameters = {
+      objectNameSingular: 'person',
+      objectRecordId: 'record-1',
+    };
     mockRecordResource = {
       record: { id: 'record-1' },
       loading: false,
       error: undefined,
     };
+  });
+
+  it('delegates core-owned records through the generic core show page', () => {
+    mockParameters = {
+      objectNameSingular: 'workflow',
+      objectRecordId: 'workspace-workflow-1',
+    };
+
+    render(<RecordShowPage />);
+
+    expect(screen.getByTestId('core-object-show-page')).toHaveTextContent(
+      'workspace-workflow-1',
+    );
+    expect(screen.queryByTestId('record-renderer')).not.toBeInTheDocument();
+  });
+
+  it('sends a chat record to the chat page', () => {
+    mockObjectMetadataItems = [{ nameSingular: 'agentChatThread' }];
+    mockParameters = {
+      objectNameSingular: 'agentChatThread',
+      objectRecordId: 'chat-1',
+    };
+
+    render(<RecordShowPage />);
+
+    expect(screen.getByTestId('navigate')).toHaveTextContent('/chat/chat-1');
+    expect(screen.queryByTestId('record-renderer')).not.toBeInTheDocument();
   });
 
   it('keeps the existing main-page chrome and canonical renderer', () => {

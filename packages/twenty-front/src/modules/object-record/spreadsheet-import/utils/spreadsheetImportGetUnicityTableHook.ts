@@ -3,13 +3,14 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { isCompositeFieldType } from '@/object-record/object-filter-dropdown/utils/isCompositeFieldType';
 import { getCompositeSubFieldKey } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetCompositeSubFieldKey';
-import { COMPOSITE_FIELD_SUB_FIELD_LABELS } from '@/settings/data-model/constants/CompositeFieldSubFieldLabel';
+import { COMPOSITE_FIELD_SUB_FIELD_LABELS } from 'twenty-shared/constants';
 import { SETTINGS_COMPOSITE_FIELD_TYPE_CONFIGS } from '@/settings/data-model/constants/SettingsCompositeFieldTypeConfigs';
 import {
   type ImportedStructuredRow,
   type SpreadsheetImportTableHook,
 } from '@/spreadsheet-import/types';
 import { isNonEmptyString } from '@sniptt/guards';
+import { t } from '@lingui/core/macro';
 import { type FieldLinksVariant, FieldMetadataType } from 'twenty-shared/types';
 import {
   getUniqueConstraintsFields,
@@ -86,7 +87,7 @@ export const spreadsheetImportGetUnicityTableHook = (
       duplicateIndices.forEach((duplicateIndex) => {
         uniqueConstraint.forEach(({ columnName }) => {
           addError(duplicateIndex, columnName, {
-            message: `This ${columnName} value already exists in your import data`,
+            message: t`This ${columnName} value already exists in your import data`,
             level: 'error',
           });
         });

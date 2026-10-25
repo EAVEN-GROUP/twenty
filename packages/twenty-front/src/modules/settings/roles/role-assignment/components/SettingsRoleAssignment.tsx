@@ -1,4 +1,3 @@
-import { isDefined } from 'twenty-shared/utils';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useUpdateAgentRole } from '@/settings/roles/hooks/useUpdateAgentRole';
@@ -9,8 +8,8 @@ import { SettingsRoleAssignmentConfirmationModal } from '@/settings/roles/role-a
 import { type SettingsRoleAssignmentConfirmationModalSelectedRoleTarget } from '@/settings/roles/role-assignment/types/SettingsRoleAssignmentConfirmationModalSelectedRoleTarget';
 import { useSettingsAllRoles } from '@/settings/roles/hooks/useSettingsAllRoles';
 import { settingsDraftRoleFamilyState } from '@/settings/roles/states/settingsDraftRoleFamilyState';
-import { useModal } from '@/ui/layout/modal/hooks/useModal';
-import { isModalOpenedComponentState } from '@/ui/layout/modal/states/isModalOpenedComponentState';
+import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
+import { isDialogOpenedComponentState } from '@/ui/layout/dialog/states/isDialogOpenedComponentState';
 import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
@@ -29,6 +28,7 @@ import { type PartialWorkspaceMember } from '@/settings/roles/types/RoleWithPart
 import { ROLE_ASSIGNMENT_CONFIRMATION_MODAL_ID } from '@/settings/roles/role-assignment/constants/RoleAssignmentConfirmationModalId';
 import { ROLE_TARGET_CONFIG } from '@/settings/roles/role-assignment/constants/RoleTargetConfig';
 import { buildRoleMaps } from '@/settings/roles/role-assignment/utils/buildRoleMaps';
+import { doNotTranslate } from 'twenty-shared/i18n';
 
 type SettingsRoleAssignmentProps = {
   roleId: string;
@@ -59,7 +59,7 @@ export const SettingsRoleAssignment = ({
   const { data: agentsData } = useQuery(FindManyAgentsDocument);
   const { data: apiKeysData } = useQuery(GetApiKeysDocument);
 
-  const { openModal, closeModal } = useModal();
+  const { openDialog, closeDialog } = useDialog();
   const modalInstanceId = useWorkspaceSurfaceScopedComponentInstanceId(
     ROLE_ASSIGNMENT_CONFIRMATION_MODAL_ID,
   );
@@ -91,13 +91,13 @@ export const SettingsRoleAssignment = ({
     setSelectRoleTarget(null);
   };
 
-  const isModalOpened = useAtomComponentStateValue(
-    isModalOpenedComponentState,
+  const isDialogOpened = useAtomComponentStateValue(
+    isDialogOpenedComponentState,
     modalInstanceId,
   );
 
   const handleConfirm = async () => {
-    if (!selectedRoleTarget || !isModalOpened) return;
+    if (!selectedRoleTarget || !isDialogOpened) return;
 
     if (!isCreateMode) {
       switch (selectedRoleTarget.entityType) {
@@ -125,7 +125,7 @@ export const SettingsRoleAssignment = ({
           );
 
           if (!member) {
-            throw new Error('Workspace member not found');
+            throw new Error(doNotTranslate('Workspace member not found'));
           }
 
           updateWorkspaceMemberRoleDraftState({
@@ -133,6 +133,7 @@ export const SettingsRoleAssignment = ({
               id: member.id,
               name: member.name,
               userEmail: member.userEmail,
+              userId: member.userId,
               avatarUrl: member.avatarUrl,
             },
           });
@@ -144,7 +145,7 @@ export const SettingsRoleAssignment = ({
           );
 
           if (!agent) {
-            throw new Error('Agent not found');
+            throw new Error(doNotTranslate('Agent not found'));
           }
 
           updateAgentRoleDraftState({
@@ -158,7 +159,7 @@ export const SettingsRoleAssignment = ({
           );
 
           if (!apiKeyData) {
-            throw new Error('API key not found');
+            throw new Error(doNotTranslate('API key not found'));
           }
 
           updateApiKeyRoleDraftState({
@@ -187,18 +188,14 @@ export const SettingsRoleAssignment = ({
       entityType: entityType as 'member' | 'agent' | 'apiKey',
     });
 
-    openModal(ROLE_ASSIGNMENT_CONFIRMATION_MODAL_ID);
+    openDialog(modalInstanceId);
   };
 
   const handleRoleClick = (roleId: string) => {
     navigateSettings(SettingsPath.RoleDetail, { roleId });
     handleModalClose();
-    closeModal(ROLE_ASSIGNMENT_CONFIRMATION_MODAL_ID);
+    closeDialog(modalInstanceId);
   };
-
-  if (!isDefined(settingsDraftRole)) {
-    return null;
-  }
 
   return (
     <>
@@ -224,6 +221,7 @@ export const SettingsRoleAssignment = ({
 
       {selectedRoleTarget && (
         <SettingsRoleAssignmentConfirmationModal
+          modalInstanceId={modalInstanceId}
           selectedRoleTarget={selectedRoleTarget}
           onClose={handleModalClose}
           onConfirm={handleConfirm}

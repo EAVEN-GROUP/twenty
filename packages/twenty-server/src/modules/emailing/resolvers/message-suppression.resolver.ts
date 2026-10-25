@@ -18,22 +18,31 @@ import { EmailGroupAccessService } from 'src/engine/core-modules/emailing-domain
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
-import {
-  FeatureFlagGuard,
-  RequireFeatureFlag,
-} from 'src/engine/guards/feature-flag.guard';
+import { FeatureFlagGuard } from 'src/engine/guards/feature-flag.guard';
 import { SettingsPermissionGuard } from 'src/engine/guards/settings-permission.guard';
-import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
+import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { MessageSuppressionService } from 'src/modules/emailing/services/message-suppression.service';
+import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
 
 @UseGuards(
-  WorkspaceAuthGuard,
-  FeatureFlagGuard,
+  AuthPrincipalGuard({
+    userSession: {
+      standard: true,
+      impersonated: true,
+      playground: true,
+      workspaceAgnostic: false,
+    },
+    apiKey: true,
+    oauthClient: true,
+    application: true,
+  }),
+  FeatureFlagGuard(FeatureFlagKey.IS_MESSAGE_CAMPAIGN_ENABLED),
   SettingsPermissionGuard(PermissionFlagType.WORKSPACE),
 )
 @UseFilters(
   EmailGroupAccessGraphqlApiExceptionFilter,
   EmailingDomainGraphqlApiExceptionFilter,
+  AuthGraphqlApiExceptionFilter,
 )
 @UsePipes(ResolverValidationPipe)
 @MetadataResolver(() => MessageSuppressionListDTO)
@@ -44,7 +53,6 @@ export class MessageSuppressionResolver {
   ) {}
 
   @Query(() => MessageSuppressionListDTO)
-  @RequireFeatureFlag(FeatureFlagKey.IS_EMAIL_GROUP_ENABLED)
   async messageSuppressions(
     @Args('input') input: FindMessageSuppressionsInput,
     @AuthWorkspace() currentWorkspace: WorkspaceEntity,
@@ -62,7 +70,6 @@ export class MessageSuppressionResolver {
   }
 
   @Mutation(() => MessageSuppressionDTO)
-  @RequireFeatureFlag(FeatureFlagKey.IS_EMAIL_GROUP_ENABLED)
   async createMessageSuppression(
     @Args('input') input: CreateMessageSuppressionInput,
     @AuthWorkspace() currentWorkspace: WorkspaceEntity,
@@ -77,7 +84,6 @@ export class MessageSuppressionResolver {
   }
 
   @Mutation(() => Boolean)
-  @RequireFeatureFlag(FeatureFlagKey.IS_EMAIL_GROUP_ENABLED)
   async deleteMessageSuppression(
     @Args('id', { type: () => UUIDScalarType }) suppressionId: string,
     @AuthWorkspace() currentWorkspace: WorkspaceEntity,

@@ -3,6 +3,7 @@ import { t } from '@lingui/core/macro';
 import {
   assertUnreachable,
   isCallRecordingTranscriptStatusMarker,
+  isDefined,
 } from 'twenty-shared/utils';
 import { CallRecordingStatus } from '~/generated/graphql';
 
@@ -13,6 +14,32 @@ type CallRecordingStatusDisplayConfiguration = {
   subTitle: string;
 };
 
+const getCompletedCallRecordingSummaryDisplayConfiguration = (
+  transcript: WidgetCallRecordingCandidate['transcript'],
+): CallRecordingStatusDisplayConfiguration => {
+  if (
+    !isCallRecordingTranscriptStatusMarker(transcript) ||
+    transcript.status === 'PENDING'
+  ) {
+    return {
+      title: t`Summary Not Available`,
+      subTitle: t`A summary is not available for this call recording yet.`,
+    };
+  }
+
+  if (transcript.status === 'EMPTY' && !isDefined(transcript.subCode)) {
+    return {
+      title: t`No Speech Detected`,
+      subTitle: t`No speech was detected, so there is nothing to summarize.`,
+    };
+  }
+
+  return {
+    title: t`Summary Not Available`,
+    subTitle: t`A summary could not be generated because no transcript is available.`,
+  };
+};
+
 export const getCallRecordingStatusDisplayConfiguration = (
   callRecording: Pick<WidgetCallRecordingCandidate, 'status' | 'transcript'>,
   artifactType: CallRecordingArtifactType,
@@ -21,15 +48,39 @@ export const getCallRecordingStatusDisplayConfiguration = (
     artifactType === 'transcript' &&
     isCallRecordingTranscriptStatusMarker(callRecording.transcript)
   ) {
-    return callRecording.transcript.status === 'PENDING'
-      ? {
+    switch (callRecording.transcript.status) {
+      case 'PENDING':
+        return {
           title: t`Preparing Transcript`,
           subTitle: t`The transcript is being prepared…`,
-        }
-      : {
+        };
+      case 'FAILED':
+        return {
           title: t`Transcript Failed`,
           subTitle: t`The transcript could not be generated.`,
         };
+      case 'EMPTY':
+        if (callRecording.transcript.subCode === 'transcript_expired') {
+          return {
+            title: t`Transcript Expired`,
+            subTitle: t`The transcript expired before it could be imported.`,
+          };
+        }
+
+        if (!isDefined(callRecording.transcript.subCode)) {
+          return {
+            title: t`No Speech Detected`,
+            subTitle: t`No speech was detected in this recording.`,
+          };
+        }
+
+        return {
+          title: t`Transcript Unavailable`,
+          subTitle: t`No transcript is available for this recording.`,
+        };
+      default:
+        return assertUnreachable(callRecording.transcript.status);
+    }
   }
 
   switch (callRecording.status) {
@@ -54,15 +105,16 @@ export const getCallRecordingStatusDisplayConfiguration = (
         subTitle: t`The call recording is being processed…`,
       };
     case CallRecordingStatus.COMPLETED:
-      return artifactType === 'summary'
-        ? {
-            title: t`Summary Not Available`,
-            subTitle: t`A summary is not available for this call recording yet.`,
-          }
-        : {
-            title: t`No Transcript`,
-            subTitle: t`No transcript is available for this call recording yet.`,
-          };
+      if (artifactType === 'transcript') {
+        return {
+          title: t`No Transcript`,
+          subTitle: t`No transcript is available for this call recording yet.`,
+        };
+      }
+
+      return getCompletedCallRecordingSummaryDisplayConfiguration(
+        callRecording.transcript,
+      );
     case CallRecordingStatus.FAILED:
       return {
         title: t`Recording Failed`,

@@ -1,81 +1,55 @@
-import { styled } from '@linaria/react';
-import { type MouseEventHandler, type ReactNode } from 'react';
+import { type MouseEvent, type MouseEventHandler, type ReactNode } from 'react';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { FormFieldRow } from 'twenty-ui/components/input';
 
-const ROW_MIN_HEIGHT = '40px';
-
-const StyledRow = styled.div<{ $clickable: boolean }>`
-  align-items: center;
-  border-bottom: 1px solid ${themeCssVariables.border.color.light};
-  box-sizing: border-box;
-  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
-  display: flex;
-  gap: ${themeCssVariables.spacing[2]};
-  min-height: ${ROW_MIN_HEIGHT};
-  padding: ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[2]}
-    ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[3]};
-  width: 100%;
-
-  &:last-of-type {
-    border-bottom: none;
-  }
-`;
-
-const StyledLabel = styled.span<{ $minWidth: string | undefined }>`
-  color: ${themeCssVariables.font.color.tertiary};
-  flex-shrink: 0;
-  font-size: ${themeCssVariables.font.size.md};
-  font-weight: ${themeCssVariables.font.weight.regular};
-  min-width: ${({ $minWidth }) => $minWidth ?? 'auto'};
-`;
-
-const StyledContent = styled.div`
-  align-items: center;
-  display: flex;
-  flex: 1;
-  min-width: 0;
-`;
-
-const StyledTrailing = styled.div`
-  align-items: center;
-  display: flex;
-`;
+const NESTED_CONTROL_SELECTOR = doNotTranslate(
+  'input, textarea, button, a[href], [role="button"]',
+);
 
 type ComposerFieldRowProps = {
   label: string;
   children: ReactNode;
   trailing?: ReactNode;
+  hasDivider?: boolean;
   onClick?: MouseEventHandler<HTMLDivElement>;
-  // A floor, not a fixed width: mixed-length labels line up without a long
-  // translation running underneath its control.
-  labelMinWidth?: string;
 };
 
-// The visible label is a plain span, so it cannot be associated with whatever
-// control the row wraps. Naming the row as a group gives assistive technology
-// the field name even for controls that take no label of their own.
 export const ComposerFieldRow = ({
   label,
   children,
   trailing,
+  hasDivider,
   onClick,
-  labelMinWidth,
-}: ComposerFieldRowProps) => (
-  <StyledRow
-    role="group"
-    aria-label={label}
-    $clickable={isDefined(onClick)}
-    onClick={onClick}
-  >
-    <StyledLabel aria-hidden="true" $minWidth={labelMinWidth}>
-      {label}
-    </StyledLabel>
-    <StyledContent>{children}</StyledContent>
-    {isDefined(trailing) && (
-      <StyledTrailing onClick={(event) => event.stopPropagation()}>
-        {trailing}
-      </StyledTrailing>
-    )}
-  </StyledRow>
-);
+}: ComposerFieldRowProps) => {
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const row = event.currentTarget;
+    const nestedControl = event.target.closest(NESTED_CONTROL_SELECTOR);
+    const isFromPortaledContent = !row.contains(event.target);
+    const isOnNestedControl =
+      isDefined(nestedControl) && row.contains(nestedControl);
+
+    if (isFromPortaledContent || isOnNestedControl) {
+      return;
+    }
+
+    onClick?.(event);
+  };
+
+  return (
+    <FormFieldRow
+      label={label}
+      hasDivider={hasDivider}
+      isHoverable={isDefined(onClick)}
+      onClick={isDefined(onClick) ? handleClick : undefined}
+      trailing={trailing}
+      trailingProps={{ onClick: (event) => event.stopPropagation() }}
+    >
+      {children}
+    </FormFieldRow>
+  );
+};

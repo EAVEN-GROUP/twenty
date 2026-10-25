@@ -12,7 +12,7 @@ import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager
 import { type WorkspaceTransactionScope } from 'src/engine/twenty-orm/types/workspace-transaction-scope.type';
 import { type WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace-repository';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
-import { type TimelineActivityPayload } from 'src/modules/timeline/types/timeline-activity-payload';
+import { type TimelineActivityPayload } from 'src/modules/timeline/types/timeline-activity-payload.type';
 import { type LinkedTimelineActivityHappensAtSyncUpdate } from 'src/modules/timeline/utils/build-linked-timeline-activity-happens-at-sync-updates.util';
 import {
   buildTimelineActivityMergeKey,
@@ -95,9 +95,7 @@ export class TimelineActivityRepository {
         { shouldBypassPermissionChecks: true },
       );
 
-    // Queue retries can replay an older source event after a newer one, so the
-    // value is read from the source row at write time instead of trusting the
-    // event snapshot: a replay then rewrites the current value, not a stale one.
+    // Queue retries can replay an older event, so read the value from the source row rather than the event snapshot
     const sourceRecords = await sourceRepository.find({
       select: ['id', happensAtFieldName],
       where: { id: In(linkedRecordIds) },
@@ -127,7 +125,7 @@ export class TimelineActivityRepository {
       );
 
     const timelineActivities = await timelineActivityRepository.find({
-      select: ['id', 'linkedRecordId'],
+      select: ['id', 'linkedRecordId', 'happensAt'],
       where: {
         linkedRecordId: In([...happensAtByLinkedRecordId.keys()]),
         timelineActivityTypeId: In(timelineActivityTypeIds),
@@ -139,9 +137,14 @@ export class TimelineActivityRepository {
         timelineActivity.linkedRecordId,
       );
 
-      return isDefined(happensAt)
-        ? [{ criteria: timelineActivity.id, partialEntity: { happensAt } }]
-        : [];
+      if (
+        !isDefined(happensAt) ||
+        new Date(timelineActivity.happensAt).getTime() === happensAt.getTime()
+      ) {
+        return [];
+      }
+
+      return [{ criteria: timelineActivity.id, partialEntity: { happensAt } }];
     });
 
     for (const updateInputsChunk of chunk(updateInputs, QUERY_MAX_RECORDS)) {
@@ -193,8 +196,7 @@ export class TimelineActivityRepository {
           const timelineActivityPropertyName =
             this.getTimelineActivityPropertyName(objectSingularName);
 
-          // Bucketed once so matching a payload stays constant time: the recent
-          // window is scoped to this batch but is not capped in size.
+          // The recent window is not capped in size, so bucket it once for constant-time matching
           const recentTimelineActivitiesByMergeKey = new Map<
             string,
             (typeof recentTimelineActivities)[number][]
@@ -235,8 +237,8 @@ export class TimelineActivityRepository {
                 )
                 .find(
                   (timelineActivity) =>
-                    !isDefined(payload.linkedRecordId) ||
-                    timelineActivity.linkedRecordId === payload.linkedRecordId,
+                    (timelineActivity.linkedRecordId ?? null) ===
+                    (payload.linkedRecordId ?? null),
                 );
 
             if (isDefined(recentTimelineActivity)) {
@@ -337,6 +339,7 @@ export class TimelineActivityRepository {
             payload.recordId,
             payload.workspaceMemberId ?? null,
             payload.timelineActivityTypeId,
+            payload.linkedRecordId ?? null,
           ]),
         ),
       ),
@@ -372,9 +375,13 @@ export class TimelineActivityRepository {
       createdAt: MoreThan(tenMinutesAgo),
     };
 
-    // The where clause is already scoped to this batch payloads and to the merge
-    // window, so every candidate is fetched: taking a single row would let only
-    // one payload of a multi record batch merge.
+    const linkedRecordIds = payloads.map((payload) => payload.linkedRecordId);
+
+    if (linkedRecordIds.every(isDefined)) {
+      whereConditions.linkedRecordId = In(linkedRecordIds);
+    }
+
+    // Every candidate is needed: a single row would let only one payload of a multi-record batch merge
     return await timelineActivityRepository.find({
       where: {
         ...whereConditions,

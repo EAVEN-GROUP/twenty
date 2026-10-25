@@ -4,13 +4,13 @@ import { DropdownComponentInstanceContext } from '@/ui/layout/dropdown/contexts/
 import { useSetActiveDropdownFocusIdAndMemorizePrevious } from '@/ui/layout/dropdown/hooks/useSetFocusedDropdownIdAndMemorizePrevious';
 
 import { isDropdownOpenComponentState } from '@/ui/layout/dropdown/states/isDropdownOpenComponentState';
-import { useWorkspaceSurfaceScopedComponentInstanceIdResolver } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
 import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePushFocusItemToFocusStack';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
 import { type GlobalHotkeysConfig } from '@/ui/utilities/hotkey/types/GlobalHotkeysConfig';
 import { useAvailableComponentInstanceId } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceId';
 import { useStore } from 'jotai';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 
 type OpenDropdownArgs = {
   dropdownComponentInstanceIdFromProps?: string;
@@ -23,32 +23,21 @@ export const useOpenDropdown = () => {
   const { setActiveDropdownFocusIdAndMemorizePrevious } =
     useSetActiveDropdownFocusIdAndMemorizePrevious();
   const store = useStore();
-  const resolveComponentInstanceId =
-    useWorkspaceSurfaceScopedComponentInstanceIdResolver();
 
   const dropdownComponentInstanceIdFromContext =
     useAvailableComponentInstanceId(DropdownComponentInstanceContext);
 
   const openDropdown = useCallback(
     (args?: OpenDropdownArgs | null | undefined) => {
-      const rawDropdownComponentInstanceId =
+      const dropdownComponentInstanceId =
         args?.dropdownComponentInstanceIdFromProps ??
         dropdownComponentInstanceIdFromContext;
 
-      if (!isDefined(rawDropdownComponentInstanceId)) {
-        throw new Error('Dropdown component instance ID is not defined');
+      if (!isDefined(dropdownComponentInstanceId)) {
+        throw new Error(
+          doNotTranslate('Dropdown component instance ID is not defined'),
+        );
       }
-
-      const dropdownComponentInstanceId = resolveComponentInstanceId(
-        rawDropdownComponentInstanceId,
-      );
-
-      store.set(
-        isDropdownOpenComponentState.atomFamily({
-          instanceId: dropdownComponentInstanceId,
-        }),
-        true,
-      );
 
       setActiveDropdownFocusIdAndMemorizePrevious(dropdownComponentInstanceId);
 
@@ -67,12 +56,18 @@ export const useOpenDropdown = () => {
             false,
         },
       });
+
+      store.set(
+        isDropdownOpenComponentState.atomFamily({
+          instanceId: dropdownComponentInstanceId,
+        }),
+        true,
+      );
     },
     [
       pushFocusItemToFocusStack,
       setActiveDropdownFocusIdAndMemorizePrevious,
       dropdownComponentInstanceIdFromContext,
-      resolveComponentInstanceId,
       store,
     ],
   );

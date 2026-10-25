@@ -1,9 +1,10 @@
+import { useMemo } from 'react';
+import { GetCoreWorkflowVersionDocument } from '~/generated/graphql';
 import { useQuery } from '@apollo/client/react';
 import { isDefined } from 'twenty-shared/utils';
 
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { type WorkflowVersion } from '@/workflow/types/Workflow';
-import { GET_WORKFLOW_VERSION_CONTENT } from '@/workflow/workflow-version/graphql/queries/getWorkflowVersionContent';
 
 export type WorkflowVersionContent = {
   workflowVersionId: string;
@@ -13,18 +14,28 @@ export type WorkflowVersionContent = {
 
 export const useWorkflowVersionContent = (workflowVersionId?: string) => {
   const apolloCoreClient = useApolloCoreClient();
-
-  const { data, loading, refetch } = useQuery<{
-    workflowVersionContent: WorkflowVersionContent;
-  }>(GET_WORKFLOW_VERSION_CONTENT, {
+  const core = useQuery(GetCoreWorkflowVersionDocument, {
     client: apolloCoreClient,
-    variables: { workflowVersionId },
+    variables: { coreWorkflowVersionId: workflowVersionId ?? '' },
+    fetchPolicy: 'cache-and-network',
     skip: !isDefined(workflowVersionId),
   });
+  const content = useMemo<WorkflowVersionContent | undefined>(() => {
+    const version = core.data?.coreWorkflowVersion;
+    return isDefined(version)
+      ? {
+          workflowVersionId: version.id,
+          trigger: version.trigger,
+          steps: version.steps,
+        }
+      : undefined;
+  }, [core.data]);
 
   return {
-    content: data?.workflowVersionContent,
-    loading,
-    refetchContent: refetch,
+    content,
+    loading: core.loading,
+    refetchContent: core.refetch,
+    contentUpdatedAt: core.data?.coreWorkflowVersion?.updatedAt,
+    error: core.error,
   };
 };

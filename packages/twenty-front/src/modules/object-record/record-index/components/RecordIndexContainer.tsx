@@ -11,9 +11,9 @@ import { RecordIndexCalendarContainer } from '@/object-record/record-index/compo
 import { RecordIndexEmptyStateNotShared } from '@/object-record/record-index/components/RecordIndexEmptyStateNotShared';
 import { RecordIndexFiltersToContextStoreEffect } from '@/object-record/record-index/components/RecordIndexFiltersToContextStoreEffect';
 import { useHasCurrentViewNonReadableFields } from '@/object-record/record-index/hooks/useHasCurrentViewNonReadableFields';
-import { RecordListContainer } from '@/object-record/record-list/components/RecordListContainer';
+import { RecordList } from '@/object-record/record-list/components/RecordList';
 import { ViewType } from '@/views/types/ViewType';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledContainer = styled.div`
   background: ${themeCssVariables.grayScale.gray3};
@@ -72,10 +72,7 @@ export const RecordIndexContainer = () => {
           )}
           {recordIndexViewType === ViewType.LIST && (
             <StyledContainerWithPadding>
-              <RecordListContainer
-                objectNameSingular={objectNameSingular}
-                viewBarInstanceId={recordIndexId}
-              />
+              <RecordList />
             </StyledContainerWithPadding>
           )}
         </>

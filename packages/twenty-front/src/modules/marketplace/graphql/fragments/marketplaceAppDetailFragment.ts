@@ -21,7 +21,13 @@ export const MARKETPLACE_APP_DETAIL_FRAGMENT = gql`
     emailSupport
     issueReportUrl
     galleryImages
+    installCount
     defaultRoleUniversalIdentifier
+    requestedCapabilities
+    billsCredits
+    objects {
+      universalIdentifier
+    }
     roles {
       universalIdentifier
       label

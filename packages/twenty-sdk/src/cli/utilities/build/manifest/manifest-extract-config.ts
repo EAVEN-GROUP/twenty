@@ -9,11 +9,13 @@ export enum TargetFunction {
   DefinePostInstallLogicFunction = 'definePostInstallLogicFunction',
   DefinePreInstallLogicFunction = 'definePreInstallLogicFunction',
   DefineUninstallLogicFunction = 'defineUninstallLogicFunction',
+  DefineHealthCheck = 'defineHealthCheck',
   DefineObject = 'defineObject',
   DefinePermissionFlag = 'definePermissionFlag',
   DefineRole = 'defineRole',
   DefineSkill = 'defineSkill',
   DefineAgent = 'defineAgent',
+  DefineWorkflow = 'defineWorkflow',
   DefineConnectionProvider = 'defineConnectionProvider',
   DefineFrontComponent = 'defineFrontComponent',
   DefineSettingsFrontComponent = 'defineSettingsFrontComponent',
@@ -22,8 +24,10 @@ export enum TargetFunction {
   DefineNavigationMenuItem = 'defineNavigationMenuItem',
   DefinePageLayout = 'definePageLayout',
   DefinePageLayoutTab = 'definePageLayoutTab',
+  DefinePageLayoutWidget = 'definePageLayoutWidget',
   DefineCommandMenuItem = 'defineCommandMenuItem',
   DefineTimelineActivityType = 'defineTimelineActivityType',
+  DefineSettingsMenuItem = 'defineSettingsMenuItem',
 }
 
 export enum ManifestEntityKey {
@@ -36,6 +40,7 @@ export enum ManifestEntityKey {
   Roles = 'roles',
   Skills = 'skills',
   Agents = 'agents',
+  Workflows = 'workflows',
   ConnectionProviders = 'connectionProviders',
   FrontComponents = 'frontComponents',
   PublicAssets = 'publicAssets',
@@ -44,8 +49,10 @@ export enum ManifestEntityKey {
   NavigationMenuItems = 'navigationMenuItems',
   PageLayouts = 'pageLayouts',
   PageLayoutTabs = 'pageLayoutTabs',
+  PageLayoutWidgets = 'pageLayoutWidgets',
   CommandMenuItems = 'commandMenuItems',
   TimelineActivityTypes = 'timelineActivityTypes',
+  SettingsMenuItems = 'settingsMenuItems',
 }
 
 export type EntityFilePaths = Record<ManifestEntityKey, string[]>;
@@ -65,11 +72,13 @@ export const TARGET_FUNCTION_TO_ENTITY_KEY_MAPPING: Record<
     ManifestEntityKey.LogicFunctions,
   [TargetFunction.DefineUninstallLogicFunction]:
     ManifestEntityKey.LogicFunctions,
+  [TargetFunction.DefineHealthCheck]: ManifestEntityKey.LogicFunctions,
   [TargetFunction.DefineObject]: ManifestEntityKey.Objects,
   [TargetFunction.DefinePermissionFlag]: ManifestEntityKey.PermissionFlags,
   [TargetFunction.DefineRole]: ManifestEntityKey.Roles,
   [TargetFunction.DefineSkill]: ManifestEntityKey.Skills,
   [TargetFunction.DefineAgent]: ManifestEntityKey.Agents,
+  [TargetFunction.DefineWorkflow]: ManifestEntityKey.Workflows,
   [TargetFunction.DefineConnectionProvider]:
     ManifestEntityKey.ConnectionProviders,
   [TargetFunction.DefineFrontComponent]: ManifestEntityKey.FrontComponents,
@@ -81,9 +90,11 @@ export const TARGET_FUNCTION_TO_ENTITY_KEY_MAPPING: Record<
     ManifestEntityKey.NavigationMenuItems,
   [TargetFunction.DefinePageLayout]: ManifestEntityKey.PageLayouts,
   [TargetFunction.DefinePageLayoutTab]: ManifestEntityKey.PageLayoutTabs,
+  [TargetFunction.DefinePageLayoutWidget]: ManifestEntityKey.PageLayoutWidgets,
   [TargetFunction.DefineCommandMenuItem]: ManifestEntityKey.CommandMenuItems,
   [TargetFunction.DefineTimelineActivityType]:
     ManifestEntityKey.TimelineActivityTypes,
+  [TargetFunction.DefineSettingsMenuItem]: ManifestEntityKey.SettingsMenuItems,
 };
 
 const computeIsTargetFunctionCall = (node: ts.Node): string | undefined => {

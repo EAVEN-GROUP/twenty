@@ -20,6 +20,7 @@ jobs:
         packages/twenty-sdk/**
         packages/twenty-client-sdk/**
         packages/twenty-server/**
+        packages/twenty-ui/**
         .github/workflows/ci-sdk.yaml
         !packages/twenty-sdk/package.json
         !packages/twenty-client-sdk/package.json
@@ -104,5 +105,5 @@ jobs:
     needs: [changed-files-check, sdk-test, sdk-e2e-test]
     steps:
       - name: Fail job if any needs failed
-        if: contains(needs.*.result, 'failure')
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1

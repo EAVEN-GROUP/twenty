@@ -7,15 +7,17 @@ import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldCont
 import { useFieldFocus } from '@/object-record/record-field/ui/hooks/useFieldFocus';
 import { MAX_RELATION_CHIPS_DISPLAYED_INLINE } from '@/object-record/record-field/ui/meta-types/display/constants/MaxRelationChipsDisplayedInline';
 import { useRelationFromManyFieldDisplay } from '@/object-record/record-field/ui/meta-types/hooks/useRelationFromManyFieldDisplay';
-import { ExpandableList } from '@/ui/layout/expandable-list/components/ExpandableList';
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { UserContext } from '@/users/contexts/UserContext';
+import { useLingui } from '@lingui/react/macro';
 import { isArray } from '@sniptt/guards';
 import { useContext } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { dateLocaleState } from '~/localization/states/dateLocaleState';
+import { OverflowingList } from 'twenty-ui/components/layout';
 
 export const PersonMeetingsFieldDisplay = () => {
+  const { t } = useLingui();
   const { fieldValue } = useRelationFromManyFieldDisplay();
   const { isFocused } = useFieldFocus();
   const { disableChipClick, triggerEvent } = useContext(FieldContext);
@@ -42,8 +44,9 @@ export const PersonMeetingsFieldDisplay = () => {
   );
 
   return (
-    <ExpandableList
-      isChipCountDisplayed={isFocused}
+    <OverflowingList
+      overflowLabel={t`Show all items`}
+      showOverflowCount={isFocused}
       maxInlineCount={MAX_RELATION_CHIPS_DISPLAYED_INLINE}
     >
       {meetings.map((meeting) => (
@@ -67,6 +70,6 @@ export const PersonMeetingsFieldDisplay = () => {
           triggerEvent={triggerEvent}
         />
       ))}
-    </ExpandableList>
+    </OverflowingList>
   );
 };

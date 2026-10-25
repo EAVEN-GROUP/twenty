@@ -10,6 +10,14 @@ export const BOX_SHADOW_TOKENS = {
       '0px 1px 6px 0px rgba(13, 31, 45, 0.05), 0px 0px 2px 0px rgba(13, 31, 45, 0.06)',
     dark: '0px 2px 4px 0px rgba(0, 0, 0, 0.04), 0px 0px 4px 0px rgba(0, 0, 0, 0.08)',
   }),
+  sidebar: token({
+    light: '-4px 4px 4px 0px rgba(0, 0, 0, 0.005)',
+    dark: '-4px 4px 4px 0px rgba(0, 0, 0, 0.03)',
+  }),
+  bottomPanel: token({
+    light: '0px 0px 20px 0px color(display-p3 0 0 0 / 0.1)',
+    dark: '0px 0px 20px 0px rgba(0, 0, 0, 0.1)',
+  }),
   strong: token({
     light:
       '0px 4px 20px 0px rgba(13, 31, 45, 0.08), 0px 1px 4px 0px rgba(13, 31, 45, 0.06)',

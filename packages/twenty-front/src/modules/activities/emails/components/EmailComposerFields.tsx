@@ -1,15 +1,23 @@
+import { EmailOperation } from 'twenty-shared/types';
 import { useQuery } from '@apollo/client/react';
-import { useContext } from 'react';
 import { DragDropProvider } from '@dnd-kit/react';
+import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
-import { getSendableEmailHandles, isDefined } from 'twenty-shared/utils';
+import {
+  canConnectedAccountPerformEmailOperation,
+  getSendableEmailHandles,
+  isDefined,
+} from 'twenty-shared/utils';
 import { IconPaperclip } from 'twenty-ui/icon';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { useRef } from 'react';
+import { flushSync } from 'react-dom';
+import { LightButton } from 'twenty-ui/components/input';
+import { Input } from 'twenty-ui/primitives/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { ComposerFieldRow } from '@/activities/components/ComposerFieldRow';
 import { ComposerHeader } from '@/activities/components/ComposerHeader';
-import { StyledComposerTextInput } from '@/activities/components/ComposerTextInput';
 import { EmailAttachmentsField } from '@/activities/emails/components/EmailAttachmentsField';
 import { INLINE_EMAIL_BODY_EDITOR_PROFILE } from '@/activities/emails/editor/constants/InlineEmailBodyEditorProfile';
 import { useUploadEmailImage } from '@/activities/emails/hooks/useUploadEmailImage';
@@ -23,7 +31,6 @@ import { type EmailRecipientsByFieldId } from '@/activities/emails/recipients/ut
 import { type EmailComposerState } from '@/activities/emails/types/EmailComposerState';
 import { type ConnectedAccount } from '@/accounts/types/ConnectedAccount';
 import { buildConnectedAccountSenderOptions } from '@/accounts/utils/buildConnectedAccountSenderOptions';
-import { canConnectedAccountSendEmail } from '@/accounts/utils/canConnectedAccountSendEmail';
 import { FormAdvancedTextFieldInput } from '@/advanced-text-editor/components/FormAdvancedTextFieldInput';
 import { Select } from '@/ui/input/components/Select';
 import { DND_KIT_PROVIDER_PLUGINS_WITHOUT_DROP_ANIMATION } from '@/ui/utilities/drag-and-drop/constants/DndKitProviderPluginsWithoutDropAnimation';
@@ -37,24 +44,6 @@ const StyledFieldsContainer = styled.div`
   flex-direction: column;
   min-height: 0;
   width: 100%;
-`;
-
-const StyledCcBccToggle = styled.button`
-  all: unset;
-  color: ${themeCssVariables.font.color.tertiary};
-  cursor: pointer;
-  flex-shrink: 0;
-  font-size: ${themeCssVariables.font.size.md};
-  padding: 0 ${themeCssVariables.spacing[1]};
-
-  &:hover {
-    color: ${themeCssVariables.font.color.secondary};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${themeCssVariables.color.blue};
-    outline-offset: 2px;
-  }
 `;
 
 const StyledBody = styled.div`
@@ -72,24 +61,8 @@ const StyledAttachments = styled.div`
   padding: 0 ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[2]};
 `;
 
-const StyledAttachAction = styled.button`
-  align-items: center;
+const ATTACH_ACTION_CLASS_NAME = css`
   align-self: flex-start;
-  all: unset;
-  color: ${themeCssVariables.font.color.tertiary};
-  cursor: pointer;
-  display: flex;
-  font-size: ${themeCssVariables.font.size.md};
-  gap: ${themeCssVariables.spacing[1]};
-
-  &:hover {
-    color: ${themeCssVariables.font.color.secondary};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${themeCssVariables.color.blue};
-    outline-offset: 2px;
-  }
 `;
 
 const StyledRecipientLimitWarning = styled.div`
@@ -101,8 +74,7 @@ const StyledRecipientLimitWarning = styled.div`
 type EmailComposerFieldsProps = {
   composerState: EmailComposerState;
   contextRecord?: EmailComposerContextRecord | null;
-  // Surfaces without a composer footer of their own pass this so attaching
-  // stays reachable from inside the form.
+  // For surfaces without a composer footer of their own.
   onAttachFiles?: () => void;
 };
 
@@ -111,7 +83,7 @@ export const EmailComposerFields = ({
   contextRecord,
   onAttachFiles,
 }: EmailComposerFieldsProps) => {
-  const { theme } = useContext(ThemeContext);
+  const ccInputRef = useRef<HTMLInputElement>(null);
   const { uploadEmailImage } = useUploadEmailImage();
   const { data: accountsData } = useQuery<{
     myConnectedAccounts: Pick<
@@ -121,7 +93,11 @@ export const EmailComposerFields = ({
   }>(GET_MY_CONNECTED_ACCOUNTS);
 
   const sendableAccounts = (accountsData?.myConnectedAccounts ?? []).filter(
-    canConnectedAccountSendEmail,
+    (connectedAccount) =>
+      canConnectedAccountPerformEmailOperation({
+        connectedAccount,
+        operation: EmailOperation.SEND,
+      }),
   );
 
   const senderOptions = buildConnectedAccountSenderOptions(sendableAccounts);
@@ -190,6 +166,11 @@ export const EmailComposerFields = ({
 
   const areCcBccFieldsVisible = composerState.showCcBcc || isDraggingRecipients;
 
+  const handleShowCcBcc = () => {
+    flushSync(() => composerState.setShowCcBcc(true));
+    ccInputRef.current?.focus();
+  };
+
   return (
     <StyledFieldsContainer>
       <DragDropItemDndContext.Provider value={contextValues}>
@@ -206,6 +187,7 @@ export const EmailComposerFields = ({
                 <Select
                   dropdownId="email-composer-from-account"
                   fullWidth
+                  variant="transparent"
                   value={selectedSenderValue}
                   options={senderOptions}
                   onChange={handleSenderChange}
@@ -216,11 +198,13 @@ export const EmailComposerFields = ({
               label={t`To`}
               trailing={
                 !areCcBccFieldsVisible && (
-                  <StyledCcBccToggle
-                    onClick={() => composerState.setShowCcBcc(true)}
+                  <LightButton
+                    emphasis="subtle"
+                    size="sm"
+                    onClick={handleShowCcBcc}
                   >
                     {t`Cc/Bcc`}
-                  </StyledCcBccToggle>
+                  </LightButton>
                 )
               }
             >
@@ -240,6 +224,7 @@ export const EmailComposerFields = ({
                 <ComposerFieldRow label={t`Cc`}>
                   <EmailRecipientsFieldInput
                     fieldId="cc"
+                    inputRef={ccInputRef}
                     draggedSourceIndices={getDraggedIndicesForField('cc')}
                     label={t`Cc`}
                     recipients={composerState.cc}
@@ -263,8 +248,9 @@ export const EmailComposerFields = ({
                 </ComposerFieldRow>
               </>
             )}
-            <ComposerFieldRow label={t`Subject`}>
-              <StyledComposerTextInput
+            <ComposerFieldRow label={t`Subject`} hasDivider={false}>
+              <Input
+                variant="plain"
                 type="text"
                 aria-label={t`Subject`}
                 defaultValue={composerState.initialSubject}
@@ -285,7 +271,6 @@ export const EmailComposerFields = ({
         <FormAdvancedTextFieldInput
           defaultValue={composerState.initialBody}
           onChange={composerState.setBody}
-          placeholder={t`Type something or press "/" to see commands`}
           profile={INLINE_EMAIL_BODY_EDITOR_PROFILE}
           onImageUpload={uploadEmailImage}
         />
@@ -293,10 +278,15 @@ export const EmailComposerFields = ({
       {(composerState.files.length > 0 || isDefined(onAttachFiles)) && (
         <StyledAttachments>
           {isDefined(onAttachFiles) && (
-            <StyledAttachAction type="button" onClick={onAttachFiles}>
-              <IconPaperclip size={theme.icon.size.sm} />
+            <LightButton
+              className={ATTACH_ACTION_CLASS_NAME}
+              emphasis="subtle"
+              size="sm"
+              startIcon={<IconPaperclip />}
+              onClick={onAttachFiles}
+            >
               {t`Attach files`}
-            </StyledAttachAction>
+            </LightButton>
           )}
           {composerState.files.length > 0 && (
             <EmailAttachmentsField

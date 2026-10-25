@@ -25,11 +25,13 @@ import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspac
 import { EmailVerificationService } from 'src/engine/core-modules/email-verification/services/email-verification.service';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { FileCorePictureService } from 'src/engine/core-modules/file/file-core-picture/services/file-core-picture.service';
+import { FileUploadService } from 'src/engine/core-modules/file/file-upload/services/file-upload.service';
 import { UserSessionCookieService } from 'src/engine/core-modules/user-session/services/user-session-cookie.service';
 import { UserSessionService } from 'src/engine/core-modules/user-session/services/user-session.service';
 import { SsoService } from 'src/engine/core-modules/sso/services/sso.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { TwoFactorAuthenticationService } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication.service';
+import { TwoFactorAuthenticationRecoveryService } from 'src/engine/core-modules/two-factor-authentication/services/two-factor-authentication-recovery.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserWorkspaceService } from 'src/engine/core-modules/user-workspace/user-workspace.service';
 import { UserService } from 'src/engine/core-modules/user/services/user.service';
@@ -99,6 +101,7 @@ describe('AuthResolver', () => {
             checkAccessForSignIn: jest.fn(),
             findWorkspaceForSignInUp: jest.fn(),
             formatUserDataPayload: jest.fn(),
+            joinWorkspaceIfInvited: jest.fn(),
             signInUp: jest.fn(),
           },
         },
@@ -130,6 +133,10 @@ describe('AuthResolver', () => {
         },
         {
           provide: FileCorePictureService,
+          useValue: {},
+        },
+        {
+          provide: FileUploadService,
           useValue: {},
         },
         {
@@ -232,6 +239,10 @@ describe('AuthResolver', () => {
         },
         {
           provide: TwoFactorAuthenticationService,
+          useValue: {},
+        },
+        {
+          provide: TwoFactorAuthenticationRecoveryService,
           useValue: {},
         },
         {

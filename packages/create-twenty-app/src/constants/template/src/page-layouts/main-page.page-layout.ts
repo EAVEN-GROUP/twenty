@@ -1,4 +1,8 @@
-import { definePageLayout, PageLayoutTabLayoutMode } from 'twenty-sdk/define';
+import {
+  definePageLayout,
+  PageLayoutTabLayoutMode,
+  PageLayoutWidgetVerticalListHeightBehavior,
+} from 'twenty-sdk/define';
 
 import {
   APP_DISPLAY_NAME,
@@ -24,10 +28,8 @@ export default definePageLayout({
           universalIdentifier: MAIN_PAGE_WIDGET_UNIVERSAL_IDENTIFIER,
           title: ' ',
           type: 'FRONT_COMPONENT',
-          position: {
-            layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
-            index: 0,
-          },
+          heightBehavior:
+            PageLayoutWidgetVerticalListHeightBehavior.TAB_VIEWPORT,
           configuration: {
             configurationType: 'FRONT_COMPONENT',
             frontComponentUniversalIdentifier:

@@ -3,6 +3,11 @@
 exports[`ALL_UNIVERSAL_FLAT_ENTITY_FOREIGN_KEY_AGGREGATOR_PROPERTIES should match snapshot 1`] = `
 {
   "agent": [],
+  "agentChatChannel": [
+    "channelRoleUniversalIdentifiers",
+    "navigationMenuItemUniversalIdentifiers",
+  ],
+  "agentChatChannelRole": [],
   "applicationVariable": [],
   "commandMenuItem": [],
   "connectionProvider": [],
@@ -31,10 +36,12 @@ exports[`ALL_UNIVERSAL_FLAT_ENTITY_FOREIGN_KEY_AGGREGATOR_PROPERTIES should matc
     "searchFieldMetadataUniversalIdentifiers",
     "pageLayoutUniversalIdentifiers",
     "commandMenuItemUniversalIdentifiers",
+    "navigationMenuItemUniversalIdentifiers",
   ],
   "objectPermission": [],
   "pageLayout": [
     "tabUniversalIdentifiers",
+    "navigationMenuItemUniversalIdentifiers",
   ],
   "pageLayoutTab": [
     "widgetUniversalIdentifiers",
@@ -50,6 +57,7 @@ exports[`ALL_UNIVERSAL_FLAT_ENTITY_FOREIGN_KEY_AGGREGATOR_PROPERTIES should matc
     "fieldPermissionUniversalIdentifiers",
     "rowLevelPermissionPredicateUniversalIdentifiers",
     "rowLevelPermissionPredicateGroupUniversalIdentifiers",
+    "agentChatChannelRoleUniversalIdentifiers",
   ],
   "rolePermissionFlag": [],
   "roleTarget": [],
@@ -59,8 +67,10 @@ exports[`ALL_UNIVERSAL_FLAT_ENTITY_FOREIGN_KEY_AGGREGATOR_PROPERTIES should matc
     "rowLevelPermissionPredicateUniversalIdentifiers",
   ],
   "searchFieldMetadata": [],
+  "settingsMenuItem": [],
   "skill": [],
   "timelineActivityType": [],
+  "validationRule": [],
   "view": [
     "viewFieldUniversalIdentifiers",
     "viewFilterUniversalIdentifiers",
@@ -68,6 +78,7 @@ exports[`ALL_UNIVERSAL_FLAT_ENTITY_FOREIGN_KEY_AGGREGATOR_PROPERTIES should matc
     "viewGroupUniversalIdentifiers",
     "viewFieldGroupUniversalIdentifiers",
     "viewSortUniversalIdentifiers",
+    "navigationMenuItemUniversalIdentifiers",
   ],
   "viewField": [],
   "viewFieldGroup": [
@@ -81,5 +92,7 @@ exports[`ALL_UNIVERSAL_FLAT_ENTITY_FOREIGN_KEY_AGGREGATOR_PROPERTIES should matc
   "viewGroup": [],
   "viewSort": [],
   "webhook": [],
+  "workflow": [],
+  "workflowVersion": [],
 }
 `;

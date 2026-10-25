@@ -21,6 +21,7 @@ const mockClientConfig = {
   isEmailVerificationRequired: false,
   defaultSubdomain: 'app',
   frontDomain: 'localhost',
+  serverUrl: 'http://localhost:3000',
   support: {
     supportDriver: 'none',
     supportFrontChatId: undefined,
@@ -63,7 +64,7 @@ describe('getClientConfig', () => {
     const result = await getClientConfig();
 
     expect(fetch).toHaveBeenCalledWith(
-      `${REACT_APP_SERVER_BASE_URL}/client-config`,
+      `${REACT_APP_SERVER_BASE_URL}/client-config?v=v1`,
     );
     expect(result).toEqual(mockClientConfig);
   });

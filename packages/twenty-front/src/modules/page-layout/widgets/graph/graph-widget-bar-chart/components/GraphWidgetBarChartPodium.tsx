@@ -8,7 +8,7 @@ import { computePodiumDisplayNames } from '@/page-layout/widgets/graph/graph-wid
 import { type PodiumEntry } from '@/page-layout/widgets/graph/graph-widget-bar-chart/types/PodiumEntry';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 type PodiumRank = keyof typeof PODIUM_RANK_STYLES;
 

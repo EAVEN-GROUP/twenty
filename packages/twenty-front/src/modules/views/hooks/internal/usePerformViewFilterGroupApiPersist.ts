@@ -1,13 +1,14 @@
 import { useCallback } from 'react';
 
 import { type FlatViewFilterGroup } from '@/metadata-store/types/FlatViewFilterGroup';
-import { type MetadataRequestResult } from '@/object-metadata/types/MetadataRequestResult.type';
+import { type MetadataRequestResult } from '@/object-metadata/types/MetadataRequestResult';
 import { usePerformViewEntityApiPersistOperation } from '@/views/hooks/internal/usePerformViewEntityApiPersistOperation';
 import { type GraphQLView } from '@/views/types/GraphQLView';
 import { type ViewFilterGroup } from '@/views/types/ViewFilterGroup';
 import { useMutation } from '@apollo/client/react';
 import { CrudOperationType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import {
   CreateViewFilterGroupDocument,
   DestroyViewFilterGroupDocument,
@@ -46,7 +47,7 @@ export const usePerformViewFilterGroupApiPersist = () => {
       });
 
       if (!isDefined(result.data)) {
-        throw new Error('Failed to create view filter group');
+        throw new Error(doNotTranslate('Failed to create view filter group'));
       }
 
       return { newRecord: result.data.createViewFilterGroup };

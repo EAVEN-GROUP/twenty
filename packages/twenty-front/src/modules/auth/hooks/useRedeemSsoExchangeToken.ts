@@ -1,15 +1,17 @@
-import { isAppEffectRedirectEnabledState } from '@/app/states/isAppEffectRedirectEnabledState';
+import { isAppEffectRedirectEnabledState } from '@/auth/states/isAppEffectRedirectEnabledState';
 import { useMarkSessionActive } from '@/auth/hooks/useMarkSessionActive';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
-import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useMutation } from '@apollo/client/react';
+import { t } from '@lingui/core/macro';
 import { useCallback } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
+import { useToast } from 'twenty-ui/components/feedback';
 import { GetAuthTokensFromSsoExchangeTokenDocument } from '~/generated-metadata/graphql';
+import { logError } from '~/utils/logError';
 
 export const useRedeemSsoExchangeToken = () => {
-  const { enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
   const markSessionActive = useMarkSessionActive();
   const setIsAppEffectRedirectEnabled = useSetAtomState(
     isAppEffectRedirectEnabledState,
@@ -20,8 +22,7 @@ export const useRedeemSsoExchangeToken = () => {
 
   const redeemSsoExchangeToken = useCallback(
     async (ssoExchangeToken: string) => {
-      // Keeps PageChangeEffect from consuming returnToPath while the server
-      // swaps the session cookie
+      // Keeps PageChangeEffect from consuming returnToPath while the server swaps the session cookie
       setIsAppEffectRedirectEnabled(false);
 
       try {
@@ -30,16 +31,15 @@ export const useRedeemSsoExchangeToken = () => {
         });
 
         if (!isDefined(data?.getAuthTokensFromSSOExchangeToken)) {
-          throw new Error('No getAuthTokensFromSSOExchangeToken result');
+          throw new Error(
+            doNotTranslate('No getAuthTokensFromSSOExchangeToken result'),
+          );
         }
 
         markSessionActive();
       } catch (error: unknown) {
-        enqueueErrorSnackBar(
-          CombinedGraphQLErrors.is(error)
-            ? { apolloError: error }
-            : { message: error instanceof Error ? error.message : undefined },
-        );
+        logError(error);
+        enqueueToast({ status: 'error', children: t`Authentication failed` });
       } finally {
         setIsAppEffectRedirectEnabled(true);
       }
@@ -48,7 +48,7 @@ export const useRedeemSsoExchangeToken = () => {
       getAuthTokensFromSsoExchangeToken,
       markSessionActive,
       setIsAppEffectRedirectEnabled,
-      enqueueErrorSnackBar,
+      enqueueToast,
     ],
   );
 

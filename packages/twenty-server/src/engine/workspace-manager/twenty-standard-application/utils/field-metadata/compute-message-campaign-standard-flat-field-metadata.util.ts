@@ -3,6 +3,7 @@ import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-applicat
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  NumberDataType,
   RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
@@ -44,10 +45,10 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'id',
         type: FieldMetadataType.UUID,
         label: i18nLabel(
-          msg({ message: `Id`, context: 'fieldMetadata.label' }),
+          msg({ message: `ID`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
-          msg({ message: `Id`, context: 'fieldMetadata.description' }),
+          msg({ message: `ID`, context: 'fieldMetadata.description' }),
         ),
         icon: 'Icon123',
         isSystem: true,
@@ -368,6 +369,25 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         ],
       },
     }),
+    scheduledAt: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'scheduledAt',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({ message: `Scheduled at`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the campaign is due to start sending`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarClock',
+        isNullable: true,
+        isUIEditable: false,
+      },
+    }),
     sentAt: createStandardFieldFlatMetadata({
       ...base,
       context: {
@@ -394,7 +414,7 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'sentCount',
         type: FieldMetadataType.NUMBER,
         label: i18nLabel(
-          msg({ message: `Sent count`, context: 'fieldMetadata.label' }),
+          msg({ message: `Sent`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
           msg({
@@ -414,7 +434,7 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'deliveredCount',
         type: FieldMetadataType.NUMBER,
         label: i18nLabel(
-          msg({ message: `Delivered count`, context: 'fieldMetadata.label' }),
+          msg({ message: `Delivered`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
           msg({
@@ -434,7 +454,7 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'failedCount',
         type: FieldMetadataType.NUMBER,
         label: i18nLabel(
-          msg({ message: `Failed count`, context: 'fieldMetadata.label' }),
+          msg({ message: `Failed`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
           msg({
@@ -454,7 +474,7 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'bouncedCount',
         type: FieldMetadataType.NUMBER,
         label: i18nLabel(
-          msg({ message: `Bounced count`, context: 'fieldMetadata.label' }),
+          msg({ message: `Bounced`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
           msg({
@@ -474,7 +494,7 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'complainedCount',
         type: FieldMetadataType.NUMBER,
         label: i18nLabel(
-          msg({ message: `Complained count`, context: 'fieldMetadata.label' }),
+          msg({ message: `Complaints`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
           msg({
@@ -494,7 +514,7 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         fieldName: 'skippedCount',
         type: FieldMetadataType.NUMBER,
         label: i18nLabel(
-          msg({ message: `Skipped count`, context: 'fieldMetadata.label' }),
+          msg({ message: `Skipped`, context: 'fieldMetadata.label' }),
         ),
         description: i18nLabel(
           msg({
@@ -506,6 +526,96 @@ export const buildMessageCampaignStandardFlatFieldMetadatas = ({
         isNullable: false,
         isUIEditable: false,
         defaultValue: 0,
+      },
+    }),
+    uniqueClickCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'uniqueClickCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Unique clicks`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of recipients who clicked a tracked link`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconClick',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
+    clickRate: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'clickRate',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Click rate`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Share of delivered recipients who clicked a tracked link`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconClick',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+        settings: {
+          dataType: NumberDataType.FLOAT,
+          decimals: 1,
+          type: 'percentage',
+        },
+      },
+    }),
+    uniqueOpenCount: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'uniqueOpenCount',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Unique opens`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of recipients who opened the email`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconEye',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+      },
+    }),
+    openRate: createStandardFieldFlatMetadata({
+      ...base,
+      context: {
+        fieldName: 'openRate',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({ message: `Open rate`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Share of delivered recipients who opened the email, excluding Apple Mail privacy opens`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconEye',
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: 0,
+        settings: {
+          dataType: NumberDataType.FLOAT,
+          decimals: 1,
+          type: 'percentage',
+        },
       },
     }),
     unsubscribeTopicId: createStandardFieldFlatMetadata({

@@ -1,5 +1,5 @@
+import { AutomatedTriggerType } from 'src/engine/core-modules/workflow/enums/automated-trigger-type.enum';
 import { computeAutomatedTriggerFromWorkflowVersion } from 'src/engine/core-modules/workflow/utils/compute-automated-trigger-from-workflow-version.util';
-import { AutomatedTriggerType } from 'src/modules/workflow/common/standard-objects/workflow-automated-trigger.workspace-entity';
 import {
   type WorkflowTrigger,
   WorkflowTriggerType,
@@ -8,6 +8,8 @@ import {
 const buildWorkflowVersion = (trigger: WorkflowTrigger | null) => ({
   id: 'core-version-1',
   workflowId: 'workspace-workflow-1',
+  coreWorkflowId: 'core-workflow-1',
+  applicationId: 'application-1',
   triggers: trigger ? [trigger] : [],
 });
 
@@ -25,7 +27,9 @@ describe('computeAutomatedTriggerFromWorkflowVersion', () => {
         workspaceWorkflowVersionId: 'workspace-version-1',
       }),
     ).toEqual({
-      workflowId: 'workspace-workflow-1',
+      workflowId: 'core-workflow-1',
+      legacyWorkflowId: 'workspace-workflow-1',
+      applicationId: 'application-1',
       coreWorkflowVersionId: 'core-version-1',
       workspaceWorkflowVersionId: 'workspace-version-1',
       type: AutomatedTriggerType.DATABASE_EVENT,
@@ -33,7 +37,7 @@ describe('computeAutomatedTriggerFromWorkflowVersion', () => {
     });
   });
 
-  it('should collapse both ids to the legacy shape when the twin is missing', () => {
+  it('should build a core-only dispatch when the twin is missing', () => {
     const workflowVersion = buildWorkflowVersion({
       type: WorkflowTriggerType.DATABASE_EVENT,
       name: 'Record created',
@@ -45,8 +49,12 @@ describe('computeAutomatedTriggerFromWorkflowVersion', () => {
       workspaceWorkflowVersionId: null,
     });
 
-    expect(automatedTrigger?.workspaceWorkflowVersionId).toBeNull();
-    expect(automatedTrigger?.coreWorkflowVersionId).toBeNull();
+    expect(automatedTrigger).toMatchObject({
+      workflowId: 'core-workflow-1',
+      legacyWorkflowId: 'workspace-workflow-1',
+      coreWorkflowVersionId: 'core-version-1',
+    });
+    expect(automatedTrigger).not.toHaveProperty('workspaceWorkflowVersionId');
   });
 
   it('should return null for manual triggers', () => {

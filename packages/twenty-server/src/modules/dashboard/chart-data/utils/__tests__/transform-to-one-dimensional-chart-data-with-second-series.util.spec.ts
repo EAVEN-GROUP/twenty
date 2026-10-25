@@ -1,3 +1,5 @@
+import { setupI18n } from '@lingui/core';
+import { compileMessage } from '@lingui/message-utils/compileMessage';
 import { CalendarStartDay } from 'twenty-shared/constants';
 import { FieldMetadataType } from 'twenty-shared/types';
 
@@ -10,6 +12,12 @@ import { type GroupByRawResult } from 'src/modules/dashboard/chart-data/types/gr
 import { addMissingChartBuckets } from 'src/modules/dashboard/chart-data/utils/add-missing-chart-buckets.util';
 import { transformToOneDimensionalBarChartData } from 'src/modules/dashboard/chart-data/utils/transform-to-one-dimensional-bar-chart-data.util';
 import { transformToOneDimensionalLineChartData } from 'src/modules/dashboard/chart-data/utils/transform-to-one-dimensional-line-chart-data.util';
+
+const i18n = setupI18n();
+
+i18n.setMessagesCompiler(compileMessage);
+i18n.load('en', {});
+i18n.activate('en');
 
 const callDateField = {
   type: FieldMetadataType.TEXT,
@@ -62,6 +70,7 @@ const transformLine = (
     seriesIdPrefix: 'lc_test:',
     relationLabelResolution: undefined,
     secondSeriesRawResults: hasSecondSeries ? meetingsRawResults : undefined,
+    i18n,
   });
 
 const transformBar = (
@@ -80,6 +89,7 @@ const transformBar = (
     firstDayOfTheWeek: CalendarStartDay.MONDAY,
     relationLabelResolution: undefined,
     secondSeriesRawResults: hasSecondSeries ? meetingsRawResults : undefined,
+    i18n,
   });
 
 describe('transformToOneDimensionalLineChartData with a second series', () => {

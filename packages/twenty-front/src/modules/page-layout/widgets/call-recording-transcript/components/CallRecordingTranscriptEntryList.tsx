@@ -14,7 +14,8 @@ import {
 } from 'react';
 import { type CallRecordingParsedTranscriptEntry } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { doNotTranslate } from 'twenty-shared/i18n';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledTranscriptContainer = styled.div`
   height: 100%;
@@ -40,7 +41,7 @@ const StyledEntryList = styled.ul<{ hasPlaybackControls: boolean }>`
       : '0'};
 `;
 
-const MANUAL_SCROLL_KEYS = [
+const MANUAL_SCROLL_KEYS = doNotTranslate([
   'ArrowDown',
   'ArrowUp',
   'End',
@@ -48,7 +49,7 @@ const MANUAL_SCROLL_KEYS = [
   'PageDown',
   'PageUp',
   ' ',
-];
+]);
 
 type CallRecordingTranscriptEntryListProps = {
   entries: CallRecordingParsedTranscriptEntry[];
@@ -100,8 +101,8 @@ export const CallRecordingTranscriptEntryList = ({
         activeEntryElementRef={activeEntryElementRef}
         isFollowingPlayback={isFollowingPlayback}
         scrollContainerElementRef={scrollContainerElementRef}
-        videoElement={playback?.videoElement}
-        onVideoSeeking={resumeFollowingPlayback}
+        mediaElement={playback?.mediaElement}
+        onMediaSeeking={resumeFollowingPlayback}
       />
       <StyledTranscriptScrollContainer
         ref={scrollContainerElementRef}
@@ -127,7 +128,7 @@ export const CallRecordingTranscriptEntryList = ({
                 entry={entry}
                 entryElementRef={isActive ? activeEntryElementRef : undefined}
                 playbackPhase={playbackPhase}
-                videoElement={playback?.videoElement}
+                mediaElement={playback?.mediaElement}
                 onSelect={hasPlayback ? selectTranscriptEntry : undefined}
               />
             );

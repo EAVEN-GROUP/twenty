@@ -2,10 +2,12 @@ import { useIsSettingsDrawer } from '@/navigation/hooks/useIsSettingsDrawer';
 
 import { MainNavigationDrawerContent } from '@/navigation/components/MainNavigationDrawerContent';
 import { MainNavigationDrawerModeSwitcher } from '@/navigation/components/MainNavigationDrawerModeSwitcher';
+import { NavigationDrawerHeader } from '@/navigation/components/NavigationDrawerHeader';
+import { NavigationDrawerModeTransition } from '@/navigation/components/NavigationDrawerModeTransition';
 import { SettingsNavigationDrawerContent } from '@/navigation/components/SettingsNavigationDrawerContent';
 import { NavigationDrawer } from '@/ui/navigation/navigation-drawer/components/NavigationDrawer';
 import { NavigationDrawerFixedContent } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerFixedContent';
-import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
+import { useIsMobile } from 'twenty-ui/utilities';
 
 export type AppNavigationDrawerProps = {
   className?: string;
@@ -23,20 +25,21 @@ export const AppNavigationDrawer = ({
   }
 
   return (
-    <NavigationDrawer className={className}>
-      {/* Mobile switches modes from the navigation bar at the bottom of the
-          screen, so a second switcher inside the drawer only repeats it. */}
+    <NavigationDrawer className={className} header={<NavigationDrawerHeader />}>
+      {/* Mobile switches modes from the bottom navigation bar instead. */}
       {!isMobile && (
         <NavigationDrawerFixedContent>
           <MainNavigationDrawerModeSwitcher />
         </NavigationDrawerFixedContent>
       )}
 
-      {isSettingsDrawer ? (
-        <SettingsNavigationDrawerContent />
-      ) : (
-        <MainNavigationDrawerContent />
-      )}
+      <NavigationDrawerModeTransition>
+        {isSettingsDrawer ? (
+          <SettingsNavigationDrawerContent />
+        ) : (
+          <MainNavigationDrawerContent />
+        )}
+      </NavigationDrawerModeTransition>
     </NavigationDrawer>
   );
 };

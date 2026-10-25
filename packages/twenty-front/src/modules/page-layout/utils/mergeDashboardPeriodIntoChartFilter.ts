@@ -9,6 +9,7 @@ import {
   FirstDayOfTheWeek,
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 
 export const DASHBOARD_PERIOD_RECORD_FILTER_ID =
   '4f1d8a52-7c3e-4b9a-9d2f-6a1e0c5b7d31';
@@ -61,7 +62,7 @@ const buildPeriodRecordFilters = ({
 }: BuildPeriodRecordFiltersParams): PeriodRecordFilter[] => {
   const baseRecordFilter = {
     id: DASHBOARD_PERIOD_RECORD_FILTER_ID,
-    label: 'Period',
+    label: doNotTranslate('Period'),
     displayValue: '',
     fieldMetadataId: dateField.id,
     type: dateField.type,
@@ -181,7 +182,7 @@ export const mergeDashboardPeriodIntoChartFilter = ({
     recordFilterGroups: [
       {
         id: DASHBOARD_PERIOD_ROOT_GROUP_ID,
-        logicalOperator: 'AND',
+        logicalOperator: doNotTranslate('AND'),
         parentRecordFilterGroupId: null,
       },
       ...recordFilterGroups.map((group) =>

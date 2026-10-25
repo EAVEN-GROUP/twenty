@@ -12,6 +12,7 @@ export class MessageCampaignWorkspaceEntity extends BaseWorkspaceEntity {
   bodyTemplate: string | null;
   fromAddress: EmailsMetadata | null;
   status: string;
+  scheduledAt: Date | null;
   sentAt: Date | null;
   sentCount: number;
   deliveredCount: number;
@@ -19,6 +20,10 @@ export class MessageCampaignWorkspaceEntity extends BaseWorkspaceEntity {
   bouncedCount: number;
   complainedCount: number;
   skippedCount: number;
+  uniqueClickCount: number;
+  clickRate: number;
+  uniqueOpenCount: number;
+  openRate: number;
   unsubscribeTopicId: string | null;
   list: EntityRelation<MessageListWorkspaceEntity> | null;
   listId: string | null;

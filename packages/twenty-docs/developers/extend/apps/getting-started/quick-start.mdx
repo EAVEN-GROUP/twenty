@@ -81,7 +81,7 @@ For more detailed output (build logs, sync requests, error traces), add `--verbo
   <img src="/images/docs/developers/extends/apps/dev.png" alt="Dev mode terminal output" />
 </div>
 
-Open [http://localhost:2020/settings/applications#developer](http://localhost:2020/settings/applications#developer). You should see your app under **Your Apps**.
+Open [http://localhost:2020/settings/developers#apps](http://localhost:2020/settings/developers#apps). You should see your app under **My apps**.
 
 <div style={{textAlign: 'center'}}>
   <img src="/images/docs/developers/extends/apps/app-in-ui-1.png" alt="Your Apps list showing My twenty app" />
@@ -149,6 +149,21 @@ Apps are composed of **entities** — each defined as a TypeScript file with a s
 | **Page layouts** | Custom record detail pages with tabs and widgets |
 
 Full reference: [Concepts](/developers/extend/apps/getting-started/concepts).
+
+## Build with AI agent skills
+
+Official Twenty [Agent Skills](https://skills.sh/) teach coding agents the full app workflow: scaffolding, entity development, sync and deploy operations, and marketplace publishing. They install into Claude Code, Codex, Cursor, Pi, and any other harness supported by the `skills` CLI, and work against any Twenty instance, including self-hosted custom domains and localhost.
+
+```bash filename="Terminal"
+# List the available skills
+npx skills add https://github.com/twentyhq/twenty/tree/agent-skills --list
+
+# Install the scaffolding and development skills
+npx skills add https://github.com/twentyhq/twenty/tree/agent-skills --skill create-app
+npx skills add https://github.com/twentyhq/twenty/tree/agent-skills --skill develop-app
+```
+
+Each skill installs with its own reference docs. The `agent-skills` branch becomes available after the first successful publish from `main`; before that, follow the [local build instructions](https://github.com/twentyhq/twenty/tree/main/packages/twenty-agent-skills#local-development).
 
 ## Next steps
 

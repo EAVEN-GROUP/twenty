@@ -1,11 +1,11 @@
-import { ChartFiltersDeletedFieldsWarning } from '@/side-panel/pages/page-layout/components/ChartFiltersDeletedFieldsWarning';
+import { SidePanelRecordFiltersDeletedFieldsWarning } from '@/side-panel/components/SidePanelRecordFiltersDeletedFieldsWarning';
 import { ChartFiltersSettingsInitializeStateEffect } from '@/side-panel/pages/page-layout/components/ChartFiltersSettingsInitializeStateEffect';
-import { usePageLayoutIdFromContextStore } from '@/side-panel/pages/page-layout/hooks/usePageLayoutIdFromContextStore';
+import { usePageLayoutSidePanelTarget } from '@/side-panel/pages/page-layout/hooks/usePageLayoutSidePanelTarget';
 import { useUpdateCurrentWidgetConfig } from '@/side-panel/pages/page-layout/hooks/useUpdateCurrentWidgetConfig';
 import { type ChartFilterConfigKey } from '@/side-panel/pages/page-layout/types/ChartFilterConfigKey';
 import { type ChartWidget } from '@/side-panel/pages/page-layout/types/ChartWidget';
 import { cloneChartFiltersWithNewIds } from '@/side-panel/pages/page-layout/utils/cloneChartFiltersWithNewIds';
-import { dropChartRecordFiltersWithDeletedFields } from '@/side-panel/pages/page-layout/utils/dropChartRecordFiltersWithDeletedFields';
+import { sanitizeChartRecordFilters } from '@/side-panel/pages/page-layout/utils/sanitizeChartRecordFilters';
 import { getChartFiltersSettingsInstanceId } from '@/side-panel/pages/page-layout/utils/getChartFiltersSettingsInstanceId';
 import { isWidgetConfigurationOfType } from '@/side-panel/pages/page-layout/utils/isWidgetConfigurationOfType';
 
@@ -15,15 +15,16 @@ import { RecordFilterGroupsComponentInstanceContext } from '@/object-record/reco
 import { currentRecordFilterGroupsComponentState } from '@/object-record/record-filter-group/states/currentRecordFilterGroupsComponentState';
 import { RecordFiltersComponentInstanceContext } from '@/object-record/record-filter/states/context/RecordFiltersComponentInstanceContext';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { mapRecordFiltersToPersistedRecordFilters } from '@/object-record/record-filter/utils/mapRecordFiltersToPersistedRecordFilters';
 import { hasChartSecondSeries } from '@/page-layout/widgets/graph/utils/hasChartSecondSeries';
-import { InputLabel } from 'twenty-ui/input';
+import { InputLabel } from '@/ui/input/components/internal/InputLabel/InputLabel';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { useStore } from 'jotai';
 import { useMemo } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledChartFiltersPageContainer = styled.div`
   display: flex;
@@ -51,7 +52,7 @@ export const ChartFiltersSettings = ({
     filterConfigKey,
   });
 
-  const { pageLayoutId } = usePageLayoutIdFromContextStore();
+  const { pageLayoutId } = usePageLayoutSidePanelTarget();
 
   const { updateCurrentWidgetConfig } =
     useUpdateCurrentWidgetConfig(pageLayoutId);
@@ -86,12 +87,14 @@ export const ChartFiltersSettings = ({
     const {
       recordFilters: sanitizedRecordFilters,
       recordFilterGroups: sanitizedRecordFilterGroups,
-    } = dropChartRecordFiltersWithDeletedFields({
+    } = sanitizeChartRecordFilters({
       chartFilters: {
-        recordFilters: existingRecordFilters,
+        recordFilters: mapRecordFiltersToPersistedRecordFilters(
+          existingRecordFilters,
+        ),
         recordFilterGroups: existingRecordFilterGroups,
       },
-      validFieldMetadataIds,
+      fieldMetadataItems: objectMetadataItem.fields,
     });
 
     updateCurrentWidgetConfig({
@@ -148,7 +151,7 @@ export const ChartFiltersSettings = ({
           <RecordFiltersComponentInstanceContext.Provider
             value={{ instanceId }}
           >
-            <ChartFiltersDeletedFieldsWarning
+            <SidePanelRecordFiltersDeletedFieldsWarning
               validFieldMetadataIds={validFieldMetadataIds}
             />
             <AdvancedFilterSidePanelContainer

@@ -5,23 +5,22 @@ import {
   SignInUpStep,
   signInUpStepState,
 } from '@/auth/states/signInUpStepState';
-import { AuthenticatedMethod } from '@/auth/types/AuthenticatedMethod.enum';
+import { AuthenticatedMethod } from '@/auth/types/AuthenticatedMethod';
 import { workspaceAuthProvidersState } from '@/workspace/states/workspaceAuthProvidersState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
+import { MainButton } from 'twenty-ui/components/input';
 import { IconLock } from 'twenty-ui/icon';
-import { HorizontalSeparator } from 'twenty-ui/layout';
-import { MainButton } from 'twenty-ui/input';
 import { LastUsedPill } from './LastUsedPill';
 import { StyledSsoButtonContainer } from './SignInUpSsoButtonStyles';
-import { useContext } from 'react';
-import { ThemeContext } from 'twenty-ui/theme-constants';
+import { useTheme } from 'twenty-ui/theme';
+import { SignInUpSeparator } from './SignInUpSeparator';
 
 export const SignInUpWithSso = () => {
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
   const { t } = useLingui();
   const setSignInUpStep = useSetAtomState(signInUpStepState);
   const workspaceAuthProviders = useAtomStateValue(workspaceAuthProvidersState);
@@ -51,15 +50,14 @@ export const SignInUpWithSso = () => {
     <>
       <StyledSsoButtonContainer>
         <MainButton
-          Icon={() => <IconLock size={theme.icon.size.md} />}
-          title={t`Single sign-on (SSO)`}
+          startIcon={<IconLock size={theme.icon.size.md} />}
           onClick={signInWithSso}
-          variant={signInUpStep === SignInUpStep.Init ? undefined : 'secondary'}
           fullWidth
-        />
+          variant={signInUpStep === SignInUpStep.Init ? 'solid' : 'outline'}
+        >{t`Single sign-on (SSO)`}</MainButton>
         {isLastUsed && hasMultipleAuthMethods && <LastUsedPill />}
       </StyledSsoButtonContainer>
-      <HorizontalSeparator visible={false} />
+      <SignInUpSeparator />
     </>
   );
 };

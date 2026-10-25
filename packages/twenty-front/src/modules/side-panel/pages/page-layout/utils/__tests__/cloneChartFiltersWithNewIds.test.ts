@@ -2,6 +2,7 @@ import { type RecordFilterGroup } from '@/object-record/record-filter-group/type
 import { type RecordFilter } from '@/object-record/record-filter/types/RecordFilter';
 import { cloneChartFiltersWithNewIds } from '@/side-panel/pages/page-layout/utils/cloneChartFiltersWithNewIds';
 import { RecordFilterGroupLogicalOperator } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 
 const recordFilterGroups: RecordFilterGroup[] = [
   { id: 'root-group', logicalOperator: RecordFilterGroupLogicalOperator.AND },
@@ -34,7 +35,9 @@ describe('cloneChartFiltersWithNewIds', () => {
 
     expect(cloneIds).toHaveLength(4);
     expect(new Set(cloneIds).size).toBe(4);
-    expect(cloneIds.some((id) => originalIds.includes(id))).toBe(false);
+    expect(
+      cloneIds.some((id) => isDefined(id) && originalIds.includes(id)),
+    ).toBe(false);
   });
 
   it('keeps filters and groups attached to the same parents', () => {

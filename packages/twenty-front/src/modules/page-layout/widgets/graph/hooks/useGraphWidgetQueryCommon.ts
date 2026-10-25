@@ -1,13 +1,15 @@
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
+import { findFieldMetadataItemByFieldMetadataId } from '@/object-metadata/utils/findFieldMetadataItemByFieldMetadataId';
 import { flattenedFieldMetadataItemsSelector } from '@/object-metadata/states/flattenedFieldMetadataItemsSelector';
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
 import { useDashboardPeriodScopedChartConfiguration } from '@/page-layout/hooks/useDashboardPeriodScopedChartConfiguration';
-import { dropChartRecordFiltersWithDeletedFields } from '@/side-panel/pages/page-layout/utils/dropChartRecordFiltersWithDeletedFields';
+import { sanitizeChartRecordFilters } from '@/side-panel/pages/page-layout/utils/sanitizeChartRecordFilters';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import {
   computeRecordGqlOperationFilter,
   isDefined,
 } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import {
   type AggregateChartConfiguration,
   type BarChartConfiguration,
@@ -37,12 +39,13 @@ export const useGraphWidgetQueryCommon = ({
 
   const aggregateFieldId = configuration.aggregateFieldMetadataId;
 
-  const aggregateField = objectMetadataItem.readableFields.find(
-    (field: { id: string }) => field.id === aggregateFieldId,
-  );
+  const aggregateField = findFieldMetadataItemByFieldMetadataId({
+    fieldMetadataItems: objectMetadataItem.readableFields,
+    fieldMetadataId: aggregateFieldId,
+  });
 
   if (!isDefined(aggregateField)) {
-    throw new Error('Aggregate field not found');
+    throw new Error(doNotTranslate('Aggregate field not found'));
   }
 
   const { filterValueDependencies } = useFilterValueDependencies();
@@ -51,22 +54,18 @@ export const useGraphWidgetQueryCommon = ({
     flattenedFieldMetadataItemsSelector,
   );
 
-  const objectFieldMetadataIds = new Set(
-    objectMetadataItem.fields
-      .filter((field) => field.isActive)
-      .map((field) => field.id),
-  );
-
-  const { recordFilters: sanitizedRecordFilters } =
-    dropChartRecordFiltersWithDeletedFields({
-      chartFilters: periodScopedConfiguration.filter ?? {},
-      validFieldMetadataIds: objectFieldMetadataIds,
-    });
+  const { recordFilters: sanitizedRecordFilters } = sanitizeChartRecordFilters({
+    chartFilters: periodScopedConfiguration.filter ?? {},
+    fieldMetadataItems: objectMetadataItem.fields,
+  });
 
   const gqlOperationFilter = computeRecordGqlOperationFilter({
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
-    recordFilters: sanitizedRecordFilters ?? [],
+    recordFilters: (sanitizedRecordFilters ?? []).map((recordFilter) => ({
+      ...recordFilter,
+      value: recordFilter.value ?? '',
+    })),
     recordFilterGroups:
       periodScopedConfiguration.filter?.recordFilterGroups ?? [],
   });

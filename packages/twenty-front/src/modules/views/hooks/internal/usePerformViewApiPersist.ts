@@ -1,13 +1,17 @@
 import { useCallback } from 'react';
 
+import { useUpdateMetadataStoreDraft } from '@/metadata-store/hooks/useUpdateMetadataStoreDraft';
+import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { type FlatView } from '@/metadata-store/types/FlatView';
 import { type FlatViewGroup } from '@/metadata-store/types/FlatViewGroup';
-import { type MetadataRequestResult } from '@/object-metadata/types/MetadataRequestResult.type';
+import { type MetadataRequestResult } from '@/object-metadata/types/MetadataRequestResult';
 import { usePerformViewEntityApiPersistOperation } from '@/views/hooks/internal/usePerformViewEntityApiPersistOperation';
 import { useViewsSideEffectsOnViewGroups } from '@/views/hooks/useViewsSideEffectsOnViewGroups';
 import { useMutation } from '@apollo/client/react';
+import { useStore } from 'jotai';
 import { CrudOperationType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import { v4 } from 'uuid';
 import {
   CreateViewDocument,
@@ -20,6 +24,8 @@ import {
 export const usePerformViewApiPersist = () => {
   const [createViewMutation] = useMutation(CreateViewDocument);
   const [destroyViewMutation] = useMutation(DestroyViewDocument);
+  const store = useStore();
+  const { removeFromDraft, applyChanges } = useUpdateMetadataStoreDraft();
   const { triggerViewGroupOptimisticEffectAtViewCreation } =
     useViewsSideEffectsOnViewGroups();
 
@@ -57,7 +63,7 @@ export const usePerformViewApiPersist = () => {
           const newView = mutationResult.data?.createView;
 
           if (!isDefined(newView)) {
-            throw new Error('Failed to create view');
+            throw new Error(doNotTranslate('Failed to create view'));
           }
 
           const {
@@ -99,17 +105,34 @@ export const usePerformViewApiPersist = () => {
       variables: DestroyViewMutationVariables,
     ): Promise<
       MetadataRequestResult<Awaited<ReturnType<typeof destroyViewMutation>>>
-    > =>
-      performViewEntityApiPersistOperation({
-        persist: () =>
-          destroyViewMutation({
-            variables,
-          }),
+    > => {
+      const viewsStoreAtom = metadataStoreState.atomFamily('views');
+      const previousViewsEntry = store.get(viewsStoreAtom);
+
+      removeFromDraft({ key: 'views', itemIds: [variables.id] });
+      applyChanges();
+
+      return performViewEntityApiPersistOperation({
+        persist: async () => {
+          try {
+            return await destroyViewMutation({ variables });
+          } catch (error) {
+            store.set(viewsStoreAtom, previousViewsEntry);
+            throw error;
+          }
+        },
         applyResultToDraft: (_result, { removeFromDraft }) =>
           removeFromDraft({ key: 'views', itemIds: [variables.id] }),
         operationType: CrudOperationType.DELETE,
-      }),
-    [destroyViewMutation, performViewEntityApiPersistOperation],
+      });
+    },
+    [
+      destroyViewMutation,
+      performViewEntityApiPersistOperation,
+      store,
+      removeFromDraft,
+      applyChanges,
+    ],
   );
 
   return {

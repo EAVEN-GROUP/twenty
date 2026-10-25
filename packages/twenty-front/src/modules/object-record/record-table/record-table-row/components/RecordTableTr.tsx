@@ -1,22 +1,25 @@
 import { getBasePathToShowPage } from '@/object-metadata/utils/getBasePathToShowPage';
-import { useIsRecordReadOnly } from '@/object-record/read-only/hooks/useIsRecordReadOnly';
+import { useIsRecordDeleted } from '@/object-record/record-field/ui/hooks/useIsRecordDeleted';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
+import { RECORD_TABLE_ROW_TINT_CSS_VARIABLE } from '@/object-record/record-table/constants/RecordTableRowTintCssVariable';
 import { RecordTableRowContextProvider } from '@/object-record/record-table/contexts/RecordTableRowContext';
 import { RecordTableRowDiv } from '@/object-record/record-table/record-table-row/components/RecordTableRowDiv';
+import { isRecordSelectedComponentFamilyState } from '@/object-record/record-selection/states/isRecordSelectedComponentFamilyState';
 import { useRecordTableRowBackgroundColor } from '@/object-record/record-table/record-table-row/hooks/useRecordTableRowBackgroundColor';
-import { isRowSelectedComponentFamilyState } from '@/object-record/record-table/record-table-row/states/isRowSelectedComponentFamilyState';
-import { isRecordTableRowActiveComponentFamilyState } from '@/object-record/record-table/states/isRecordTableRowActiveComponentFamilyState';
 import { isRecordTableRowFocusActiveComponentState } from '@/object-record/record-table/states/isRecordTableRowFocusActiveComponentState';
-import { isRecordTableRowFocusedComponentFamilyState } from '@/object-record/record-table/states/isRecordTableRowFocusedComponentFamilyState';
+import { isRecordTableRowActiveByRecordIdComponentFamilySelector } from '@/object-record/record-table/states/selectors/isRecordTableRowActiveByRecordIdComponentFamilySelector';
+import { isRecordTableRowFocusedByRecordIdComponentFamilySelector } from '@/object-record/record-table/states/selectors/isRecordTableRowFocusedByRecordIdComponentFamilySelector';
+import { useRecordRestrictedFieldNames } from '@/object-record/record-store/hooks/useRecordRestrictedFieldNames';
+import { useAtomComponentFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilySelectorValue';
 
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
-import { forwardRef, type ReactNode } from 'react';
+import { type CSSProperties, forwardRef, useMemo, type ReactNode } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 
 type RecordTableTrProps = {
   children: ReactNode;
   recordId: string;
-  focusIndex: number;
   isDragging?: boolean;
 } & Omit<
   React.ComponentProps<typeof RecordTableRowDiv>,
@@ -24,55 +27,72 @@ type RecordTableTrProps = {
 >;
 
 export const RecordTableTr = forwardRef<HTMLDivElement, RecordTableTrProps>(
-  ({ children, recordId, focusIndex, isDragging = false, ...props }, ref) => {
-    const { objectMetadataItem } = useRecordTableContextOrThrow();
+  ({ children, recordId, isDragging = false, style, ...props }, ref) => {
+    const { objectMetadataItem, isObjectReadOnly } =
+      useRecordTableContextOrThrow();
 
-    const isRowSelected = useAtomComponentFamilyStateValue(
-      isRowSelectedComponentFamilyState,
+    const isRecordSelected = useAtomComponentFamilyStateValue(
+      isRecordSelectedComponentFamilyState,
       recordId,
     );
 
-    const isRecordTableRowActive = useAtomComponentFamilyStateValue(
-      isRecordTableRowActiveComponentFamilyState,
-      focusIndex,
+    const isRecordTableRowActive = useAtomComponentFamilySelectorValue(
+      isRecordTableRowActiveByRecordIdComponentFamilySelector,
+      recordId,
     );
 
-    const isRecordTableRowFocused = useAtomComponentFamilyStateValue(
-      isRecordTableRowFocusedComponentFamilyState,
-      focusIndex,
+    const isRecordTableRowFocused = useAtomComponentFamilySelectorValue(
+      isRecordTableRowFocusedByRecordIdComponentFamilySelector,
+      recordId,
     );
 
     const isRecordTableRowFocusActive = useAtomComponentStateValue(
       isRecordTableRowFocusActiveComponentState,
     );
 
-    const isRecordReadOnly = useIsRecordReadOnly({
-      recordId,
-      objectMetadataId: objectMetadataItem.id,
-    });
+    const isRecordDeleted = useIsRecordDeleted({ recordId });
+
+    const restrictedFieldNames = useRecordRestrictedFieldNames(recordId);
 
     const backgroundColor = useRecordTableRowBackgroundColor(recordId);
 
+    const recordTableRowContextValue = useMemo(
+      () => ({
+        recordId,
+        pathToShowPage:
+          getBasePathToShowPage({
+            objectNameSingular: objectMetadataItem.nameSingular,
+          }) + recordId,
+        objectNameSingular: objectMetadataItem.nameSingular,
+        isSelected: isRecordSelected,
+        isRecordReadOnly: isObjectReadOnly || isRecordDeleted,
+        restrictedFieldNames,
+      }),
+      [
+        restrictedFieldNames,
+        isObjectReadOnly,
+        isRecordDeleted,
+        isRecordSelected,
+        objectMetadataItem.nameSingular,
+        recordId,
+      ],
+    );
+
     return (
-      <RecordTableRowContextProvider
-        value={{
-          recordId: recordId,
-          rowIndex: focusIndex,
-          pathToShowPage:
-            getBasePathToShowPage({
-              objectNameSingular: objectMetadataItem.nameSingular,
-            }) + recordId,
-          objectNameSingular: objectMetadataItem.nameSingular,
-          isSelected: isRowSelected,
-          isRecordReadOnly,
-          backgroundColor,
-        }}
-      >
+      <RecordTableRowContextProvider value={recordTableRowContextValue}>
         <RecordTableRowDiv
           className="table-row"
           isDragging={isDragging}
           ref={ref}
           data-active={isRecordTableRowActive}
+          style={
+            isDefined(backgroundColor)
+              ? ({
+                  ...style,
+                  [RECORD_TABLE_ROW_TINT_CSS_VARIABLE]: backgroundColor,
+                } as CSSProperties)
+              : style
+          }
           data-focused={
             isRecordTableRowFocusActive &&
             isRecordTableRowFocused &&

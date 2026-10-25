@@ -4,9 +4,11 @@ import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-enti
 import { getMetadataFlatEntityMapsKey } from 'src/engine/metadata-modules/flat-entity/utils/get-metadata-flat-entity-maps-key.util';
 import { TWENTY_STANDARD_ALL_METADATA_NAME } from 'src/engine/workspace-manager/twenty-standard-application/constants/twenty-standard-all-metadata-name.constant';
 import { type TwentyStandardAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/types/twenty-standard-all-flat-entity-maps.type';
+import { buildStandardFlatAgentChatChannelMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/agent-chat-channel/build-standard-flat-agent-chat-channel-maps.util';
 import { buildStandardFlatAgentMetadataMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/agent-metadata/build-standard-flat-agent-metadata-maps.util';
 import { buildStandardFlatFieldMetadataMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/build-standard-flat-field-metadata-maps.util';
 import { getStandardObjectMetadataRelatedEntityIds } from 'src/engine/workspace-manager/twenty-standard-application/utils/get-standard-object-metadata-related-entity-ids.util';
+import { WORKSPACE_CREATION_ONLY_WIDGET_TYPES } from 'src/engine/workspace-manager/twenty-standard-application/constants/workspace-creation-only-widget-types.constant';
 import { getStandardPageLayoutMetadataRelatedEntityIds } from 'src/engine/workspace-manager/twenty-standard-application/utils/get-standard-page-layout-metadata-related-entity-ids.util';
 import { buildStandardFlatIndexMetadataMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/build-standard-flat-index-metadata-maps.util';
 import { buildStandardFlatCommandMenuItemMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/command-menu-item/build-standard-flat-command-menu-item-maps.util';
@@ -33,12 +35,14 @@ export type ComputeTwentyStandardApplicationAllFlatEntityMapsArgs = {
   now: string;
   workspaceId: string;
   twentyStandardApplicationId: string;
+  isWorkspaceCreation?: boolean;
 };
 
 export const computeTwentyStandardApplicationAllFlatEntityMaps = ({
   now,
   workspaceId,
   twentyStandardApplicationId,
+  isWorkspaceCreation = false,
 }: ComputeTwentyStandardApplicationAllFlatEntityMapsArgs): {
   allFlatEntityMaps: TwentyStandardAllFlatEntityMaps;
   // TODO remove once all metadatas has fully been universal migrated
@@ -191,11 +195,16 @@ export const computeTwentyStandardApplicationAllFlatEntityMaps = ({
     standardPageLayoutMetadataRelatedEntityIds,
   });
 
+  const excludedWidgetTypes = isWorkspaceCreation
+    ? []
+    : WORKSPACE_CREATION_ONLY_WIDGET_TYPES;
+
   const flatPageLayoutTabMaps = buildStandardFlatPageLayoutTabMetadataMaps({
     now,
     workspaceId,
     twentyStandardApplicationId,
     standardPageLayoutMetadataRelatedEntityIds,
+    excludedWidgetTypes,
   });
 
   const flatPageLayoutWidgetMaps =
@@ -205,6 +214,7 @@ export const computeTwentyStandardApplicationAllFlatEntityMaps = ({
       twentyStandardApplicationId,
       standardObjectMetadataRelatedEntityIds,
       standardPageLayoutMetadataRelatedEntityIds,
+      excludedWidgetTypes,
     });
 
   const standardRecordFormFlatEntities = computeStandardRecordFormFlatEntities({
@@ -261,6 +271,12 @@ export const computeTwentyStandardApplicationAllFlatEntityMaps = ({
       twentyStandardApplicationId,
     });
 
+  const flatAgentChatChannelMaps = buildStandardFlatAgentChatChannelMaps({
+    now,
+    workspaceId,
+    twentyStandardApplicationId,
+  });
+
   const allFlatEntityMaps: TwentyStandardAllFlatEntityMaps = {
     flatViewFieldMaps,
     flatViewFieldGroupMaps,
@@ -281,6 +297,7 @@ export const computeTwentyStandardApplicationAllFlatEntityMaps = ({
     flatPageLayoutWidgetMaps: flatPageLayoutWidgetMapsWithRecordForms,
     flatCommandMenuItemMaps,
     flatTimelineActivityTypeMaps,
+    flatAgentChatChannelMaps,
   };
 
   const idByUniversalIdentifierByMetadataName: IdByUniversalIdentifierByMetadataName =

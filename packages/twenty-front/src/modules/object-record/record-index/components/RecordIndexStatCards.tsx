@@ -3,7 +3,7 @@ import { RecordIndexStatCard } from '@/object-record/record-index/components/Rec
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledRow = styled.div`
   box-sizing: border-box;

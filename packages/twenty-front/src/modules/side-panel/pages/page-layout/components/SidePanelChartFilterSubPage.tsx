@@ -2,12 +2,13 @@ import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMeta
 import { pageLayoutDraftComponentState } from '@/page-layout/states/pageLayoutDraftComponentState';
 import { pageLayoutEditingWidgetIdComponentState } from '@/page-layout/states/pageLayoutEditingWidgetIdComponentState';
 import { ChartFiltersSettings } from '@/side-panel/pages/page-layout/components/ChartFiltersSettings';
-import { usePageLayoutIdFromContextStore } from '@/side-panel/pages/page-layout/hooks/usePageLayoutIdFromContextStore';
+import { usePageLayoutSidePanelTarget } from '@/side-panel/pages/page-layout/hooks/usePageLayoutSidePanelTarget';
 import { type ChartFilterConfigKey } from '@/side-panel/pages/page-layout/types/ChartFilterConfigKey';
 import { isChartWidget } from '@/side-panel/pages/page-layout/utils/isChartWidget';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 
 type SidePanelChartFilterSubPageProps = {
   filterConfigKey?: ChartFilterConfigKey;
@@ -16,7 +17,7 @@ type SidePanelChartFilterSubPageProps = {
 export const SidePanelChartFilterSubPage = ({
   filterConfigKey = 'filter',
 }: SidePanelChartFilterSubPageProps) => {
-  const { pageLayoutId } = usePageLayoutIdFromContextStore();
+  const { pageLayoutId } = usePageLayoutSidePanelTarget();
 
   const pageLayoutDraft = useAtomComponentStateValue(
     pageLayoutDraftComponentState,
@@ -48,7 +49,9 @@ export const SidePanelChartFilterSubPage = ({
 
   if (!isDefined(objectMetadataItem)) {
     throw new Error(
-      `Object metadata item not found for id ${widgetInEditMode.objectMetadataId}`,
+      doNotTranslate(
+        `Object metadata item not found for id ${widgetInEditMode.objectMetadataId}`,
+      ),
     );
   }
 

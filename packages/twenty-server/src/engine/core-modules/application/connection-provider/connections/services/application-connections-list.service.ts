@@ -1,17 +1,27 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { type FindOptionsWhere, In, Repository } from 'typeorm';
 
+import {
+  CONNECTION_SCOPE_BY_LEGACY_VISIBILITY,
+  LEGACY_CONNECTION_VISIBILITY_BY_SCOPE,
+} from 'twenty-shared/application-runtime';
 import { ConnectedAccountProvider } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
+import { ConnectionProviderExceptionCode } from 'src/engine/core-modules/application/connection-provider/connection-provider-exception-code.enum';
 import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
+import { ConnectionProviderException } from 'src/engine/core-modules/application/connection-provider/connection-provider.exception';
 import { type AppConnectionDto } from 'src/engine/core-modules/application/connection-provider/connections/dtos/app-connection.dto';
-import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
-import { resolveWorkspaceMemberId } from 'src/engine/core-modules/user-workspace/utils/resolve-workspace-member-id.util';
-import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
+import { isConnectionHiddenFromRequestUser } from 'src/engine/core-modules/application/connection-provider/connections/utils/is-connection-hidden-from-request-user.util';
+import {
+  ConnectedAccountEntity,
+  type ConnectedAccountScope,
+} from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
 import { ConnectedAccountTokenEncryptionService } from 'src/engine/metadata-modules/connected-account/services/connected-account-token-encryption.service';
+import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
+import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { ConnectedAccountRefreshTokensService } from 'src/modules/connected-account/refresh-tokens-manager/services/connected-account-refresh-tokens.service';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
@@ -25,6 +35,7 @@ type ListArgs = {
   filter: {
     providerName?: string;
     userWorkspaceId?: string;
+    scope?: ConnectedAccountScope;
     visibility?: 'user' | 'workspace';
   };
 };
@@ -46,10 +57,8 @@ export class ApplicationConnectionsListService {
     private readonly workspaceCacheService: WorkspaceCacheService,
     @InjectRepository(ConnectedAccountEntity)
     private readonly connectedAccountRepository: Repository<ConnectedAccountEntity>,
-    @InjectRepository(ConnectionProviderEntity)
-    private readonly oauthProviderRepository: Repository<ConnectionProviderEntity>,
-    @InjectRepository(UserWorkspaceEntity)
-    private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
+    @InjectWorkspaceScopedRepository(ConnectionProviderEntity)
+    private readonly oauthProviderRepository: WorkspaceScopedRepository<ConnectionProviderEntity>,
   ) {}
 
   async list({
@@ -58,8 +67,8 @@ export class ApplicationConnectionsListService {
     requestUserWorkspaceId,
     filter,
   }: ListArgs): Promise<AppConnectionDto[]> {
-    const providers = await this.oauthProviderRepository.find({
-      where: { applicationId, workspaceId },
+    const providers = await this.oauthProviderRepository.find(workspaceId, {
+      where: { applicationId },
     });
 
     const providerById = new Map(providers.map((p) => [p.id, p]));
@@ -87,26 +96,34 @@ export class ApplicationConnectionsListService {
         : {}),
     };
 
+    const scopeFilter =
+      filter.scope ??
+      (isDefined(filter.visibility)
+        ? CONNECTION_SCOPE_BY_LEGACY_VISIBILITY[filter.visibility]
+        : undefined);
+
     const accounts = await this.connectedAccountRepository.find({
       where: this.buildPrivacyWhere(
         baseWhere,
         requestUserWorkspaceId,
-        filter.visibility,
+        scopeFilter,
       ),
     });
 
+    const { flatWorkspaceMemberMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatWorkspaceMemberMaps',
+      ]);
+
     const refreshed = await Promise.all(
-      accounts.map(async (account) =>
+      accounts.map((account) =>
         this.refreshAndMap(
           account,
           workspaceId,
           providerById,
-          await resolveWorkspaceMemberId({
-            userWorkspaceId: account.userWorkspaceId,
-            workspaceId,
-            userWorkspaceRepository: this.userWorkspaceRepository,
-            workspaceCacheService: this.workspaceCacheService,
-          }),
+          flatWorkspaceMemberMaps.idByUserWorkspaceId[
+            account.userWorkspaceId
+          ] ?? null,
         ),
       ),
     );
@@ -129,45 +146,45 @@ export class ApplicationConnectionsListService {
       },
     });
 
-    if (!isDefined(account)) {
-      throw new NotFoundException(`Connection ${id} not found`);
-    }
-
-    // Same privacy rule as list(): a request-user can only see their own
-    // user-visibility credentials. Workspace-shared ones are visible to
-    // anyone in the workspace. Cron has no request user — sees all.
     if (
-      isDefined(requestUserWorkspaceId) &&
-      account.visibility === 'user' &&
-      account.userWorkspaceId !== requestUserWorkspaceId
+      !isDefined(account) ||
+      isConnectionHiddenFromRequestUser({ account, requestUserWorkspaceId })
     ) {
-      throw new NotFoundException(`Connection ${id} not found`);
+      throw new ConnectionProviderException(
+        `Connection ${id} not found`,
+        ConnectionProviderExceptionCode.CONNECTION_NOT_FOUND,
+      );
     }
 
     if (!isDefined(account.connectionProviderId)) {
-      throw new NotFoundException(`Connection ${id} has no provider`);
+      throw new ConnectionProviderException(
+        `Connection ${id} has no provider`,
+        ConnectionProviderExceptionCode.CONNECTION_PROVIDER_NOT_FOUND,
+      );
     }
 
-    const provider = await this.oauthProviderRepository.findOneByOrFail({
-      id: account.connectionProviderId,
+    const provider = await this.oauthProviderRepository.findOneOrFail(
       workspaceId,
-    });
+      { where: { id: account.connectionProviderId } },
+    );
+
+    const { flatWorkspaceMemberMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatWorkspaceMemberMaps',
+      ]);
 
     const dto = await this.refreshAndMap(
       account,
       workspaceId,
       new Map([[provider.id, provider]]),
-      await resolveWorkspaceMemberId({
-        userWorkspaceId: account.userWorkspaceId,
-        workspaceId,
-        userWorkspaceRepository: this.userWorkspaceRepository,
-        workspaceCacheService: this.workspaceCacheService,
-      }),
+      flatWorkspaceMemberMaps.idByUserWorkspaceId[account.userWorkspaceId] ??
+        null,
     );
 
     if (!isDefined(dto)) {
-      throw new NotFoundException(
+      throw new ConnectionProviderException(
         `Connection ${id} could not be refreshed; ask the user to reconnect`,
+        ConnectionProviderExceptionCode.REFRESH_FAILED,
       );
     }
 
@@ -177,33 +194,33 @@ export class ApplicationConnectionsListService {
   private buildPrivacyWhere(
     baseWhere: FindOptionsWhere<ConnectedAccountEntity>,
     requestUserWorkspaceId: string | null,
-    visibilityFilter: 'user' | 'workspace' | undefined,
+    scopeFilter: ConnectedAccountScope | undefined,
   ):
     | FindOptionsWhere<ConnectedAccountEntity>
     | FindOptionsWhere<ConnectedAccountEntity>[] {
     if (!isDefined(requestUserWorkspaceId)) {
-      return isDefined(visibilityFilter)
-        ? { ...baseWhere, visibility: visibilityFilter }
+      return isDefined(scopeFilter)
+        ? { ...baseWhere, scope: scopeFilter }
         : baseWhere;
     }
 
-    if (visibilityFilter === 'user') {
+    if (scopeFilter === 'USER') {
       return {
         ...baseWhere,
-        visibility: 'user',
+        scope: 'USER',
         userWorkspaceId: requestUserWorkspaceId,
       };
     }
 
-    if (visibilityFilter === 'workspace') {
-      return { ...baseWhere, visibility: 'workspace' };
+    if (scopeFilter === 'WORKSPACE') {
+      return { ...baseWhere, scope: 'WORKSPACE' };
     }
 
     return [
-      { ...baseWhere, visibility: 'workspace' },
+      { ...baseWhere, scope: 'WORKSPACE' },
       {
         ...baseWhere,
-        visibility: 'user',
+        scope: 'USER',
         userWorkspaceId: requestUserWorkspaceId,
       },
     ];
@@ -242,7 +259,9 @@ export class ApplicationConnectionsListService {
         providerName: provider.name,
         name: account.name ?? account.handle,
         handle: account.handle,
-        visibility: account.visibility as 'user' | 'workspace',
+        externalAccountId: account.externalAccountId,
+        scope: account.scope,
+        visibility: LEGACY_CONNECTION_VISIBILITY_BY_SCOPE[account.scope],
         userWorkspaceId: account.userWorkspaceId,
         workspaceMemberId,
         accessToken: this.connectedAccountTokenEncryptionService.decrypt({
@@ -251,6 +270,7 @@ export class ApplicationConnectionsListService {
         }),
         scopes: account.scopes ?? provider.oauthConfig?.scopes ?? [],
         authFailedAt: account.authFailedAt?.toISOString() ?? null,
+        authFailedReason: account.authFailedReason,
       };
     } catch (error) {
       this.logger.warn(

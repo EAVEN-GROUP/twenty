@@ -1,6 +1,11 @@
 {
   "name": "twenty-sdk",
-  "version": "2.39.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twentyhq/twenty.git",
+    "directory": "packages/twenty-sdk"
+  },
+  "version": "2.51.0",
   "sideEffects": false,
   "bin": {
     "twenty": "dist/cli.cjs"
@@ -9,7 +14,8 @@
     "dist",
     "README.md",
     "CHANGELOG.md",
-    "package.json"
+    "package.json",
+    "docs/build.md"
   ],
   "scripts": {
     "build": "npx rimraf dist && npx vite build"
@@ -62,7 +68,13 @@
       "types": "./dist/front-component-renderer/build/index.d.ts",
       "import": "./dist/front-component-renderer/build.mjs",
       "require": "./dist/front-component-renderer/build.cjs"
-    }
+    },
+    "./build": {
+      "types": "./dist/build/index.d.ts",
+      "import": "./dist/build.mjs",
+      "require": "./dist/build.cjs"
+    },
+    "./build/descriptor.json": "./dist/build/descriptor.json"
   },
   "license": "MIT",
   "dependencies": {
@@ -77,11 +89,11 @@
     "ink": "^6.8.0",
     "inquirer": "^14.0.0",
     "jsonc-parser": "^3.2.0",
-    "preact": "^10.28.3",
+    "preact": "^11.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "semver": "7.6.3",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.5",
     "tinyglobby": "^0.2.15",
     "twenty-client-sdk": "workspace:*",
     "typescript": "^5.9.3",
@@ -99,7 +111,6 @@
     "rollup-plugin-dts": "^6.4.1",
     "ts-morph": "^25.0.0",
     "tsc-alias": "^1.8.16",
-    "tsx": "^4.7.0",
     "twenty-shared": "workspace:*",
     "twenty-ui": "workspace:*",
     "vite": "^8.0.0",
@@ -108,7 +119,8 @@
   },
   "engines": {
     "node": "^24.5.0",
-    "yarn": "^4.0.2"
+    "yarn": "^4.0.2",
+    "twenty": ">=2.49.0"
   },
   "typesVersions": {
     "*": {
@@ -135,6 +147,9 @@
       ],
       "front-component-renderer/build": [
         "dist/front-component-renderer/build/index.d.ts"
+      ],
+      "build": [
+        "dist/build/index.d.ts"
       ]
     }
   }

@@ -1,18 +1,18 @@
 import { DatePicker } from '@/ui/input/components/internal/date/components/DatePicker';
 import { DATE_PICKER_CONTAINER_WIDTH } from '@/ui/input/components/internal/date/components/StyledDatePickerContainer';
 import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
+import { LegacyDropdownContent } from '@/ui/layout/dropdown/components/LegacyDropdownContent';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { UserContext } from '@/users/contexts/UserContext';
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
+import { formatDateString } from '@/object-record/record-field/ui/utils/formatDateString';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useContext } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { IconCalendar } from 'twenty-ui/icon';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { dateLocaleState } from '~/localization/states/dateLocaleState';
-import { formatDateString } from '~/utils/string/formatDateString';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledDateButton = styled.button`
   align-items: center;
@@ -72,7 +72,7 @@ export const PageLayoutPeriodDatePicker = ({
         </StyledDateButton>
       }
       dropdownComponents={
-        <DropdownContent widthInPixels={DATE_PICKER_CONTAINER_WIDTH}>
+        <LegacyDropdownContent widthInPixels={DATE_PICKER_CONTAINER_WIDTH}>
           <DatePicker
             instanceId={`${dropdownId}-picker`}
             plainDateString={value}
@@ -80,7 +80,7 @@ export const PageLayoutPeriodDatePicker = ({
             onClose={() => closeDropdown(dropdownId)}
             onClear={() => onChange(null)}
           />
-        </DropdownContent>
+        </LegacyDropdownContent>
       }
     />
   );

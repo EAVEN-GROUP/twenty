@@ -1,10 +1,10 @@
 import { type ApplicationDTO } from 'src/engine/core-modules/application/dtos/application.dto';
-import { ApplicationState } from 'src/engine/core-modules/application/enums/application-state.enum';
 import { type FlatApplication } from 'src/engine/core-modules/application/types/flat-application.type';
 
 export const fromFlatApplicationToApplicationDto = ({
   canBeUninstalled,
   autoUpgrade,
+  createdAt,
   description,
   id,
   logo,
@@ -16,12 +16,13 @@ export const fromFlatApplicationToApplicationDto = ({
   availablePackages,
   universalIdentifier,
   version,
-  state,
   settingsCustomTabFrontComponentId,
+  healthCheckLogicFunctionId,
 }: FlatApplication): ApplicationDTO => {
   return {
     canBeUninstalled,
     autoUpgrade,
+    createdAt: new Date(createdAt),
     description: description ?? undefined,
     id,
     logo: logo ?? undefined,
@@ -34,8 +35,8 @@ export const fromFlatApplicationToApplicationDto = ({
     availablePackages: availablePackages ?? {},
     universalIdentifier,
     version: version ?? undefined,
-    state: state ?? ApplicationState.INSTALLED,
     settingsCustomTabFrontComponentId:
       settingsCustomTabFrontComponentId ?? undefined,
+    healthCheckLogicFunctionId: healthCheckLogicFunctionId ?? undefined,
   };
 };

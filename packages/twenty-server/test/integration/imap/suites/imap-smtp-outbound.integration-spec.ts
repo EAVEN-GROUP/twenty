@@ -23,13 +23,16 @@ describe('IMAP/SMTP outbound messaging (integration)', () => {
   let messageChannelId: string;
 
   beforeAll(async () => {
-    await updateConfigVariable({
-      input: { key: 'OUTBOUND_HTTP_SAFE_MODE_ENABLED', value: false },
-    });
-
     greenmail = await startGreenmailContainer({
       username: HANDLE,
       password: PASSWORD,
+    });
+
+    await updateConfigVariable({
+      input: {
+        key: 'OUTBOUND_HTTP_ALLOWED_INTERNAL_HOSTS',
+        value: [greenmail.host],
+      },
     });
 
     const { data } = await saveImapSmtpCaldavAccount({
@@ -67,7 +70,7 @@ describe('IMAP/SMTP outbound messaging (integration)', () => {
 
   afterAll(async () => {
     await updateConfigVariable({
-      input: { key: 'OUTBOUND_HTTP_SAFE_MODE_ENABLED', value: true },
+      input: { key: 'OUTBOUND_HTTP_ALLOWED_INTERNAL_HOSTS', value: [] },
     }).catch(() => undefined);
 
     if (connectedAccountId) {
@@ -148,9 +151,7 @@ describe('IMAP/SMTP outbound messaging (integration)', () => {
 
     expect(result).toMatchObject({
       success: false,
-      error: expect.stringContaining(
-        'is not the connected account handle nor one of its verified aliases',
-      ),
+      error: 'You cannot send from this address.',
     });
     expect(
       await findRecordNodesByFilter<{ id: string }>(

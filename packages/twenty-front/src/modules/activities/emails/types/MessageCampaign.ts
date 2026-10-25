@@ -10,6 +10,7 @@ export type MessageCampaign = {
   unsubscribeTopicId: string | null;
   listId: string | null;
   status: MessageCampaignStatus;
+  scheduledAt: string | null;
   sentAt: string | null;
   sentCount: number;
   deliveredCount: number;
@@ -17,4 +18,8 @@ export type MessageCampaign = {
   skippedCount: number;
   bouncedCount: number;
   complainedCount: number;
+  uniqueClickCount: number;
+  clickRate: number;
+  uniqueOpenCount: number;
+  openRate: number;
 };

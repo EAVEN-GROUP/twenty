@@ -63,6 +63,7 @@ there, since Slack validates the set:
 | `users:read` | list the Slack roster for the email sweep, and look up a requester's display name |
 | `users:read.email` | match a Slack account to a workspace member by confirmed email |
 | `assistant:write` | agent surface: `assistant.threads.*` (statuses, titles, suggested prompts) |
+| `files:read` | assistant: download files shared with a request so the agent can read them |
 
 Adding or removing scopes later means existing installs must re-authorize:
 disconnect and **Add connection** again.
@@ -164,7 +165,10 @@ mentions and DMs, at the cost of un-mentioned thread follow-ups.
 > hand as well (see Record link previews). Upgrading from any version before
 > 0.9.0 adds the `slack#/entities/task` entity type, which has to be selected
 > under Work Object Previews by hand; until it is, task links stop rendering a
-> card at all. No new scopes or events, so no reconnect.
+> card at all. No new scopes or events, so no reconnect. Upgrading from any
+> version before 1.4.0 adds the `files:read` scope so the assistant can read
+> files shared with it; that needs a reconnect, and until then shared files
+> reach the assistant as names only, exactly as they did before. No new events.
 
 ### Interactivity
 
@@ -184,14 +188,17 @@ Once both are set, **reconnect** so the token picks up the assistant scopes.
 
 ### Permissions
 
-The `slack-assistant` agent binds to the app's **Slack Assistant** role
-automatically on install and upgrade. That role is the ceiling for everything
-the bot can do.
+Only a Slack account linked to a workspace member can use the assistant. An
+account with no link is told to ask an admin for a link, and a linked member
+whose message was not addressed to the assistant (for example a reply in a
+followed thread from someone who never mentioned it there) is asked to mention
+it in a new message.
 
-Where a Slack account is linked to a workspace member, the bot also runs with
-that member's own permissions, so it can never do more than the person asking.
-Accounts with no link act with the Slack Assistant role alone, so keep it scoped
-to what you're comfortable exposing to anyone who can message the bot.
+Every answer runs with the linked member's own permissions, so the assistant can
+never do more than the person asking. The app's role only covers what the app's
+own functions need: tracking assistant requests, linking Slack accounts, reading
+workspace members for the email match and rendering record previews. It is not
+an extra ceiling on a member's answer.
 
 ## Linking Slack accounts to workspace members
 
@@ -362,10 +369,11 @@ configured.
   gets an ephemeral nudge (only that member sees it) to mention the bot again.
 - **Channel welcome.** With `member_joined_channel` subscribed, the bot posts a
   short introduction the first time it is added to a channel, with the details
-  in a thread reply so the channel itself stays quiet. It fires once per channel
-  for 30 days, and only for the bot's own join — humans joining afterwards
-  trigger nothing. Skip the subscription if you would rather it arrived
-  silently.
+  in a thread reply so the channel itself stays quiet. It names both ways to
+  reach the bot: mention it in the channel, or DM it to keep a question and its
+  answer out of the channel. It fires once per channel for 30 days, and only for
+  the bot's own join — humans joining afterwards trigger nothing. Skip the
+  subscription if you would rather it arrived silently.
 - **One Slack workspace per Twenty workspace.** Connecting Slack claims that
   Slack team for the connecting Twenty workspace, and on the same server a
   second Twenty workspace connecting the same team is rejected. Removing the last
@@ -398,4 +406,5 @@ Fields use camelCase in the step UI:
 | Feedback buttons show a warning when clicked | **Interactivity & Shortcuts** is not enabled, or its Request URL is wrong | Enable it and set the `slack-interactivity-resolver` URL above |
 | Connecting is rejected because the Slack team is already claimed | Another Twenty workspace on this server has connected the same Slack team | Remove the connection on that workspace, or uninstall the app there, to release the claim |
 | A manual link stays *Awaiting consent* | The person has not answered the consent DM, or `im:write` was not granted so it was never sent | Resend the request from the **Slack user links** settings section; if nothing arrives, reconnect to grant `im:write` |
-| The bot acts with the Slack Assistant role instead of the member's permissions | The Slack account has no link, or its verified email no longer matches the member | Check the link's status in the settings section and link the account by hand if the email cannot match |
+| The bot declines a person with *"not linked"* instead of answering | The Slack account has no link, or its verified email no longer matches the member | Check the link's status in the settings section and link the account by hand if the email cannot match |
+| The bot asks a linked member to mention it in a new message | The message was not addressed to the assistant, such as a reply in a followed thread from someone who never mentioned it there | Mention the assistant in a new message |

@@ -2,7 +2,7 @@ import { type FieldFullNameValue } from '@/object-record/record-field/ui/types/F
 import { TextInput } from '@/ui/input/components/TextInput';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledNameFields = styled.div`
   display: flex;

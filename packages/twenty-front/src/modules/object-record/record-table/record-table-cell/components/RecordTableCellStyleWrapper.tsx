@@ -1,30 +1,37 @@
 import { cx } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { type ReactNode, useContext } from 'react';
-import { ThemeContext } from 'twenty-ui/theme-constants';
+import { type ReactNode } from 'react';
+import { themeCssVariables } from 'twenty-ui/theme';
 
-export const StyledCell = styled.div<{
-  backgroundColor: string;
-  borderColor: string;
-  isDragging?: boolean;
-  fontColor: string;
-  hasRightBorder?: boolean;
-  hasBottomBorder?: boolean;
-}>`
-  background: ${({ backgroundColor, isDragging }) =>
-    isDragging ? 'transparent' : backgroundColor};
+import { RECORD_TABLE_ROW_TINT_CSS_VARIABLE } from '@/object-record/record-table/constants/RecordTableRowTintCssVariable';
 
-  border-bottom: 1px solid
-    ${({ borderColor, hasBottomBorder, isDragging }) =>
-      hasBottomBorder && !isDragging ? borderColor : 'transparent'};
-  border-right: ${({ borderColor, hasRightBorder }) =>
-    hasRightBorder ? `1px solid ${borderColor}` : 'none'};
-
-  color: ${({ fontColor }) => fontColor};
-
+const StyledCell = styled.div`
+  background: var(
+    ${RECORD_TABLE_ROW_TINT_CSS_VARIABLE},
+    ${themeCssVariables.background.primary}
+  );
+  border-bottom: 1px solid ${themeCssVariables.border.color.medium};
+  border-right: 1px solid ${themeCssVariables.border.color.medium};
+  color: ${themeCssVariables.font.color.primary};
   padding: 0;
-
   text-align: left;
+
+  &[data-selected] {
+    background: ${themeCssVariables.accent.quaternary};
+  }
+
+  &[data-without-right-border] {
+    border-right: none;
+  }
+
+  &[data-without-bottom-border] {
+    border-bottom-color: transparent;
+  }
+
+  &[data-dragging] {
+    background: transparent;
+    border-bottom-color: transparent;
+  }
 `;
 
 export const RecordTableCellStyleWrapper = ({
@@ -34,7 +41,6 @@ export const RecordTableCellStyleWrapper = ({
   hasRightBorder = false,
   hasBottomBorder = true,
   widthClassName,
-  rowTintColor,
   ...divProps
 }: {
   className?: string;
@@ -44,26 +50,13 @@ export const RecordTableCellStyleWrapper = ({
   hasRightBorder?: boolean;
   hasBottomBorder?: boolean;
   widthClassName: string;
-  rowTintColor?: string;
 } & React.ComponentProps<'div'>) => {
-  const { theme } = useContext(ThemeContext);
-
-  const tdBackgroundColor = isSelected
-    ? theme.accent.quaternary
-    : (rowTintColor ?? theme.background.primary);
-
-  const borderColor = theme.border.color.medium;
-
-  const fontColor = theme.font.color.primary;
-
   return (
     <StyledCell
-      isDragging={isDragging}
-      backgroundColor={tdBackgroundColor}
-      borderColor={borderColor}
-      fontColor={fontColor}
-      hasRightBorder={hasRightBorder}
-      hasBottomBorder={hasBottomBorder}
+      data-selected={isSelected || undefined}
+      data-dragging={isDragging || undefined}
+      data-without-right-border={!hasRightBorder || undefined}
+      data-without-bottom-border={!hasBottomBorder || undefined}
       // oxlint-disable-next-line react/jsx-props-no-spreading
       {...divProps}
       className={cx('table-cell', widthClassName)}

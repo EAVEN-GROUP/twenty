@@ -1,3 +1,4 @@
+import { getChipLabel } from '@/ui/field/display/utils/getChipLabel';
 import { CallRecordingTranscriptEntryWords } from '@/page-layout/widgets/call-recording-transcript/components/CallRecordingTranscriptEntryWords';
 import { type CallRecordingTranscriptEntryPlaybackPhase } from '@/page-layout/widgets/call-recording-transcript/types/CallRecordingTranscriptEntryPlaybackPhase';
 import { formatCallRecordingTranscriptTimestamp } from '@/page-layout/widgets/call-recording-transcript/utils/formatCallRecordingTranscriptTimestamp';
@@ -6,8 +7,8 @@ import { t } from '@lingui/core/macro';
 import { type Ref } from 'react';
 import { type CallRecordingParsedTranscriptEntry } from 'twenty-shared/types';
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
-import { Avatar, Chip, ChipVariant } from 'twenty-ui/data-display';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Avatar, Chip } from 'twenty-ui/primitives/data-display';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledEntry = styled.li<{
   hasPlaybackControls: boolean;
@@ -77,7 +78,7 @@ const StyledText = styled.p<{ isUpcoming: boolean }>`
 type CallRecordingTranscriptEntryListItemProps = {
   entry: CallRecordingParsedTranscriptEntry;
   playbackPhase?: CallRecordingTranscriptEntryPlaybackPhase;
-  videoElement?: HTMLVideoElement;
+  mediaElement?: HTMLMediaElement;
   entryElementRef?: Ref<HTMLLIElement>;
   onSelect?: (entryStartSeconds: number) => void;
 };
@@ -85,7 +86,7 @@ type CallRecordingTranscriptEntryListItemProps = {
 export const CallRecordingTranscriptEntryListItem = ({
   entry,
   playbackPhase,
-  videoElement,
+  mediaElement,
   entryElementRef,
   onSelect,
 }: CallRecordingTranscriptEntryListItemProps) => {
@@ -95,7 +96,7 @@ export const CallRecordingTranscriptEntryListItem = ({
   const isActive = playbackPhase === 'speaking';
   const hasPlaybackControls = isDefined(playbackPhase) || isDefined(onSelect);
   const hasSpokenWordHighlight =
-    isActive && isDefined(videoElement) && isNonEmptyArray(entry.words);
+    isActive && isDefined(mediaElement) && isNonEmptyArray(entry.words);
   const formattedStartTimestamp = isDefined(entryStartSeconds)
     ? formatCallRecordingTranscriptTimestamp(entryStartSeconds)
     : undefined;
@@ -125,18 +126,18 @@ export const CallRecordingTranscriptEntryListItem = ({
     >
       <StyledEntryHeader>
         <Chip
-          clickable={false}
-          label={speakerName}
-          variant={ChipVariant.Transparent}
-          leftComponent={
+          variant="plain"
+          startElement={
             <Avatar
-              placeholder={speakerName}
-              placeholderColorSeed={speakerName}
+              name={speakerName}
+              colorSeed={speakerName}
               size="sm"
-              type="rounded"
+              shape="circle"
             />
           }
-        />
+        >
+          {getChipLabel(speakerName).content}
+        </Chip>
         {isDefined(formattedStartTimestamp) && (
           <StyledTimestamp
             as={isSelectable ? 'button' : undefined}
@@ -154,7 +155,7 @@ export const CallRecordingTranscriptEntryListItem = ({
         {hasSpokenWordHighlight ? (
           <CallRecordingTranscriptEntryWords
             words={entry.words}
-            videoElement={videoElement}
+            mediaElement={mediaElement}
           />
         ) : (
           entry.text

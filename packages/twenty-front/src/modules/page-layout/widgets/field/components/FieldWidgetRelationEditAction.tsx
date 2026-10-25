@@ -21,8 +21,9 @@ import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/use
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { CustomError, isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import { IconPencil, IconPlus } from 'twenty-ui/icon';
-import { IconButton } from 'twenty-ui/input';
+import { IconButton } from 'twenty-ui/components/input';
 import { RelationType } from '~/generated-metadata/graphql';
 
 type FieldWidgetRelationEditActionProps = {
@@ -49,7 +50,7 @@ export const FieldWidgetRelationEditAction = ({
 
   if (!objectMetadataItem) {
     throw new CustomError(
-      'Object metadata item not found',
+      doNotTranslate('Object metadata item not found'),
       'OBJECT_METADATA_ITEM_NOT_FOUND',
     );
   }
@@ -88,17 +89,14 @@ export const FieldWidgetRelationEditAction = ({
     fieldDefinition.metadata.relationType === RelationType.MANY_TO_ONE ||
     hasAtLeastOneRelationRecord;
 
-  const triggerIcon = isEditAction ? IconPencil : IconPlus;
+  const TriggerIcon = isEditAction ? IconPencil : IconPlus;
   const triggerLabel = isEditAction ? t`Edit relation` : t`Add relation`;
 
   const dropdownTriggerClickableComponent = (
     <StyledEditButtonWrapper>
-      <IconButton
-        Icon={triggerIcon}
-        variant="tertiary"
-        size="small"
-        ariaLabel={triggerLabel}
-      />
+      <IconButton variant="ghost" size="sm" aria-label={triggerLabel}>
+        <TriggerIcon />
+      </IconButton>
     </StyledEditButtonWrapper>
   );
 

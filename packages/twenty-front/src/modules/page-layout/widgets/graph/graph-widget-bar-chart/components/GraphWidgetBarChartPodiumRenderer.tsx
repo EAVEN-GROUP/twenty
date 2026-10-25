@@ -12,7 +12,7 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo } from 'react';
 import { isDefined } from 'twenty-shared/utils';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { BarChartGroupMode } from '~/generated-metadata/graphql';
 
 const PODIUM_STATUS_FIELD_NAME = 'status';

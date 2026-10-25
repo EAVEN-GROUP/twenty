@@ -1,5 +1,12 @@
 import request from 'supertest';
-import { updateWorkflowVersionTrigger } from 'test/integration/graphql/suites/workflow/utils/update-workflow-version-trigger.util';
+import {
+  activateCoreWorkflowVersion,
+  createCoreWorkflow,
+  createCoreWorkflowVersionStep,
+  deactivateCoreWorkflowVersion,
+  deleteCoreWorkflows,
+  updateCoreWorkflowVersionTrigger,
+} from 'test/integration/graphql/suites/workflow/utils/core-workflow.util';
 import { isDefined } from 'twenty-shared/utils';
 
 const POLL_ATTEMPTS = 20;
@@ -65,13 +72,13 @@ type CoreWorkflowFilter = {
 };
 
 describe('coreWorkflows (e2e)', () => {
-  let workflowId: string;
-  let firstVersionId: string;
+  let coreWorkflowId: string;
+  let firstCoreWorkflowVersionId: string;
   let alreadyDestroyed = false;
 
-  const findCoreWorkflow = async (
+  const listCoreWorkflows = async (
     filter?: CoreWorkflowFilter,
-  ): Promise<CoreWorkflow | undefined> => {
+  ): Promise<CoreWorkflow[]> => {
     const response = await graphql(CORE_WORKFLOWS_QUERY, { filter });
 
     expect(response.body.errors).toBeUndefined();
@@ -87,10 +94,15 @@ describe('coreWorkflows (e2e)', () => {
       expect(totalCount).toBe(edges.length);
     }
 
-    return edges
-      .map((edge) => edge.node)
-      .find((workflow) => workflow.workspaceWorkflowId === workflowId);
+    return edges.map((edge) => edge.node);
   };
+
+  const findCoreWorkflow = async (
+    filter?: CoreWorkflowFilter,
+  ): Promise<CoreWorkflow | undefined> =>
+    (await listCoreWorkflows(filter)).find(
+      (workflow) => workflow.id === coreWorkflowId,
+    );
 
   const waitForCoreWorkflow = async (
     predicate: (workflow: CoreWorkflow | undefined) => boolean,
@@ -109,52 +121,16 @@ describe('coreWorkflows (e2e)', () => {
   };
 
   beforeAll(async () => {
-    const createResponse = await graphql(`
-      mutation {
-        createWorkflow(data: { name: "Core Workflows List" }) {
-          id
-        }
-      }
-    `);
-
-    expect(createResponse.body.errors).toBeUndefined();
-    workflowId = createResponse.body.data.createWorkflow.id;
-
-    const getResponse = await graphql(
-      `
-        query GetWorkflow($id: UUID!) {
-          workflow(filter: { id: { eq: $id } }) {
-            versions {
-              edges {
-                node {
-                  id
-                }
-              }
-            }
-          }
-        }
-      `,
-      { id: workflowId },
-    );
-
-    firstVersionId = getResponse.body.data.workflow.versions.edges[0].node.id;
+    ({ coreWorkflowId, coreWorkflowVersionId: firstCoreWorkflowVersionId } =
+      await createCoreWorkflow({ name: 'Core Workflows List' }));
   });
 
   afterAll(async () => {
-    if (alreadyDestroyed) {
+    if (alreadyDestroyed || !isDefined(coreWorkflowId)) {
       return;
     }
 
-    await graphql(
-      `
-        mutation DestroyWorkflow($id: UUID!) {
-          destroyWorkflow(id: $id) {
-            id
-          }
-        }
-      `,
-      { id: workflowId },
-    );
+    await deleteCoreWorkflows({ coreWorkflowIds: [coreWorkflowId] });
   });
 
   it('should list the workflow as DRAFT right after creation', async () => {
@@ -322,7 +298,7 @@ describe('coreWorkflows (e2e)', () => {
       ],
     });
 
-    expect(updatedAfter?.workspaceWorkflowId).toBe(workflowId);
+    expect(updatedAfter?.id).toBe(coreWorkflowId);
 
     const updatedBefore = await findCoreWorkflow({
       logicalOperator: 'AND',
@@ -348,7 +324,7 @@ describe('coreWorkflows (e2e)', () => {
       ],
     });
 
-    expect(updatedOnTheSameDay?.workspaceWorkflowId).toBe(workflowId);
+    expect(updatedOnTheSameDay?.id).toBe(coreWorkflowId);
   });
 
   it('should reject an operand the field does not support', async () => {
@@ -366,8 +342,8 @@ describe('coreWorkflows (e2e)', () => {
   });
 
   it('should list the workflow as ACTIVE once its version is activated', async () => {
-    await updateWorkflowVersionTrigger({
-      workflowVersionId: firstVersionId,
+    await updateCoreWorkflowVersionTrigger({
+      coreWorkflowVersionId: firstCoreWorkflowVersionId,
       trigger: {
         name: 'Manual Trigger',
         type: 'MANUAL',
@@ -377,38 +353,14 @@ describe('coreWorkflows (e2e)', () => {
       },
     });
 
-    const stepResponse = await graphql(
-      `
-        mutation CreateWorkflowVersionStep(
-          $input: CreateWorkflowVersionStepInput!
-        ) {
-          createWorkflowVersionStep(input: $input) {
-            stepsDiff
-          }
-        }
-      `,
-      {
-        input: {
-          workflowVersionId: firstVersionId,
-          stepType: 'FIND_RECORDS',
-          parentStepId: 'trigger',
-          position: { x: 200, y: 0 },
-        },
-      },
-    );
+    await createCoreWorkflowVersionStep({
+      coreWorkflowVersionId: firstCoreWorkflowVersionId,
+      stepType: 'FIND_RECORDS',
+    });
 
-    expect(stepResponse.body.errors).toBeUndefined();
-
-    const activateResponse = await graphql(
-      `
-        mutation ActivateWorkflowVersion($workflowVersionId: UUID!) {
-          activateWorkflowVersion(workflowVersionId: $workflowVersionId)
-        }
-      `,
-      { workflowVersionId: firstVersionId },
-    );
-
-    expect(activateResponse.body.errors).toBeUndefined();
+    await activateCoreWorkflowVersion({
+      coreWorkflowVersionId: firstCoreWorkflowVersionId,
+    });
 
     const coreWorkflow = await waitForCoreWorkflow(
       (workflow) => workflow?.statuses[0] === 'ACTIVE',
@@ -418,16 +370,9 @@ describe('coreWorkflows (e2e)', () => {
   });
 
   it('should list the workflow as DEACTIVATED once its version is deactivated', async () => {
-    const deactivateResponse = await graphql(
-      `
-        mutation DeactivateWorkflowVersion($workflowVersionId: UUID!) {
-          deactivateWorkflowVersion(workflowVersionId: $workflowVersionId)
-        }
-      `,
-      { workflowVersionId: firstVersionId },
-    );
-
-    expect(deactivateResponse.body.errors).toBeUndefined();
+    await deactivateCoreWorkflowVersion({
+      coreWorkflowVersionId: firstCoreWorkflowVersionId,
+    });
 
     const coreWorkflow = await waitForCoreWorkflow(
       (workflow) => workflow?.statuses[0] === 'DEACTIVATED',
@@ -495,16 +440,7 @@ describe('coreWorkflows (e2e)', () => {
   });
 
   it('should not list the workflow once it is destroyed', async () => {
-    await graphql(
-      `
-        mutation DestroyWorkflow($id: UUID!) {
-          destroyWorkflow(id: $id) {
-            id
-          }
-        }
-      `,
-      { id: workflowId },
-    );
+    await deleteCoreWorkflows({ coreWorkflowIds: [coreWorkflowId] });
 
     alreadyDestroyed = true;
 

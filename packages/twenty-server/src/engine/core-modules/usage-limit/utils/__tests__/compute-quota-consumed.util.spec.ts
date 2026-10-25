@@ -1,38 +1,50 @@
 import { type LimitQuotaCounter } from 'src/engine/core-modules/usage-limit/types/limit-quota-counter.type';
-import { type QuotaConsumptionRow } from 'src/engine/core-modules/usage-limit/types/quota-consumption-row.type';
+import { type UsageConsumptionRow } from 'src/engine/core-modules/usage/types/usage-consumption-row.type';
 import { computeQuotaConsumed } from 'src/engine/core-modules/usage-limit/utils/compute-quota-consumed.util';
 import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
 import { UsageResourceType } from 'src/engine/core-modules/usage/enums/usage-resource-type.enum';
+import { UsageUnit } from 'src/engine/core-modules/usage/enums/usage-unit.enum';
 
 const buildRow = (
-  overrides: Partial<QuotaConsumptionRow>,
-): QuotaConsumptionRow => ({
-  operationType: UsageOperationType.AI_CHAT_TOKEN,
-  userWorkspaceId: 'user-1',
-  apiKeyId: '',
-  applicationId: '',
-  agentId: '',
-  workflowId: '',
-  logicFunctionId: '',
-  creditsUsedMicro: '100',
-  quantity: '10',
-  ...overrides,
-});
+  overrides: Partial<UsageConsumptionRow>,
+): UsageConsumptionRow => {
+  const creditsUsedMicro = overrides.creditsUsedMicro ?? '100';
+  const userCreditsUsedMicro = overrides.userCreditsUsedMicro ?? '0';
+
+  return {
+    operationType: UsageOperationType.AI_CHAT_TOKEN,
+    unit: UsageUnit.TOKEN,
+    userWorkspaceId: 'user-1',
+    apiKeyId: '',
+    applicationId: '',
+    agentId: '',
+    workflowId: '',
+    logicFunctionId: '',
+    creditsUsedMicro,
+    userCreditsUsedMicro,
+    workspaceCreditsUsedMicro: String(
+      Number(creditsUsedMicro) - Number(userCreditsUsedMicro),
+    ),
+    quantity: '10',
+    ...overrides,
+  };
+};
 
 const buildCounter = (
   overrides: Partial<LimitQuotaCounter>,
 ): LimitQuotaCounter => ({
   kind: 'limit',
+  isDefault: false,
   key: 'counter-key',
   limitValue: 1_000,
-  meter: 'creditsUsedMicro',
+  unit: UsageUnit.CREDIT,
   resourceType: UsageResourceType.AI,
   periodUnit: 'month',
   periodStart: new Date('2026-08-01T00:00:00.000Z'),
   periodEnd: new Date('2026-09-01T00:00:00.000Z'),
   spenderType: 'workspace',
   spenderId: null,
-  operationType: UsageOperationType.ALL,
+  operationTypes: [UsageOperationType.ALL],
   ...overrides,
 });
 
@@ -53,16 +65,16 @@ const rows = [
 ];
 
 describe('computeQuotaConsumed', () => {
-  it('sums every row for a workspace counter with no operation', () => {
-    expect(computeQuotaConsumed({ rows, counter: buildCounter({}) })).toBe(147);
+  it('sums the credits of every operation for a credit counter on every operation', () => {
+    expect(computeQuotaConsumed({ rows, scope: buildCounter({}) })).toBe(147);
   });
 
-  it('cuts by operation when the counter names one', () => {
+  it('cuts by operation when the scope names one', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({
-          operationType: UsageOperationType.AI_CHAT_TOKEN,
+        scope: buildCounter({
+          operationTypes: [UsageOperationType.AI_CHAT_TOKEN],
         }),
       }),
     ).toBe(140);
@@ -72,7 +84,7 @@ describe('computeQuotaConsumed', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({
+        scope: buildCounter({
           spenderType: 'userWorkspace',
           spenderId: 'user-2',
         }),
@@ -84,7 +96,7 @@ describe('computeQuotaConsumed', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({
+        scope: buildCounter({
           spenderType: 'userWorkspace',
           spenderId: null,
         }),
@@ -92,11 +104,27 @@ describe('computeQuotaConsumed', () => {
     ).toBe(140);
   });
 
-  it('sums the quantity column when the counter meters on it', () => {
+  it('sums the token quantity of every operation for a token counter', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({ meter: 'quantity' }),
+        scope: buildCounter({ unit: UsageUnit.TOKEN }),
+      }),
+    ).toBe(23);
+  });
+
+  it('leaves rows of another unit out of a token counter', () => {
+    expect(
+      computeQuotaConsumed({
+        rows: [
+          ...rows,
+          buildRow({
+            operationType: UsageOperationType.WEB_SEARCH,
+            unit: UsageUnit.INVOCATION,
+            quantity: '5',
+          }),
+        ],
+        scope: buildCounter({ unit: UsageUnit.TOKEN }),
       }),
     ).toBe(23);
   });
@@ -105,7 +133,7 @@ describe('computeQuotaConsumed', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({ spenderType: 'agent', spenderId: 'agent-1' }),
+        scope: buildCounter({ spenderType: 'agent', spenderId: 'agent-1' }),
       }),
     ).toBe(100);
   });
@@ -114,7 +142,7 @@ describe('computeQuotaConsumed', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({
+        scope: buildCounter({
           spenderType: 'workflow',
           spenderId: 'workflow-1',
         }),
@@ -126,11 +154,131 @@ describe('computeQuotaConsumed', () => {
     expect(
       computeQuotaConsumed({
         rows,
-        counter: buildCounter({
+        scope: buildCounter({
           spenderType: 'logicFunction',
           spenderId: 'logic-function-1',
         }),
       }),
     ).toBe(40);
+  });
+
+  describe('when one run records an INVOCATION row and a MILLISECOND row', () => {
+    const logicFunctionRunRows = [
+      buildRow({
+        operationType: UsageOperationType.CODE_EXECUTION,
+        unit: UsageUnit.INVOCATION,
+        logicFunctionId: 'logic-function-1',
+        creditsUsedMicro: '3000',
+        quantity: '1',
+      }),
+      buildRow({
+        operationType: UsageOperationType.CODE_EXECUTION,
+        unit: UsageUnit.MILLISECOND,
+        logicFunctionId: 'logic-function-1',
+        creditsUsedMicro: '150',
+        quantity: '1500',
+      }),
+    ];
+
+    const logicFunctionScope = buildCounter({
+      operationTypes: [UsageOperationType.CODE_EXECUTION],
+      spenderType: 'logicFunction',
+      spenderId: 'logic-function-1',
+    });
+
+    it('sums the credits of both units', () => {
+      expect(
+        computeQuotaConsumed({
+          rows: logicFunctionRunRows,
+          scope: logicFunctionScope,
+        }),
+      ).toBe(3150);
+    });
+
+    it('counts the run once on an INVOCATION counter', () => {
+      expect(
+        computeQuotaConsumed({
+          rows: logicFunctionRunRows,
+          scope: { ...logicFunctionScope, unit: UsageUnit.INVOCATION },
+        }),
+      ).toBe(1);
+    });
+  });
+
+  it('counts the credits of a credit-unit row, never its quantity', () => {
+    expect(
+      computeQuotaConsumed({
+        rows: [
+          buildRow({
+            operationType: UsageOperationType.SUBSCRIPTION,
+            unit: UsageUnit.CREDIT,
+            userWorkspaceId: '',
+            applicationId: 'application-1',
+            quantity: '1',
+            creditsUsedMicro: '20000000',
+          }),
+        ],
+        scope: buildCounter({}),
+      }),
+    ).toBe(20_000_000);
+  });
+
+  it('sums only the listed operations for a scope over several operations', () => {
+    expect(
+      computeQuotaConsumed({
+        rows,
+        scope: buildCounter({
+          operationTypes: [
+            UsageOperationType.AI_CHAT_TOKEN,
+            UsageOperationType.WEB_SEARCH,
+          ],
+        }),
+      }),
+    ).toBe(140);
+  });
+
+  describe('when user credits paid part of the credits', () => {
+    const rowsWithUserCredits = [
+      buildRow({ creditsUsedMicro: '100', userCreditsUsedMicro: '60' }),
+      buildRow({
+        userWorkspaceId: 'user-2',
+        creditsUsedMicro: '40',
+        userCreditsUsedMicro: '40',
+      }),
+    ];
+
+    it('counts only the workspace credits on a workspace-wide credit counter', () => {
+      expect(
+        computeQuotaConsumed({
+          rows: rowsWithUserCredits,
+          scope: buildCounter({}),
+        }),
+      ).toBe(40);
+    });
+
+    it('counts every credit on a credit counter of one user', () => {
+      expect(
+        computeQuotaConsumed({
+          rows: rowsWithUserCredits,
+          scope: buildCounter({
+            spenderType: 'userWorkspace',
+            spenderId: 'user-1',
+          }),
+        }),
+      ).toBe(100);
+    });
+
+    it('counts only the user credits on a user credit counter', () => {
+      expect(
+        computeQuotaConsumed({
+          rows: rowsWithUserCredits,
+          scope: buildCounter({
+            unit: UsageUnit.USER_CREDIT,
+            spenderType: 'userWorkspace',
+            spenderId: 'user-1',
+          }),
+        }),
+      ).toBe(60);
+    });
   });
 });

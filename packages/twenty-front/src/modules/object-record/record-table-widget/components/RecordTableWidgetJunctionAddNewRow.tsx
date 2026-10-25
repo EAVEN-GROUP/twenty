@@ -1,15 +1,17 @@
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { useObjectPermissionsForObject } from '@/object-record/hooks/useObjectPermissionsForObject';
 import { isObjectMetadataReadOnly } from '@/object-record/read-only/utils/isObjectMetadataReadOnly';
-import { RecordTableActionRow } from '@/object-record/record-table/record-table-row/components/RecordTableActionRow';
 import { RecordTableWidgetRelationPickerDropdownContent } from '@/object-record/record-table-widget/components/RecordTableWidgetRelationPickerDropdownContent';
 import { type RecordTableWidgetJunctionCreateThrough } from '@/object-record/record-table-widget/contexts/RecordTableWidgetContext';
 import { useCreateJunctionRecordFromTableWidget } from '@/object-record/record-table-widget/hooks/useCreateJunctionRecordFromTableWidget';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
-import { Dropdown } from '@/ui/layout/dropdown/components/Dropdown';
-import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
+import { RecordTableActionRow } from '@/object-record/record-table/record-table-row/components/RecordTableActionRow';
+import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
+import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
+import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
 import { t } from '@lingui/core/macro';
 import { type RecordGqlOperationFilter } from 'twenty-shared/types';
+import { useToast } from 'twenty-ui/components/feedback';
+import { Dropdown } from 'twenty-ui/components/navigation';
 import { IconPlus } from 'twenty-ui/icon';
 import { logError } from '~/utils/logError';
 
@@ -24,8 +26,7 @@ export const RecordTableWidgetJunctionAddNewRow = ({
   junctionCreateThrough,
   targetRecordsFilter = junctionCreateThrough.targetRecordsFilter,
 }: RecordTableWidgetJunctionAddNewRowProps) => {
-  const { closeDropdown } = useCloseDropdown();
-  const { enqueueErrorSnackBar } = useSnackBar();
+  const { enqueueToast } = useToast();
 
   const { objectMetadataItem: junctionObjectMetadataItem } =
     useObjectMetadataItemById({
@@ -40,8 +41,7 @@ export const RecordTableWidgetJunctionAddNewRow = ({
     junctionCreateThrough,
   });
 
-  // Linking an existing record only writes the junction object, so the
-  // junction's own permissions gate the row rather than the target object's.
+  // Linking only writes the junction object, so its permissions gate the row.
   if (
     isObjectMetadataReadOnly({
       objectPermissions: junctionObjectPermissions,
@@ -52,22 +52,18 @@ export const RecordTableWidgetJunctionAddNewRow = ({
   }
 
   const handleTargetRecordSelected = (targetRecordId: string) => {
-    closeDropdown(dropdownId);
     createJunctionRecord(targetRecordId).catch((error) => {
       logError(error);
-      enqueueErrorSnackBar({ message: t`Failed to add record` });
+      enqueueToast({ status: 'error', children: t`Failed to add record` });
     });
   };
 
   return (
-    <Dropdown
-      dropdownId={dropdownId}
-      dropdownPlacement="bottom-start"
-      clickableComponentWidth="100%"
-      clickableComponent={
+    <DropdownRoot dropdownId={dropdownId} type="picker">
+      <Dropdown.Trigger render={<div />} nativeButton={false}>
         <RecordTableActionRow LeftIcon={IconPlus} text={t`Add New`} />
-      }
-      dropdownComponents={
+      </Dropdown.Trigger>
+      <DropdownContent align="start" width={GenericDropdownContentWidth.Medium}>
         <RecordTableWidgetRelationPickerDropdownContent
           objectNameSingular={
             junctionCreateThrough.targetObjectMetadataNameSingular
@@ -75,7 +71,7 @@ export const RecordTableWidgetJunctionAddNewRow = ({
           recordsFilter={targetRecordsFilter}
           onRelationRecordSelected={handleTargetRecordSelected}
         />
-      }
-    />
+      </DropdownContent>
+    </DropdownRoot>
   );
 };

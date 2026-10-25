@@ -55,6 +55,7 @@ import { IconHierarchy } from 'twenty-ui/icon';
 | Layout | `IconAppWindow` | `app-window` | Representing layouts as a general concept. | Representing a specific layout page, widget, or dashboard. | layout, page structure, arrangement |
 | Layout page | `IconPerspective` | `perspective` | Representing a configurable page inside a layout. | Representing the broader layout system or a record page. | layout page, page canvas, page configuration |
 | Widget | `IconLayoutGridAdd` | `layout-grid-add` | Representing a widget or the act of adding a widget. | Representing a complete dashboard or generic application. | widget, add widget, dashboard block |
+| Transcript | `IconBlockquote` | `blockquote` | Representing a transcript tab or widget. | Representing recording controls or audio and video playback. | transcript, transcription, spoken words |
 | Record Page | `IconAddressBook` | `address-book` | Representing a page dedicated to one record. | Representing a generic layout page or object definition. | record page, record layout, record detail |
 | Side Panel | `IconLayoutSidebarRight` | `layout-sidebar-right` | Representing a side panel that shows contextual content alongside a page. | Representing the main navigation sidebar, a modal, or an open or close panel action. | side panel, right panel, context panel, drawer |
 | Command Menu Item | `IconCommand` | `command` | Representing an item or action in the command menu. | Representing a navigation item or keyboard shortcut alone. | command menu, command item, keyboard command |
@@ -98,7 +99,8 @@ import { IconHierarchy } from 'twenty-ui/icon';
 | Concept | React component | Tabler name | Use when | Avoid when | Search keywords |
 | --- | --- | --- | --- | --- | --- |
 | API | `IconApi` | `api` | Representing APIs, API access, or API configuration. | Representing MCP, webhooks, or external-service integrations. | API, REST, GraphQL, API key |
-| MCP & APIs | `IconPlug` | `plug` | Representing the combined MCP, API keys, and webhooks settings area. | Representing an API, MCP server, webhook, or integration individually. | MCP and APIs, developer connections, API keys and webhooks, platform connections |
+| Developers | `IconCode` | `code` | Representing the Developers settings area for API keys, webhooks, and apps. | Representing an API, webhook, or app individually, or generic source code. | developers, developer settings, API keys and webhooks, app development |
+| CLI | `IconTerminal2` | `terminal-2` | Representing the Twenty command line tool or its commands. | Representing execution logs, runtime output, or the command menu. | CLI, command line, terminal, twenty command |
 | API Key | `IconKey` | `key` | Representing an API key or API credential. | Representing APIs generally, security settings, or permissions. | API key, API credential, access token, secret key |
 | Webhook | `IconWebhook` | `webhook` | Representing webhooks, webhook endpoints, or webhook events. | Representing a generic API, integration, or workflow action. | webhook, event callback, HTTP event, webhook endpoint |
 | Integration / Connection | `IconPlug` | `plug` | Representing an integration or connection to an external service. | Representing an app, API, MCP, or connected email account. | integration, connection, external service, provider |
@@ -127,4 +129,4 @@ import { IconHierarchy } from 'twenty-ui/icon';
 2. Confirm the visual choice in the linked Figma dictionary.
 3. Run `npx nx generateIconDictionary twenty-ui`.
 4. Review the `UI/Icon/Icon Dictionary` Storybook story.
-5. Run `npx jest packages/twenty-ui/src/icon/__tests__/TwentyIconDictionary.test.ts --config=packages/twenty-ui/jest.config.mjs`.
+5. Run `npx vitest run --root packages/twenty-ui --project unit src/icon/__tests__/TwentyIconDictionary.test.ts`.

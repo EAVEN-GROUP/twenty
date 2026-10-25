@@ -10,45 +10,29 @@ import { type CreateMeetingModalStep } from '@/meetings/types/CreateMeetingModal
 import { normalizePersonName } from '@/meetings/utils/normalizePersonName';
 import { type FieldFullNameValue } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
-import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
-import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
-import { ModalStatefulWrapper } from '@/ui/layout/modal/components/ModalStatefulWrapper';
-import { useModal } from '@/ui/layout/modal/hooks/useModal';
-import { currentFocusIdSelector } from '@/ui/utilities/focus/states/currentFocusIdSelector';
+import { DialogInstance } from '@/ui/layout/dialog/components/DialogInstance';
+import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useStore } from 'jotai';
-import { type KeyboardEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type Temporal } from 'temporal-polyfill';
 import { isDefined } from 'twenty-shared/utils';
-import { Button } from 'twenty-ui/input';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { H1Title, H1TitleFontColor } from 'twenty-ui/typography';
+import { useToast } from 'twenty-ui/components/feedback';
+import { Button } from 'twenty-ui/primitives/input';
+import { Dialog } from 'twenty-ui/primitives/surfaces';
 
-const StyledCenteredTitle = styled.div`
-  text-align: center;
-`;
-
-const StyledModalActions = styled.div`
-  display: flex;
-  gap: ${themeCssVariables.spacing[2]};
-  margin-top: ${themeCssVariables.spacing[4]};
-
-  > div {
-    flex: 1;
-  }
+const StyledActionSlot = styled.div`
+  flex: 1;
 `;
 
 const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
   const { t } = useLingui();
   const store = useStore();
-  const { openModal, closeModal } = useModal();
-  const scopedModalInstanceId = useWorkspaceSurfaceScopedComponentInstanceId(
-    CREATE_MEETING_MODAL_ID,
-  );
-  const { enqueueErrorSnackBar } = useSnackBar();
+  const { openDialog, closeDialog } = useDialog();
+  const { enqueueToast } = useToast();
   const setCreateMeetingModal = useSetAtomState(createMeetingModalState);
 
   const [step, setStep] = useState<CreateMeetingModalStep>('name');
@@ -74,28 +58,12 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
   const personFullName = `${firstName} ${lastName}`.trim();
 
   useEffect(() => {
-    openModal(CREATE_MEETING_MODAL_ID);
-  }, [openModal]);
+    openDialog(CREATE_MEETING_MODAL_ID);
+  }, [openDialog]);
 
   const handleClose = () => {
-    closeModal(CREATE_MEETING_MODAL_ID);
+    closeDialog(CREATE_MEETING_MODAL_ID);
     setCreateMeetingModal(null);
-  };
-
-  // The modal popup stops Escape from reaching the modal hotkey whenever focus
-  // is inside it (name inputs, buttons, calendar days). Only act while the
-  // modal is the focused layer so an open month/year dropdown still closes
-  // first.
-  const handleKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (
-      event.key !== 'Escape' ||
-      store.get(currentFocusIdSelector.atom) !== scopedModalInstanceId
-    ) {
-      return;
-    }
-
-    event.stopPropagation();
-    handleClose();
   };
 
   const handleNext = async () => {
@@ -109,8 +77,9 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
       await updatePersonName({ personId, personName });
       setStep('date');
     } catch {
-      enqueueErrorSnackBar({
-        message: t`The name could not be saved.`,
+      enqueueToast({
+        status: 'error',
+        children: t`The name could not be saved.`,
       });
     } finally {
       setIsSavingPersonName(false);
@@ -130,8 +99,9 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
       });
       handleClose();
     } catch {
-      enqueueErrorSnackBar({
-        message: t`The meeting could not be created.`,
+      enqueueToast({
+        status: 'error',
+        children: t`The meeting could not be created.`,
       });
     }
   };
@@ -144,75 +114,81 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
         : t`Book a meeting`;
 
   return (
-    <ModalStatefulWrapper
-      modalInstanceId={CREATE_MEETING_MODAL_ID}
-      onClose={handleClose}
+    <DialogInstance
+      dialogId={CREATE_MEETING_MODAL_ID}
+      dismissible
+      onClose={() => setCreateMeetingModal(null)}
       onEnter={step === 'name' ? handleNext : undefined}
-      isClosable
-      size="small"
-      padding="large"
-      overlay="dark"
-      dataGloballyPreventClickOutside
       renderInDocumentBody
-      smallBorderRadius
-      autoHeight
     >
-      <div onKeyDownCapture={handleKeyDownCapture}>
-        <StyledCenteredTitle>
-          <H1Title title={title} fontColor={H1TitleFontColor.Primary} />
-        </StyledCenteredTitle>
-        {step === 'name' ? (
-          <CreateMeetingModalNameStep
-            personName={personName}
-            onPersonNameChange={setPersonName}
-          />
-        ) : (
-          <CreateMeetingModalDateStep
-            meetingDate={meetingDate}
-            onMeetingDateChange={setMeetingDate}
-          />
-        )}
-        {step === 'name' ? (
-          <StyledModalActions>
-            <Button
-              onClick={handleClose}
-              variant="secondary"
-              title={t`Skip`}
-              fullWidth
-              justify="center"
-            />
-            <Button
-              onClick={handleNext}
-              variant="primary"
-              accent="blue"
-              title={t`Next`}
-              disabled={isSavingPersonName}
-              fullWidth
-              justify="center"
-            />
-          </StyledModalActions>
-        ) : (
-          <StyledModalActions>
-            <Button
-              onClick={() => setStep('name')}
-              variant="secondary"
-              title={t`Back`}
-              fullWidth
-              justify="center"
-            />
-            <Button
-              onClick={handleSubmit}
-              variant="primary"
-              accent="blue"
-              title={t`Book meeting`}
-              disabled={!isDefined(meetingDate) || loading}
-              fullWidth
-              justify="center"
-            />
-          </StyledModalActions>
-        )}
-      </div>
-    </ModalStatefulWrapper>
+      {({ onKeyDown }) => (
+        <Dialog.Popup
+          onKeyDown={onKeyDown}
+          size="compact"
+          data-globally-prevent-click-outside
+        >
+          <Dialog.Header>
+            <Dialog.Title>{title}</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            {step === 'name' ? (
+              <CreateMeetingModalNameStep
+                personName={personName}
+                onPersonNameChange={setPersonName}
+              />
+            ) : (
+              <CreateMeetingModalDateStep
+                meetingDate={meetingDate}
+                onMeetingDateChange={setMeetingDate}
+              />
+            )}
+          </Dialog.Body>
+          {step === 'name' ? (
+            <Dialog.Footer>
+              <StyledActionSlot>
+                <Button onClick={handleClose} variant="outline" fullWidth>
+                  {t`Skip`}
+                </Button>
+              </StyledActionSlot>
+              <StyledActionSlot>
+                <Button
+                  onClick={handleNext}
+                  variant="solid"
+                  color="accent"
+                  disabled={isSavingPersonName}
+                  fullWidth
+                >
+                  {t`Next`}
+                </Button>
+              </StyledActionSlot>
+            </Dialog.Footer>
+          ) : (
+            <Dialog.Footer>
+              <StyledActionSlot>
+                <Button
+                  onClick={() => setStep('name')}
+                  variant="outline"
+                  fullWidth
+                >
+                  {t`Back`}
+                </Button>
+              </StyledActionSlot>
+              <StyledActionSlot>
+                <Button
+                  onClick={handleSubmit}
+                  variant="solid"
+                  color="accent"
+                  disabled={!isDefined(meetingDate) || loading}
+                  fullWidth
+                >
+                  {t`Book meeting`}
+                </Button>
+              </StyledActionSlot>
+            </Dialog.Footer>
+          )}
+        </Dialog.Popup>
+      )}
+    </DialogInstance>
   );
 };
 

@@ -1,6 +1,6 @@
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
-import { CommandMenuItemDropdown } from '@/command-menu/components/CommandMenuItemDropdown';
-import { CommandMenuItemToggle } from '@/command-menu/components/CommandMenuItemToggle';
+import { CommandMenuItemDropdownTrigger } from '@/command-menu/components/CommandMenuItemDropdownTrigger';
+import { CommandMenuItemSwitch } from '@/command-menu/components/CommandMenuItemSwitch';
 import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type FieldConfiguration } from '@/page-layout/types/FieldConfiguration';
@@ -23,13 +23,15 @@ import { WidgetViewLayoutSettingsRows } from '@/side-panel/pages/page-layout/com
 import { WidgetSettingsManageSection } from '@/side-panel/pages/page-layout/components/WidgetSettingsManageSection';
 import { WidgetSettingsPlacementSection } from '@/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection';
 import { WIDGET_SETTINGS_SELECTABLE_ITEM_IDS } from '@/side-panel/pages/page-layout/constants/settings/WidgetSettingsSelectableItemIds';
-import { usePageLayoutIdFromContextStore } from '@/side-panel/pages/page-layout/hooks/usePageLayoutIdFromContextStore';
+import { usePageLayoutSidePanelTarget } from '@/side-panel/pages/page-layout/hooks/usePageLayoutSidePanelTarget';
 import { useUpdateCurrentWidgetConfig } from '@/side-panel/pages/page-layout/hooks/useUpdateCurrentWidgetConfig';
 import { useWidgetInEditMode } from '@/side-panel/pages/page-layout/hooks/useWidgetInEditMode';
 import { useWidgetSettingsPlacementSelectableItemIds } from '@/side-panel/pages/page-layout/hooks/useWidgetSettingsPlacementSelectableItemIds';
 import { getWidgetViewLayoutSettingsItemIds } from '@/side-panel/pages/page-layout/utils/getWidgetViewLayoutSettingsItemIds';
 import { SidePanelSubPages } from '@/side-panel/types/SidePanelSubPages';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
+import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
+import { useOpenDropdown } from '@/ui/layout/dropdown/hooks/useOpenDropdown';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
@@ -56,7 +58,8 @@ const StyledSidePanelContainer = styled.div`
 
 export const SidePanelRecordPageFieldSettings = () => {
   const { t } = useLingui();
-  const { pageLayoutId } = usePageLayoutIdFromContextStore();
+  const { openDropdown } = useOpenDropdown();
+  const { pageLayoutId } = usePageLayoutSidePanelTarget();
 
   const { placementSelectableItemIds, widgetSettingsPlacement } =
     useWidgetSettingsPlacementSelectableItemIds(pageLayoutId);
@@ -98,12 +101,7 @@ export const SidePanelRecordPageFieldSettings = () => {
     nestedRelationFieldMetadataId: currentNestedRelationFieldMetadataId,
   });
 
-  // A relation field widget in table display mode embeds a widget view scoped to
-  // the current record's related records; its source object is the relation
-  // target (or the nested relation target two hops away), not the record
-  // page's own object. A configured but unresolvable nested relation keeps
-  // the target undefined so the terminal view's settings stay hidden instead
-  // of being edited against the first hop's object.
+  // The embedded view lists the relation target, not the page's object; an unresolvable nested hop stays undefined to hide its settings
   const targetObjectMetadataId = isDefined(currentNestedRelationFieldMetadataId)
     ? resolvedNestedRelation?.nestedRelationTargetObjectMetadataItem.id
     : currentFieldMetadataItem?.relation?.targetObjectMetadata.id;
@@ -210,37 +208,51 @@ export const SidePanelRecordPageFieldSettings = () => {
       <StyledSidePanelContainer>
         <SidePanelList selectableItemIds={selectableItemIds}>
           <SidePanelGroup heading={t`Data and display`}>
-            <SelectableListItem itemId="field">
-              <CommandMenuItemDropdown
-                id="field"
-                label={t`Field`}
-                Icon={IconListDetails}
-                dropdownId="field"
-                dropdownComponents={
-                  <DropdownContent>
-                    <FieldWidgetFieldDropdownContent />
-                  </DropdownContent>
-                }
-                dropdownPlacement="bottom-end"
-                description={fieldLabel}
-                contextualTextPosition="right"
-              />
+            <SelectableListItem
+              itemId="field"
+              onEnter={() =>
+                openDropdown({ dropdownComponentInstanceIdFromProps: 'field' })
+              }
+            >
+              <DropdownRoot dropdownId="field" type="picker">
+                <CommandMenuItemDropdownTrigger
+                  id="field"
+                  label={t`Field`}
+                  Icon={IconListDetails}
+                  description={fieldLabel}
+                  contextualTextPosition="right"
+                />
+                <DropdownContent
+                  side="bottom"
+                  align="end"
+                  collisionPadding={{ left: 0, right: 0 }}
+                >
+                  <FieldWidgetFieldDropdownContent />
+                </DropdownContent>
+              </DropdownRoot>
             </SelectableListItem>
-            <SelectableListItem itemId="layout">
-              <CommandMenuItemDropdown
-                id="layout"
-                label={t`Layout`}
-                Icon={layoutRowIcon}
-                dropdownId="layout"
-                dropdownComponents={
-                  <DropdownContent>
-                    <FieldWidgetLayoutDropdownContent />
-                  </DropdownContent>
-                }
-                dropdownPlacement="bottom-end"
-                description={layoutLabel}
-                contextualTextPosition="right"
-              />
+            <SelectableListItem
+              itemId="layout"
+              onEnter={() =>
+                openDropdown({ dropdownComponentInstanceIdFromProps: 'layout' })
+              }
+            >
+              <DropdownRoot dropdownId="layout" type="picker">
+                <CommandMenuItemDropdownTrigger
+                  id="layout"
+                  label={t`Layout`}
+                  Icon={layoutRowIcon}
+                  description={layoutLabel}
+                  contextualTextPosition="right"
+                />
+                <DropdownContent
+                  side="bottom"
+                  align="end"
+                  collisionPadding={{ left: 0, right: 0 }}
+                >
+                  <FieldWidgetLayoutDropdownContent />
+                </DropdownContent>
+              </DropdownRoot>
             </SelectableListItem>
             {isTableDisplayMode &&
               isDefined(targetObjectMetadataId) &&
@@ -271,12 +283,12 @@ export const SidePanelRecordPageFieldSettings = () => {
             )}
             {isTableDisplayMode && isWidgetContentEditingSupported && (
               <SelectableListItem itemId="field-allow-editing">
-                <CommandMenuItemToggle
+                <CommandMenuItemSwitch
                   LeftIcon={IconPencil}
                   text={t`Allow editing`}
                   id="field-allow-editing"
-                  toggled={isUIEditable}
-                  onToggleChange={handleIsUIEditableChange}
+                  checked={isUIEditable}
+                  onCheckedChange={handleIsUIEditableChange}
                 />
               </SelectableListItem>
             )}

@@ -43,6 +43,14 @@ const getFlatEntities = ({
 const isSoftDeleted = (flatEntity: ApplicationFlatEntity): boolean =>
   'deletedAt' in flatEntity && isDefined(flatEntity.deletedAt);
 
+const isWorkflowTriggerCommandMenuItem = (
+  flatEntity: ApplicationFlatEntity,
+): boolean =>
+  ('workflowVersionId' in flatEntity &&
+    isDefined(flatEntity.workflowVersionId)) ||
+  ('coreWorkflowVersionId' in flatEntity &&
+    isDefined(flatEntity.coreWorkflowVersionId));
+
 const classifyFlatEntity = ({
   metadataName,
   flatEntity,
@@ -67,6 +75,13 @@ const classifyFlatEntity = ({
         status: ApplicationExportCoverageStatus.EXCLUDED,
         reason: 'runtime configuration',
       };
+    case 'role':
+      return 'isEditable' in flatEntity && flatEntity.isEditable === false
+        ? {
+            status: ApplicationExportCoverageStatus.EXCLUDED,
+            reason: 'non-editable role',
+          }
+        : { status: ApplicationExportCoverageStatus.UNSUPPORTED };
     case 'searchFieldMetadata':
       return { status: ApplicationExportCoverageStatus.ENGINE_DERIVED };
     case 'roleTarget':
@@ -78,20 +93,8 @@ const classifyFlatEntity = ({
             reason: 'member or API key role assignment',
           }
         : { status: ApplicationExportCoverageStatus.UNSUPPORTED };
-    case 'navigationMenuItem':
-      return ('userWorkspaceId' in flatEntity &&
-        isDefined(flatEntity.userWorkspaceId)) ||
-        ('targetRecordId' in flatEntity && isDefined(flatEntity.targetRecordId))
-        ? {
-            status: ApplicationExportCoverageStatus.EXCLUDED,
-            reason: 'personal navigation item',
-          }
-        : { status: ApplicationExportCoverageStatus.UNSUPPORTED };
     case 'commandMenuItem':
-      if (
-        'workflowVersionId' in flatEntity &&
-        isDefined(flatEntity.workflowVersionId)
-      ) {
+      if (isWorkflowTriggerCommandMenuItem(flatEntity)) {
         return {
           status: ApplicationExportCoverageStatus.EXCLUDED,
           reason: 'workflow trigger command',

@@ -4,11 +4,12 @@ import { metadataStoreStatusFamilySelector } from '@/metadata-store/states/metad
 import { useNavigationMenuItemSectionItems } from '@/navigation-menu-item/display/hooks/useNavigationMenuItemSectionItems';
 import { type ObjectPathInfo } from '@/navigation/types/ObjectPathInfo';
 import { getFirstNavigationMenuItemLink } from '@/navigation/utils/getFirstNavigationMenuItemLink';
+import { computeObjectViewTargetIds } from '@/views/utils/computeObjectViewTargetIds';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { filterReadableActiveObjectMetadataItems } from '@/object-metadata/utils/filterReadableActiveObjectMetadataItems';
 import { useObjectPermissions } from '@/object-record/hooks/useObjectPermissions';
-import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
+import { useIsMobile } from 'twenty-ui/utilities';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -50,11 +51,16 @@ export const useDefaultHomePagePath = () => {
     [activeObjectMetadataItems, objectPermissionsByObjectMetadataId],
   );
 
-  const getFirstView = useCallback(
+  const getTargetViewId = useCallback(
     (objectMetadataItemId: string | undefined | null) => {
-      return views.find(
-        (view) => view.objectMetadataId === objectMetadataItemId,
+      const { firstSelectableViewId, indexViewId } = computeObjectViewTargetIds(
+        {
+          views,
+          objectMetadataId: objectMetadataItemId ?? undefined,
+        },
       );
+
+      return firstSelectableViewId ?? indexViewId;
     },
     [views],
   );
@@ -82,10 +88,10 @@ export const useDefaultHomePagePath = () => {
       return null;
     }
 
-    const view = getFirstView(firstObjectMetadataItem.id);
+    const viewId = getTargetViewId(firstObjectMetadataItem.id);
 
-    return { objectMetadataItem: firstObjectMetadataItem, view };
-  }, [getFirstView, readableNonSystemObjectMetadataItems]);
+    return { objectMetadataItem: firstObjectMetadataItem, viewId };
+  }, [getTargetViewId, readableNonSystemObjectMetadataItems]);
 
   const defaultHomePagePath = useMemo(() => {
     if (!isDefined(currentUser)) {
@@ -96,9 +102,7 @@ export const useDefaultHomePagePath = () => {
       return AppPath.Home;
     }
 
-    // Both stores are transiently empty during the post-login window;
-    // deciding the redirect before they are loaded could strand users on a
-    // wrong fallback (/settings/profile or the alphabetically-first object).
+    // Both stores are empty right after login; deciding now would pick a wrong fallback.
     if (!areObjectMetadataItemsLoaded || !areNavigationMenuItemsLoaded) {
       return AppPath.Index;
     }
@@ -118,8 +122,8 @@ export const useDefaultHomePagePath = () => {
     return getAppPath(
       AppPath.RecordIndexPage,
       { objectNamePlural: firstObjectPathInfo.objectMetadataItem?.namePlural },
-      firstObjectPathInfo.view?.id
-        ? { viewId: firstObjectPathInfo.view.id }
+      isDefined(firstObjectPathInfo.viewId)
+        ? { viewId: firstObjectPathInfo.viewId }
         : undefined,
     );
   }, [

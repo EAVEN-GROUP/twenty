@@ -1,4 +1,3 @@
-import { type DraggableListDropResult } from '@/ui/layout/draggable-list/types/DraggableListDropResult';
 import { useCallback, useMemo } from 'react';
 
 import { useColumnDefinitionsFromObjectMetadata } from '@/object-metadata/hooks/useColumnDefinitionsFromObjectMetadata';
@@ -17,6 +16,7 @@ import { useSaveCurrentViewFields } from '@/views/hooks/useSaveCurrentViewFields
 import { mapRecordFieldToViewField } from '@/views/utils/mapRecordFieldToViewField';
 import { produce } from 'immer';
 import { findByProperty, isDefined } from 'twenty-shared/utils';
+import { doNotTranslate } from 'twenty-shared/i18n';
 import { v4 } from 'uuid';
 import { mapArrayToObject } from '~/utils/array/mapArrayToObject';
 import { sortByProperty } from '~/utils/array/sortByProperty';
@@ -93,14 +93,16 @@ export const useObjectOptionsForBoard = ({
   );
 
   const handleReorderBoardFields = useCallback(
-    (result: DraggableListDropResult) => {
-      if (!result.destination) {
-        return;
-      }
-
+    ({
+      recordFieldToMove,
+      targetRecordField,
+    }: {
+      recordFieldToMove: Pick<RecordField, 'id' | 'fieldMetadataItemId'>;
+      targetRecordField: Pick<RecordField, 'id'>;
+    }) => {
       const updatedRecordField = reorderVisibleRecordFields({
-        fromIndex: result.source.index - 1,
-        toIndex: result.destination.index - 1,
+        recordFieldToMove,
+        targetRecordField,
       });
 
       saveViewFields([mapRecordFieldToViewField(updatedRecordField)]);
@@ -138,8 +140,7 @@ export const useObjectOptionsForBoard = ({
   const { updateRecordField } = useUpdateRecordField(recordBoardId);
   const { upsertRecordField } = useUpsertRecordField(recordBoardId);
 
-  // Todo : this seems over complex and should at least be extracted to an util with unit test.
-  // Let's refactor this as we introduce the new viewBar
+  // TODO: overly complex; extract to a unit-tested util.
   const handleBoardFieldVisibilityChange = useCallback(
     async (
       updatedFieldDefinition: Pick<
@@ -187,7 +188,9 @@ export const useObjectOptionsForBoard = ({
           (draftRecordIndexFieldDefinitions) => {
             if (!isDefined(correspondingAvailableColumnDefinition)) {
               throw new Error(
-                `correspondingAvailableColumnDefinition is not defined this should not happen.`,
+                doNotTranslate(
+                  `correspondingAvailableColumnDefinition is not defined this should not happen.`,
+                ),
               );
             }
 

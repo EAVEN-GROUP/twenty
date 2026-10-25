@@ -67,6 +67,8 @@ export class LambdaDriver implements LogicFunctionDriver {
       this.toolFunctions,
       options.logicFunctionResourceService,
       options.sdkClientArchiveService,
+      options.cacheLockService,
+      options.workspaceCacheService,
     );
     this.executorManager = new LambdaExecutorManagerService(
       options,
@@ -199,9 +201,15 @@ export class LambdaDriver implements LogicFunctionDriver {
       const lambdaClient = await this.awsClient.getLambdaClient();
 
       const invokeStart = Date.now();
-      const result = await lambdaClient.send(command, {
-        abortSignal: AbortSignal.timeout(timeoutMs),
-      });
+      const result = await lambdaClient
+        .send(command, { abortSignal: AbortSignal.timeout(timeoutMs) })
+        .catch(async (error) => {
+          await this.executorManager.clearLambdaExecutorCache(
+            flatLogicFunction,
+          );
+
+          throw error;
+        });
       const invokeDurationMs = Date.now() - invokeStart;
 
       const parsedResult = result.Payload

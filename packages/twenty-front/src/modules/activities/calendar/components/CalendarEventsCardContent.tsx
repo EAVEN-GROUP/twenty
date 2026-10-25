@@ -1,3 +1,4 @@
+import { CalendarEventsEmptyState } from '@/activities/calendar/components/CalendarEventsEmptyState';
 import { CalendarMonthCard } from '@/activities/calendar/components/CalendarMonthCard';
 import { CalendarContext } from '@/activities/calendar/contexts/CalendarContext';
 import { useCalendarEvents } from '@/activities/calendar/hooks/useCalendarEvents';
@@ -6,20 +7,13 @@ import { SkeletonLoader } from '@/activities/components/SkeletonLoader';
 import { StyledWidgetScrollContainer } from '@/ui/layout/components/WidgetContentContainer';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
-import { useLingui } from '@lingui/react/macro';
 import { format, getYear } from 'date-fns';
-import {
-  AnimatedPlaceholder,
-  AnimatedPlaceholderEmptyContainer,
-  AnimatedPlaceholderEmptySubTitle,
-  AnimatedPlaceholderEmptyTextContainer,
-  AnimatedPlaceholderEmptyTitle,
-} from 'twenty-ui/feedback';
-import { Section } from 'twenty-ui/layout';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
-import { H3Title } from 'twenty-ui/typography';
+import { Section } from 'twenty-ui/components/layout';
+
+import { Heading } from 'twenty-ui/primitives/typography';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { type TimelineCalendarEvent } from '~/generated/graphql';
-import { dateLocaleState } from '~/localization/states/dateLocaleState';
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
 
 const StyledContainer = styled(StyledWidgetScrollContainer)`
   gap: ${themeCssVariables.spacing[8]};
@@ -29,14 +23,9 @@ const StyledYear = styled.span`
   color: ${themeCssVariables.font.color.light};
 `;
 
-const StyledTitleContainer = styled.div`
+const StyledMonthHeading = styled(Heading)`
+  font-weight: ${themeCssVariables.font.weight.regular};
   margin-bottom: ${themeCssVariables.spacing[2]};
-
-  h3 {
-    color: ${themeCssVariables.font.color.secondary};
-    font-size: ${themeCssVariables.font.size.md};
-    font-weight: ${themeCssVariables.font.weight.regular};
-  }
 `;
 
 type CalendarEventsCardContentProps = {
@@ -54,7 +43,6 @@ export const CalendarEventsCardContent = ({
   onLastRowVisible,
   timelineCalendarEvents,
 }: CalendarEventsCardContentProps) => {
-  const { t } = useLingui();
   const { localeCatalog } = useAtomStateValue(dateLocaleState);
 
   const {
@@ -69,20 +57,7 @@ export const CalendarEventsCardContent = ({
   }
 
   if (!timelineCalendarEvents?.length) {
-    // TODO: change animated placeholder
-    return (
-      <AnimatedPlaceholderEmptyContainer>
-        <AnimatedPlaceholder type="noMatchRecord" />
-        <AnimatedPlaceholderEmptyTextContainer>
-          <AnimatedPlaceholderEmptyTitle>
-            {t`No Events`}
-          </AnimatedPlaceholderEmptyTitle>
-          <AnimatedPlaceholderEmptySubTitle>
-            {t`No events have been scheduled with this ${objectName} yet.`}
-          </AnimatedPlaceholderEmptySubTitle>
-        </AnimatedPlaceholderEmptyTextContainer>
-      </AnimatedPlaceholderEmptyContainer>
-    );
+    return <CalendarEventsEmptyState objectName={objectName} />;
   }
 
   return (
@@ -102,19 +77,13 @@ export const CalendarEventsCardContent = ({
           });
 
           return (
-            <Section key={monthTime}>
-              <StyledTitleContainer>
-                <H3Title
-                  title={
-                    <>
-                      {monthLabel}
-                      {isLastMonthOfYear && <StyledYear> {year}</StyledYear>}
-                    </>
-                  }
-                />
-              </StyledTitleContainer>
+            <Section.Root key={monthTime}>
+              <StyledMonthHeading level={3} size="md" color="secondary">
+                {monthLabel}
+                {isLastMonthOfYear && <StyledYear> {year}</StyledYear>}
+              </StyledMonthHeading>
               <CalendarMonthCard dayTimes={monthDayTimes} />
-            </Section>
+            </Section.Root>
           );
         })}
         <CustomResolverFetchMoreLoader

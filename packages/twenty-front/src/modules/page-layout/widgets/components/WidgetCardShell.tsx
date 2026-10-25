@@ -7,16 +7,16 @@ import { WidgetContentRenderer } from '@/page-layout/widgets/components/WidgetCo
 import { WidgetComponentInstanceContext } from '@/page-layout/widgets/states/contexts/WidgetComponentInstanceContext';
 import { type WidgetAccessDenialInfo } from '@/page-layout/widgets/types/WidgetAccessDenialInfo';
 import { type WidgetCardVariant } from '@/page-layout/widgets/types/WidgetCardVariant';
-import { getWidgetContentPadding } from '@/page-layout/widgets/utils/getWidgetContentPadding';
-import { isWidgetCardFlushInViewMode } from '@/page-layout/widgets/utils/isWidgetCardFlushInViewMode';
+import { getWidgetCardContentPadding } from '@/page-layout/widgets/utils/getWidgetCardContentPadding';
+import { isViewportFillingWidget } from '@/page-layout/widgets/utils/isViewportFillingWidget';
 import { WidgetCard } from '@/page-layout/widgets/widget-card/components/WidgetCard';
 import { WidgetCardContent } from '@/page-layout/widgets/widget-card/components/WidgetCardContent';
 import { WidgetCardHeader } from '@/page-layout/widgets/widget-card/components/WidgetCardHeader';
 import { styled } from '@linaria/react';
-import { type MouseEvent, useContext } from 'react';
+import { type MouseEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { IconLock } from 'twenty-ui/icon';
-import { ThemeContext } from 'twenty-ui/theme-constants';
+import { useTheme } from 'twenty-ui/theme';
 import {
   PageLayoutTabLayoutMode,
   PageLayoutType,
@@ -62,21 +62,23 @@ export const WidgetCardShell = ({
   onMouseEnter,
   onMouseLeave,
 }: WidgetCardShellProps) => {
-  const { theme } = useContext(ThemeContext);
-  const { layoutMode } = usePageLayoutContentContext();
+  const theme = useTheme();
+  const { layoutMode, presentation } = usePageLayoutContentContext();
   const { currentPageLayout } = useCurrentPageLayoutOrThrow();
 
   const isVerticalList = layoutMode === PageLayoutTabLayoutMode.VERTICAL_LIST;
   const isFixedHeightIframe =
     currentPageLayout.type === PageLayoutType.RECORD_PAGE &&
     isVerticalList &&
-    widget.type === WidgetType.IFRAME;
-  const contentPadding = isWidgetCardFlushInViewMode({
+    widget.type === WidgetType.IFRAME &&
+    !isViewportFillingWidget(widget);
+  const contentPadding = getWidgetCardContentPadding({
     isEditable,
+    pageLayoutType: currentPageLayout.type,
+    presentation,
     variant,
-  })
-    ? getWidgetContentPadding(widget.type)
-    : 'default';
+    widgetType: widget.type,
+  });
 
   const dataTestId =
     widget.type === WidgetType.FIELDS ? 'record-fields-widget' : widget.id;

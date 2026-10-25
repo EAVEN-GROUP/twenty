@@ -163,12 +163,13 @@ export class MessagingMessagesImportService {
               })
             : null;
 
-          const blocklist = workspaceMember
-            ? await this.blocklistRepository.getByWorkspaceMemberId(
-                workspaceMember.id,
+          const blocklist =
+            await this.blocklistRepository.getEntriesApplicableToWorkspaceMember(
+              {
+                workspaceMemberId: workspaceMember?.id ?? null,
                 workspaceId,
-              )
-            : [];
+              },
+            );
 
           if (!isDefined(messageChannel.handle)) {
             throw new MessageImportDriverException(
@@ -209,7 +210,9 @@ export class MessagingMessagesImportService {
             );
           }
 
-          if (messageIdsToFetch.length < messagesGetBatchSize) {
+          const isLastBatch = messageIdsToFetch.length < messagesGetBatchSize;
+
+          if (isLastBatch) {
             await this.messageChannelSyncStatusService.markAsMessageSyncCompleted(
               [messageChannel.id],
               workspaceId,
@@ -229,6 +232,13 @@ export class MessagingMessagesImportService {
               syncStageStartedAt: null,
             },
           );
+
+          if (!isLastBatch) {
+            await this.cacheStorage.incrBy(
+              `messages-imported:${workspaceId}:${messageChannel.id}`,
+              messageIdsToFetch.length,
+            );
+          }
 
           return await this.trackMessageImportCompleted(
             messageChannel,

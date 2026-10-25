@@ -1,12 +1,6 @@
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
-import { DropdownComponentInstanceContext } from '@/ui/layout/dropdown/contexts/DropdownComponentInstanceContext';
-import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
-import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-list/states/isSelectedItemIdComponentFamilyState';
-import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
-import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
-import { useWorkspaceSurfaceScopedComponentInstanceId } from '@/ui/layout/hooks/useWorkspaceSurfaceScopedComponentInstanceId';
-import { Avatar } from 'twenty-ui/data-display';
-import { MenuItemSelectAvatar } from 'twenty-ui/navigation';
+import { Dropdown } from 'twenty-ui/components/navigation';
+import { Avatar } from 'twenty-ui/primitives/data-display';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 type RecordTableWidgetRelationPickerMenuItemProps = {
@@ -18,39 +12,22 @@ export const RecordTableWidgetRelationPickerMenuItem = ({
   relationRecord,
   onSelect,
 }: RecordTableWidgetRelationPickerMenuItemProps) => {
-  const dropdownId = useAvailableComponentInstanceIdOrThrow(
-    DropdownComponentInstanceContext,
-  );
-
-  const scopedDropdownId =
-    useWorkspaceSurfaceScopedComponentInstanceId(dropdownId);
-
-  const isSelectedItemId = useAtomComponentFamilyStateValue(
-    isSelectedItemIdComponentFamilyState,
-    relationRecord.id,
-    scopedDropdownId,
-  );
-
   return (
-    <SelectableListItem
-      itemId={relationRecord.id}
-      onEnter={() => onSelect(relationRecord.id)}
+    <Dropdown.OptionItem
+      onSelect={() => onSelect(relationRecord.id)}
+      selected={false}
+      startIcon={
+        <Avatar
+          src={getAbsoluteImageUrl(relationRecord.avatarUrl)}
+          imageProps={{ alt: '' }}
+          colorSeed={relationRecord.id}
+          name={relationRecord.name}
+          size="md"
+          shape={relationRecord.avatarShape ?? 'circle'}
+        />
+      }
     >
-      <MenuItemSelectAvatar
-        onClick={() => onSelect(relationRecord.id)}
-        text={relationRecord.name}
-        selected={false}
-        focused={isSelectedItemId}
-        avatar={
-          <Avatar
-            avatarUrl={getAbsoluteImageUrl(relationRecord.avatarUrl)}
-            placeholderColorSeed={relationRecord.id}
-            placeholder={relationRecord.name}
-            size="md"
-            type={relationRecord.avatarType ?? 'rounded'}
-          />
-        }
-      />
-    </SelectableListItem>
+      {relationRecord.name}
+    </Dropdown.OptionItem>
   );
 };

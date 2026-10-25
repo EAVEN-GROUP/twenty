@@ -1,9 +1,10 @@
+import { RECORD_TABLE_ROW_TINT_CSS_VARIABLE } from '@/object-record/record-table/constants/RecordTableRowTintCssVariable';
 import { TABLE_Z_INDEX } from '@/object-record/record-table/constants/TableZIndex';
 import { getRecordTableColumnFieldWidthClassName } from '@/object-record/record-table/utils/getRecordTableColumnFieldWidthClassName';
 import { cx } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { useContext, type ReactNode } from 'react';
-import { ThemeContext } from 'twenty-ui/theme-constants';
+import { type ReactNode } from 'react';
+import { useTheme } from 'twenty-ui/theme';
 
 const StyledRecordTableTd = styled.div<{
   backgroundColor: string;
@@ -38,22 +39,20 @@ export const RecordTableCellFirstRowFirstColumn = ({
   isDragging,
   hasRightBorder = false,
   hasBottomBorder = true,
-  rowTintColor,
 }: {
   children?: ReactNode;
   isSelected?: boolean;
   isDragging?: boolean;
   hasRightBorder?: boolean;
   hasBottomBorder?: boolean;
-  rowTintColor?: string;
 }) => {
-  const { theme } = useContext(ThemeContext);
+  const theme = useTheme();
 
   const zIndex = TABLE_Z_INDEX.cell.sticky;
 
   const tdBackgroundColor = isSelected
     ? theme.accent.quaternary
-    : (rowTintColor ?? theme.background.primary);
+    : `var(${RECORD_TABLE_ROW_TINT_CSS_VARIABLE}, ${theme.background.primary})`;
 
   const borderColor = theme.border.color.medium;
 

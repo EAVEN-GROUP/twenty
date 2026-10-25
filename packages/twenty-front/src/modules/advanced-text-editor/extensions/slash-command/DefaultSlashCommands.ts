@@ -1,13 +1,16 @@
 import { ADVANCED_TEXT_EDITOR_BLOCK_SLASH_COMMANDS } from '@/advanced-text-editor/constants/AdvancedTextEditorBlockSlashCommands';
+import { RICH_TEXT_BLOCK_SLASH_COMMANDS } from '@/advanced-text-editor/constants/RichTextBlockSlashCommands';
 import { type SlashCommandConfig } from '@/advanced-text-editor/extensions/slash-command/types/SlashCommandConfig';
 import { msg } from '@lingui/core/macro';
 import {
+  IconBlockquote,
   IconH1,
   IconH2,
   IconH3,
   IconList,
+  IconListCheck,
   IconListNumbers,
-  IconPilcrow,
+  IconTextSize,
 } from 'twenty-ui/icon';
 
 const TEXT_SLASH_COMMANDS: SlashCommandConfig[] = [
@@ -15,7 +18,7 @@ const TEXT_SLASH_COMMANDS: SlashCommandConfig[] = [
     id: 'paragraph',
     title: msg`Text`,
     description: msg`Plain text paragraph`,
-    icon: IconPilcrow,
+    icon: IconTextSize,
     keywords: [msg`paragraph`, msg`text`, msg`p`],
     getIsActive: (editor) => editor.isActive('paragraph'),
     getIsVisible: (editor) => editor.can().setParagraph?.() ?? false,
@@ -55,6 +58,17 @@ const TEXT_SLASH_COMMANDS: SlashCommandConfig[] = [
     getOnSelect: (editor, range) => () =>
       editor.chain().focus().deleteRange(range).setHeading({ level: 3 }).run(),
   },
+  {
+    id: 'blockquote',
+    title: msg`Quote`,
+    description: msg`Highlighted quotation`,
+    icon: IconBlockquote,
+    keywords: [msg`quote`, msg`blockquote`, msg`citation`],
+    getIsActive: (editor) => editor.isActive('blockquote'),
+    getIsVisible: (editor) => editor.can().toggleBlockquote?.() ?? false,
+    getOnSelect: (editor, range) => () =>
+      editor.chain().focus().deleteRange(range).toggleBlockquote().run(),
+  },
 ];
 
 const LIST_SLASH_COMMANDS: SlashCommandConfig[] = [
@@ -80,10 +94,22 @@ const LIST_SLASH_COMMANDS: SlashCommandConfig[] = [
     getOnSelect: (editor, range) => () =>
       editor.chain().focus().deleteRange(range).toggleOrderedList().run(),
   },
+  {
+    id: 'taskList',
+    title: msg`Check List`,
+    description: msg`List with checkboxes`,
+    icon: IconListCheck,
+    keywords: [msg`check`, msg`todo`, msg`task`, msg`checkbox`],
+    getIsActive: (editor) => editor.isActive('taskList'),
+    getIsVisible: (editor) => editor.can().toggleTaskList?.() ?? false,
+    getOnSelect: (editor, range) => () =>
+      editor.chain().focus().deleteRange(range).toggleTaskList().run(),
+  },
 ];
 
 export const DEFAULT_SLASH_COMMANDS: SlashCommandConfig[] = [
   ...TEXT_SLASH_COMMANDS,
   ...ADVANCED_TEXT_EDITOR_BLOCK_SLASH_COMMANDS,
   ...LIST_SLASH_COMMANDS,
+  ...RICH_TEXT_BLOCK_SLASH_COMMANDS,
 ];

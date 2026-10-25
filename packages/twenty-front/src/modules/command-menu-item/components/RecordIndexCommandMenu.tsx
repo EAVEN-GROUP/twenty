@@ -9,6 +9,7 @@ import { RecordIndexRowColorButton } from '@/object-record/record-index/componen
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { isDefined } from 'twenty-shared/utils';
 
 export const RecordIndexCommandMenu = () => {
   const isInSidePanel = useWorkspaceSurface().type === 'side-panel';
@@ -21,28 +22,28 @@ export const RecordIndexCommandMenu = () => {
     isLayoutCustomizationModeEnabledState,
   );
 
+  if (!isDefined(contextStoreCurrentObjectMetadataItemId)) {
+    return null;
+  }
+
   return (
     <>
-      {contextStoreCurrentObjectMetadataItemId && (
-        <>
-          <CommandMenuContextProvider
-            displayType="button"
-            containerType={CommandMenuItemContainerType.IndexPageHeader}
-            isInPreviewMode={isLayoutCustomizationModeEnabled && !isInSidePanel}
-          >
-            <PinnedCommandMenuItemButtons
-              leadingItem={<RecordIndexRowColorButton />}
-            />
-          </CommandMenuContextProvider>
-          <CommandMenuContextProvider
-            displayType="dropdownItem"
-            containerType={CommandMenuItemContainerType.IndexPageDropdown}
-          >
-            <RecordIndexCommandMenuDropdown />
-          </CommandMenuContextProvider>
-          {!isInSidePanel && <CommandMenuItemEditButton />}
-        </>
-      )}
+      <CommandMenuContextProvider
+        displayType="button"
+        containerType={CommandMenuItemContainerType.IndexPageHeader}
+        isInPreviewMode={isLayoutCustomizationModeEnabled && !isInSidePanel}
+      >
+        <PinnedCommandMenuItemButtons
+          leadingItem={<RecordIndexRowColorButton />}
+        />
+      </CommandMenuContextProvider>
+      <CommandMenuContextProvider
+        displayType="dropdownItem"
+        containerType={CommandMenuItemContainerType.IndexPageDropdown}
+      >
+        <RecordIndexCommandMenuDropdown />
+      </CommandMenuContextProvider>
+      {!isInSidePanel && <CommandMenuItemEditButton />}
     </>
   );
 };

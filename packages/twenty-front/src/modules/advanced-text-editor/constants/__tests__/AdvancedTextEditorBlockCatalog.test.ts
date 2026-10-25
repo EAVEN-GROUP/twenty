@@ -30,6 +30,16 @@ describe('ADVANCED_TEXT_EDITOR_BLOCK_CATALOG', () => {
     }
   });
 
+  it('escapes the translated HTML block instruction', () => {
+    const htmlRecipe = ADVANCED_TEXT_EDITOR_BLOCK_INSERTION_RECIPES.find(
+      ({ id }) => id === 'html',
+    );
+
+    expect(
+      htmlRecipe?.createContent(() => 'Edit <script> & links').attrs?.html,
+    ).toBe('<p style="margin: 0px;">Edit &lt;script&gt; &amp; links</p>');
+  });
+
   it('uses the same recipes for insert controls and slash commands', () => {
     const recipeIds = ADVANCED_TEXT_EDITOR_BLOCK_INSERTION_RECIPES.map(
       ({ id }) => id,
@@ -41,15 +51,20 @@ describe('ADVANCED_TEXT_EDITOR_BLOCK_CATALOG', () => {
     ).toEqual(recipeIds);
   });
 
-  it('keeps document blocks above list commands in the slash menu', () => {
+  it('orders the slash menu commands', () => {
     expect(DEFAULT_SLASH_COMMANDS.map(({ id }) => id)).toEqual([
       'paragraph',
       'h1',
       'h2',
       'h3',
+      'blockquote',
       ...ADVANCED_TEXT_EDITOR_BLOCK_INSERTION_RECIPES.map(({ id }) => id),
       'bulletList',
       'orderedList',
+      'taskList',
+      'codeBlock',
+      'table',
+      'file',
     ]);
   });
 });

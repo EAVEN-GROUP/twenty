@@ -6,6 +6,7 @@ import {
   RelationType,
 } from 'twenty-shared/types';
 
+import { createStandardMorphRelationHeadFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-morph-relation-head-flat-metadata.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type AllStandardObjectFieldName } from 'src/engine/workspace-manager/twenty-standard-application/types/all-standard-object-field-name.type';
 import {
@@ -48,9 +49,9 @@ export const buildStandardTargetFlatFieldMetadatas = <
     context: {
       fieldName: 'id',
       type: FieldMetadataType.UUID,
-      label: i18nLabel(msg({ message: `Id`, context: 'fieldMetadata.label' })),
+      label: i18nLabel(msg({ message: `ID`, context: 'fieldMetadata.label' })),
       description: i18nLabel(
-        msg({ message: `Id`, context: 'fieldMetadata.description' }),
+        msg({ message: `ID`, context: 'fieldMetadata.description' }),
       ),
       icon: 'Icon123',
       isSystem: true,
@@ -266,6 +267,10 @@ export const buildStandardTargetFlatFieldMetadatas = <
       isUIEditable: false,
       defaultValue: true,
     },
+  }),
+  target: createStandardMorphRelationHeadFlatMetadata({
+    ...args,
+    objectName,
   }),
   targetPerson: createStandardRelationFieldFlatMetadata({
     ...args,

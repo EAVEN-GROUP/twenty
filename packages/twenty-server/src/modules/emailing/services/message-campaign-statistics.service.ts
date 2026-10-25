@@ -1,3 +1,4 @@
+import { CampaignDeliveryWorkspaceEntity } from 'src/modules/emailing/standard-objects/campaign-delivery.workspace-entity';
 import { CAMPAIGN_JOB_RETRY_LIMIT } from 'src/engine/core-modules/emailing-domain/constants/campaign-job-retry-limit.constant';
 import { Injectable } from '@nestjs/common';
 
@@ -6,40 +7,33 @@ import { fastDeepEqual, isDefined } from 'twenty-shared/utils';
 import { MoreThanOrEqual } from 'typeorm';
 import { MessageCampaignStatus } from 'twenty-shared/types';
 
-import { InjectCacheStorage } from 'src/engine/core-modules/cache-storage/decorators/cache-storage.decorator';
-import { CacheStorageService } from 'src/engine/core-modules/cache-storage/services/cache-storage.service';
-import { CacheStorageNamespace } from 'src/engine/core-modules/cache-storage/types/cache-storage-namespace.enum';
 import {
   CAMPAIGN_STATS_REFRESH_DEBOUNCE_MS,
   REFRESH_CAMPAIGN_STATS_JOB,
 } from 'src/engine/core-modules/emailing-domain/constants/campaign.constant';
 import { type RefreshCampaignStatsJobData } from 'src/engine/core-modules/emailing-domain/types/refresh-campaign-stats-job-data.type';
-import { CampaignDeliveryEntity } from 'src/engine/core-modules/emailing-domain/campaign-delivery.entity';
 import { type CampaignCountGroup } from 'src/engine/core-modules/emailing-domain/types/campaign-count-group.type';
 import { type CampaignCounts } from 'src/engine/core-modules/emailing-domain/types/campaign-counts.type';
 import { computeCampaignCounts } from 'src/engine/core-modules/emailing-domain/utils/compute-campaign-counts.util';
-import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
-import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { getCampaignDeliveryTableName } from 'src/modules/emailing/utils/get-campaign-delivery-table-name.util';
 import { MessageCampaignWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-campaign.workspace-entity';
+import { CampaignEngagementEventService } from 'src/modules/emailing/services/campaign-engagement-event.service';
+import { type CampaignEngagementCounts } from 'src/modules/emailing/types/campaign-engagement-counts.type';
 
 const RECONCILIATION_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-const REFRESH_LOCK_TTL_MS = CAMPAIGN_STATS_REFRESH_DEBOUNCE_MS + 2_000;
 
 @Injectable()
 export class MessageCampaignStatisticsService {
   constructor(
-    @InjectWorkspaceScopedRepository(CampaignDeliveryEntity)
-    private readonly campaignDeliveryRepository: WorkspaceScopedRepository<CampaignDeliveryEntity>,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     @InjectMessageQueue(MessageQueue.campaignQueue)
     private readonly messageQueueService: MessageQueueService,
-    @InjectCacheStorage(CacheStorageNamespace.ModuleEmailing)
-    private readonly cacheStorageService: CacheStorageService,
+    private readonly campaignEngagementEventService: CampaignEngagementEventService,
   ) {}
 
   async scheduleRefresh({
@@ -49,31 +43,18 @@ export class MessageCampaignStatisticsService {
     workspaceId: string;
     campaignId: string;
   }): Promise<void> {
-    const lockKey = `campaign-stats-refresh:${workspaceId}:${campaignId}`;
-
-    const acquired = await this.cacheStorageService.acquireLock(
-      lockKey,
-      REFRESH_LOCK_TTL_MS,
-    );
-
-    if (!acquired) {
-      return;
-    }
-
-    await this.messageQueueService
-      .add<RefreshCampaignStatsJobData>(
-        REFRESH_CAMPAIGN_STATS_JOB,
-        { workspaceId, campaignId },
-        {
-          delay: CAMPAIGN_STATS_REFRESH_DEBOUNCE_MS,
-          retryLimit: CAMPAIGN_JOB_RETRY_LIMIT,
+    await this.messageQueueService.add<RefreshCampaignStatsJobData>(
+      REFRESH_CAMPAIGN_STATS_JOB,
+      { workspaceId, campaignId },
+      {
+        delay: CAMPAIGN_STATS_REFRESH_DEBOUNCE_MS,
+        retryLimit: CAMPAIGN_JOB_RETRY_LIMIT,
+        deduplication: {
+          id: `campaign-stats-refresh:${workspaceId}:${campaignId}`,
+          keepLastIfActive: true,
         },
-      )
-      .catch(async (error) => {
-        await this.cacheStorageService.releaseLock(lockKey);
-
-        throw error;
-      });
+      },
+    );
   }
 
   async countDeliveriesByState({
@@ -83,28 +64,34 @@ export class MessageCampaignStatisticsService {
     workspaceId: string;
     campaignId: string;
   }): Promise<CampaignCounts> {
-    const groups = await this.campaignDeliveryRepository
-      .createQueryBuilder('delivery')
-      .select('delivery.state', 'state')
-      .addSelect('COUNT(*)', 'total')
-      .addSelect('COUNT(delivery."deliveredAt")', 'deliveredCount')
-      .addSelect('COUNT(delivery."bouncedAt")', 'bouncedCount')
-      .addSelect('COUNT(delivery."complainedAt")', 'complainedCount')
-      .addSelect(
-        `COUNT(*) FILTER (WHERE delivery."rejectedAt" IS NOT NULL OR delivery."renderingFailedAt" IS NOT NULL)`,
-        'providerFailedCount',
-      )
-      .where('delivery."workspaceId" = :workspaceId', { workspaceId })
-      .andWhere('delivery."campaignId" = :campaignId', { campaignId })
-      .groupBy('delivery.state')
-      .getRawMany<CampaignCountGroup>();
+    const groups = await this.workspaceOrmManager.executeInWorkspaceContext(
+      async () => {
+        const campaignDeliveryRepository =
+          this.workspaceOrmManager.getRepository(
+            CampaignDeliveryWorkspaceEntity,
+            { shouldBypassPermissionChecks: true },
+            { shouldSkipEventEmission: true },
+          );
+        return campaignDeliveryRepository.executeRaw<CampaignCountGroup>(
+          `SELECT
+        "state",
+        COUNT(*) AS "total",
+        COUNT("deliveredAt") AS "deliveredCount",
+        COUNT("bouncedAt") AS "bouncedCount",
+        COUNT("complainedAt") AS "complainedCount",
+        COUNT(*) FILTER (WHERE "rejectedAt" IS NOT NULL OR "renderingFailedAt" IS NOT NULL) AS "providerFailedCount"
+      FROM ${getCampaignDeliveryTableName(workspaceId)}
+      WHERE "campaignId" = :campaignId
+      GROUP BY "state"`,
+          { campaignId },
+        );
+      },
+      buildSystemAuthContext(workspaceId),
+    );
 
     return computeCampaignCounts({ groups });
   }
 
-  // The refresh lock is left to expire instead of being released here: a
-  // backed-up queue can start this job after the lock TTL, and deleting the key
-  // then would drop the lock a newer schedule already owns.
   async refreshCampaignCounts({
     workspaceId,
     campaignId,
@@ -118,6 +105,23 @@ export class MessageCampaignStatisticsService {
     });
 
     await this.persistCampaignCounts({ workspaceId, campaignId, counts });
+
+    if (!this.campaignEngagementEventService.isAvailable()) {
+      return;
+    }
+
+    const engagementCounts =
+      await this.campaignEngagementEventService.countCampaignEngagement({
+        workspaceId,
+        campaignId,
+      });
+
+    await this.persistEngagementStats({
+      workspaceId,
+      campaignId,
+      engagementCounts,
+      deliveredCount: counts.deliveredCount,
+    });
   }
 
   async reconcileWorkspaceCampaignCounts({
@@ -148,7 +152,7 @@ export class MessageCampaignStatisticsService {
       }, buildSystemAuthContext(workspaceId));
 
     for (const campaignId of campaignIds) {
-      await this.refreshCampaignCounts({ workspaceId, campaignId });
+      await this.scheduleRefresh({ workspaceId, campaignId });
     }
   }
 
@@ -208,5 +212,73 @@ export class MessageCampaignStatisticsService {
 
       await campaignRepository.update({ id: campaignId }, nextCounts);
     }, buildSystemAuthContext(workspaceId));
+  }
+
+  private async persistEngagementStats({
+    workspaceId,
+    campaignId,
+    engagementCounts,
+    deliveredCount,
+  }: {
+    workspaceId: string;
+    campaignId: string;
+    engagementCounts: CampaignEngagementCounts;
+    deliveredCount: number;
+  }): Promise<void> {
+    await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
+      const campaignRepository = this.workspaceOrmManager.getRepository(
+        MessageCampaignWorkspaceEntity,
+        { shouldBypassPermissionChecks: true },
+      );
+
+      const campaign = await campaignRepository.findOne({
+        where: { id: campaignId },
+        select: {
+          id: true,
+          uniqueClickCount: true,
+          clickRate: true,
+          uniqueOpenCount: true,
+          openRate: true,
+        },
+      });
+
+      if (!isDefined(campaign)) {
+        return;
+      }
+
+      const nextEngagementStats = {
+        uniqueClickCount: engagementCounts.uniqueClickCount,
+        clickRate: this.computeRate(
+          engagementCounts.uniqueClickCount,
+          deliveredCount,
+        ),
+        uniqueOpenCount: engagementCounts.uniqueOpenCount,
+        openRate: this.computeRate(
+          engagementCounts.uniqueOpenCount,
+          deliveredCount,
+        ),
+      };
+
+      const storedEngagementStats = {
+        uniqueClickCount: campaign.uniqueClickCount,
+        clickRate: campaign.clickRate,
+        uniqueOpenCount: campaign.uniqueOpenCount,
+        openRate: campaign.openRate,
+      };
+
+      if (fastDeepEqual(storedEngagementStats, nextEngagementStats)) {
+        return;
+      }
+
+      await campaignRepository.update({ id: campaignId }, nextEngagementStats);
+    }, buildSystemAuthContext(workspaceId));
+  }
+
+  private computeRate(count: number, deliveredCount: number): number {
+    if (deliveredCount === 0) {
+      return 0;
+    }
+
+    return count / deliveredCount;
   }
 }

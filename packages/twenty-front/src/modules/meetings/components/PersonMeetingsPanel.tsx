@@ -1,13 +1,13 @@
 import { MEETING_OBJECT_NAME_SINGULAR } from '@/meetings/constants/MeetingObjectNameSingular';
 import { useCanCreateMeetings } from '@/meetings/hooks/useCanCreateMeetings';
 import { useOpenCreateMeetingModal } from '@/meetings/hooks/useOpenCreateMeetingModal';
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { formatDateISOStringToDateTime } from '@/localization/utils/formatDateISOStringToDateTime';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
-import { CreateNewButton } from '@/ui/input/relation-picker/components/CreateNewButton';
-import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
+import { LegacyDropdownContent } from '@/ui/layout/dropdown/components/LegacyDropdownContent';
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { GenericDropdownContentWidth } from '@/ui/layout/dropdown/constants/GenericDropdownContentWidth';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -16,8 +16,7 @@ import { useLingui } from '@lingui/react/macro';
 import { type Ref, useContext } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { IconCalendarEvent, IconPlus } from 'twenty-ui/icon';
-import { MenuItem } from 'twenty-ui/navigation';
-import { dateLocaleState } from '~/localization/states/dateLocaleState';
+import { ListItemButton } from 'twenty-ui/components/navigation';
 
 type PersonMeetingsPanelProps = {
   personId: string;
@@ -82,32 +81,32 @@ export const PersonMeetingsPanel = ({
   };
 
   return (
-    <DropdownContent
+    <LegacyDropdownContent
       ref={containerRef}
       widthInPixels={GenericDropdownContentWidth.ExtraLarge}
     >
       {meetings.length > 0 && (
         <DropdownMenuItemsContainer>
           {meetings.map((meeting) => (
-            <MenuItem
+            <ListItemButton
               key={meeting.id}
-              LeftIcon={IconCalendarEvent}
-              text={getMeetingDateLabel(meeting)}
-              contextualText={statusLabelByValue.get(meeting.status)}
+              startIcon={<IconCalendarEvent />}
+              description={statusLabelByValue.get(meeting.status)}
+              descriptionPlacement="inline"
               onClick={() => handleOpenMeeting(meeting.id)}
-            />
+            >
+              {getMeetingDateLabel(meeting)}
+            </ListItemButton>
           ))}
         </DropdownMenuItemsContainer>
       )}
       {canCreateMeetings && (
         <DropdownMenuItemsContainer scrollable={false}>
-          <CreateNewButton
-            LeftIcon={IconPlus}
-            text={t`Add meeting`}
-            onClick={handleAddMeeting}
-          />
+          <ListItemButton startIcon={<IconPlus />} onClick={handleAddMeeting}>
+            {t`Add meeting`}
+          </ListItemButton>
         </DropdownMenuItemsContainer>
       )}
-    </DropdownContent>
+    </LegacyDropdownContent>
   );
 };

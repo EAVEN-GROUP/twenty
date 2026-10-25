@@ -2,11 +2,12 @@ import { ImageBubbleMenu } from '@/advanced-text-editor/components/ImageBubbleMe
 import { LinkBubbleMenu } from '@/advanced-text-editor/components/LinkBubbleMenu';
 import { TextBubbleMenu } from '@/advanced-text-editor/components/TextBubbleMenu';
 import { type AdvancedTextEditorComponentProps } from '@/advanced-text-editor/types/AdvancedTextEditorComponentProps';
+import { getAdvancedTextEditorTypographyStyle } from '@/advanced-text-editor/utils/getAdvancedTextEditorTypographyStyle';
 import { hasEditorExtension } from '@/advanced-text-editor/utils/hasEditorExtension';
 import { FORM_FIELD_PLACEHOLDER_STYLES } from '@/ui/input/constants/FormFieldPlaceholderStyles';
 import { styled } from '@linaria/react';
 import { EditorContent } from '@tiptap/react';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledEditorContainer = styled.div<{
   readonly?: boolean;
@@ -22,7 +23,20 @@ const StyledEditorContainer = styled.div<{
     flex-grow: 1;
     height: 100%;
     min-height: ${({ minHeight }) => minHeight}px;
+    position: relative;
     width: 100%;
+  }
+
+  .drop-cursor {
+    background-color: ${themeCssVariables.color.blue};
+    border-radius: ${themeCssVariables.border.radius.pill};
+    pointer-events: none;
+    position: absolute;
+    transition-duration: calc(
+      ${themeCssVariables.animation.duration.fast} * 1s
+    );
+    transition-property: left, top, width, height;
+    transition-timing-function: ease-out;
   }
 
   .tiptap {
@@ -32,13 +46,15 @@ const StyledEditorContainer = styled.div<{
       readonly
         ? themeCssVariables.font.color.secondary
         : themeCssVariables.font.color.primary};
-    font-family: ${themeCssVariables.font.family};
-    font-size: ${themeCssVariables.font.size.sm};
+    font-family: var(--editor-font-family);
+    font-size: var(--editor-font-size);
     font-weight: ${themeCssVariables.font.weight.regular};
     height: 100%;
+    line-height: var(--editor-line-height);
+    overflow-wrap: anywhere;
     padding: ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[2]};
 
-    p.is-editor-empty:first-of-type::before {
+    p.is-editor-empty:first-of-type:not([data-placeholder=''])::before {
       ${FORM_FIELD_PLACEHOLDER_STYLES}
       content: attr(data-placeholder);
       float: left;
@@ -46,9 +62,26 @@ const StyledEditorContainer = styled.div<{
       pointer-events: none;
     }
 
+    .empty-block-hint {
+      position: relative;
+
+      &::before {
+        color: ${themeCssVariables.font.color.light};
+        content: attr(data-hint);
+        left: 0;
+        overflow: hidden;
+        padding: inherit;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+        text-overflow: ellipsis;
+        top: 0;
+        white-space: nowrap;
+      }
+    }
+
     p {
-      line-height: 1.5;
-      margin: 0;
+      margin: 0 0 var(--editor-block-spacing);
     }
 
     .variable-tag {
@@ -58,40 +91,212 @@ const StyledEditorContainer = styled.div<{
       padding: ${themeCssVariables.spacing[1]};
     }
 
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-weight: var(--editor-heading-font-weight);
+      line-height: var(--editor-heading-line-height);
+      margin: var(--editor-heading-spacing-top) 0
+        var(--editor-heading-spacing-bottom);
+    }
+
     h1 {
-      font-size: 1.5em;
+      font-size: var(--editor-heading-1-font-size);
     }
 
     h2 {
-      font-size: 1.3em;
+      font-size: var(--editor-heading-2-font-size);
     }
 
     h3 {
-      font-size: 1.1em;
+      font-size: var(--editor-heading-3-font-size);
+    }
+
+    h4,
+    h5,
+    h6 {
+      font-size: var(--editor-font-size);
+    }
+
+    ul,
+    ol {
+      margin: 0 0 var(--editor-block-spacing);
+      padding-left: var(--editor-list-indent);
     }
 
     li {
-      line-height: 1.5;
-      margin-bottom: ${themeCssVariables.spacing[2]};
+      --editor-list-item-offset: calc(
+        var(--editor-parent-list-offset, 0px) + var(--editor-list-indent)
+      );
+      margin: 0 0 var(--editor-list-item-spacing);
+
+      &::marker {
+        color: var(--editor-accent-color);
+      }
+
+      & > p {
+        margin: 0;
+      }
+
+      & > p:first-child {
+        margin-left: calc(-1 * var(--editor-list-item-offset));
+        padding-left: var(--editor-list-item-offset);
+        position: relative;
+      }
+
+      & > :is(ul, ol) {
+        --editor-parent-list-offset: var(--editor-list-item-offset);
+      }
+    }
+
+    blockquote {
+      border-left: var(--editor-quote-border-width) solid
+        var(--editor-accent-color);
+      font-style: italic;
+      margin: 0 0 var(--editor-block-spacing);
+      padding-left: var(--editor-quote-indent);
+    }
+
+    .node-image,
+    .node-file {
+      margin-bottom: var(--editor-block-spacing);
+    }
+
+    code {
+      background-color: ${themeCssVariables.background.transparent.light};
+      border-radius: ${themeCssVariables.border.radius.sm};
+      font-family: ${themeCssVariables.code.font.family};
+      font-size: 0.9em;
+      padding: 0 ${themeCssVariables.spacing[1]};
+    }
+
+    pre {
+      background-color: ${themeCssVariables.background.transparent.lighter};
+      border-radius: ${themeCssVariables.border.radius.md};
+      margin: 0 0 var(--editor-block-spacing);
+      overflow-x: auto;
+      padding: ${themeCssVariables.spacing[2]} ${themeCssVariables.spacing[3]};
+
+      code {
+        background-color: transparent;
+        padding: 0;
+      }
+    }
+
+    ul[data-type='taskList'] {
+      list-style: none;
+      padding-left: 0;
+
+      li {
+        align-items: flex-start;
+        display: flex;
+        gap: ${themeCssVariables.spacing[2]};
+
+        & > label {
+          flex: 0 0 auto;
+          user-select: none;
+        }
+
+        & > div {
+          flex: 1 1 auto;
+          min-width: 0;
+        }
+
+        & > div > p {
+          margin: 0;
+        }
+      }
+
+      li[data-checked='true'] > div {
+        color: ${themeCssVariables.font.color.tertiary};
+        text-decoration: line-through;
+      }
+    }
+
+    .tableWrapper {
+      margin: 0 0 var(--editor-block-spacing);
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      table-layout: fixed;
+      width: 100%;
+
+      td,
+      th {
+        border: 1px solid ${themeCssVariables.border.color.medium};
+        box-sizing: border-box;
+        min-width: 1em;
+        padding: ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[2]};
+        position: relative;
+        vertical-align: top;
+
+        & > p {
+          margin: 0;
+        }
+      }
+
+      th {
+        background-color: ${themeCssVariables.background.tertiary};
+        font-weight: ${themeCssVariables.font.weight.medium};
+        text-align: left;
+      }
+
+      .selectedCell::after {
+        background-color: ${themeCssVariables.color.blue3};
+        content: '';
+        inset: 0;
+        pointer-events: none;
+        position: absolute;
+      }
+
+      .column-resize-handle {
+        background-color: ${themeCssVariables.color.blue};
+        bottom: 0;
+        pointer-events: none;
+        position: absolute;
+        right: calc(-1 * ${themeCssVariables.spacing['0.5']});
+        top: 0;
+        width: ${themeCssVariables.spacing[1]};
+      }
+    }
+
+    &.resize-cursor {
+      cursor: col-resize;
     }
 
     .block-section {
       border-radius: ${themeCssVariables.border.radius.sm};
       box-sizing: border-box;
-      margin-bottom: ${themeCssVariables.spacing[2]};
+      margin-bottom: var(--editor-block-spacing);
       outline: 1px dashed transparent;
       outline-offset: 2px;
 
       &:hover {
-        outline-color: ${themeCssVariables.border.color.medium};
+        outline-color: ${themeCssVariables.border.color.strong};
+      }
+
+      &.ProseMirror-selectednode {
+        background-color: ${themeCssVariables.color.blue3};
+        outline: 1px dashed ${themeCssVariables.border.color.strong};
       }
     }
 
     .block-columns {
+      border-radius: ${themeCssVariables.border.radius.sm};
       box-sizing: border-box;
       display: flex;
       gap: ${themeCssVariables.spacing[2]};
-      margin-bottom: ${themeCssVariables.spacing[2]};
+      margin-bottom: var(--editor-block-spacing);
+
+      &.ProseMirror-selectednode {
+        background-color: ${themeCssVariables.color.blue3};
+        outline: none;
+      }
     }
 
     .block-column {
@@ -99,12 +304,22 @@ const StyledEditorContainer = styled.div<{
       box-sizing: border-box;
       flex: 1;
       min-width: 0;
-      outline: 1px dashed ${themeCssVariables.border.color.light};
+      outline: 1px dashed transparent;
       outline-offset: 2px;
     }
 
+    .block-columns:hover .block-column,
+    .block-columns.ProseMirror-selectednode .block-column {
+      outline-color: ${themeCssVariables.border.color.strong};
+    }
+
     .block-button-wrapper {
-      margin-bottom: ${themeCssVariables.spacing[2]};
+      margin-bottom: var(--editor-block-spacing);
+
+      &.ProseMirror-selectednode {
+        background-color: ${themeCssVariables.color.blue3};
+        outline: none;
+      }
     }
 
     .block-button {
@@ -117,10 +332,62 @@ const StyledEditorContainer = styled.div<{
       border-bottom: none;
       border-left: none;
       border-right: none;
+      border-top: 1px solid ${themeCssVariables.border.color.medium};
+
+      &.ProseMirror-selectednode {
+        box-shadow: 0 0 0 ${themeCssVariables.spacing[2]}
+          ${themeCssVariables.color.blue3};
+        outline: none;
+      }
     }
 
     .ProseMirror-selectednode {
       outline: 2px solid ${themeCssVariables.color.blue};
+    }
+
+    :is(p, h1, h2, h3, ul, ol, li, blockquote).ProseMirror-selectednode {
+      background-color: ${themeCssVariables.color.blue3};
+      outline: none;
+    }
+
+    .block-column.ProseMirror-selectednode {
+      background-color: ${themeCssVariables.color.blue3};
+      outline: 1px dashed ${themeCssVariables.border.color.strong};
+    }
+
+    :is(.node-image, .node-html).ProseMirror-selectednode {
+      outline: none;
+      position: relative;
+
+      &::after {
+        background-color: ${themeCssVariables.color.blue3};
+        content: '';
+        inset: 0;
+        mix-blend-mode: multiply;
+        pointer-events: none;
+        position: absolute;
+      }
+    }
+
+    :is(h1, h2, h3):first-child {
+      margin-top: 0;
+    }
+
+    :is(
+      p,
+      h1,
+      h2,
+      h3,
+      ul,
+      ol,
+      li,
+      blockquote,
+      .node-image,
+      .block-section,
+      .block-columns,
+      .block-button-wrapper
+    ):last-child {
+      margin-bottom: 0;
     }
   }
 
@@ -150,13 +417,18 @@ export const AdvancedTextEditor = ({
   readonly,
   editor,
   minHeight,
+  variant,
 }: AdvancedTextEditorProps) => {
   const hasTextBubbleMenu = TEXT_BUBBLE_MENU_EXTENSION_NAMES.some(
     (extensionName) => hasEditorExtension(editor, extensionName),
   );
 
   return (
-    <StyledEditorContainer readonly={readonly} minHeight={minHeight}>
+    <StyledEditorContainer
+      readonly={readonly}
+      minHeight={minHeight}
+      style={getAdvancedTextEditorTypographyStyle(variant)}
+    >
       <EditorContent className="editor-content" editor={editor} />
       {hasEditorExtension(editor, 'image') &&
         !hasEditorExtension(editor, 'section') && (

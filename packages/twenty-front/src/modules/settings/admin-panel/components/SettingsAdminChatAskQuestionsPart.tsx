@@ -1,9 +1,9 @@
 import { t } from '@lingui/core/macro';
 import { styled } from '@linaria/react';
 
-import { Tag, type TagColor } from 'twenty-ui/data-display';
+import { Tag, type TagColor } from 'twenty-ui/primitives/data-display';
 import { IconHelpCircle } from 'twenty-ui/icon';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { SettingsAdminChatAskQuestionsQuestion } from '@/settings/admin-panel/components/SettingsAdminChatAskQuestionsQuestion';
 import { SettingsAdminChatToolCallPart } from '@/settings/admin-panel/components/SettingsAdminChatToolCallPart';
@@ -40,10 +40,6 @@ const StyledCardHeader = styled.div`
   font-size: ${themeCssVariables.font.size.md};
   font-weight: ${themeCssVariables.font.weight.medium};
   gap: ${themeCssVariables.spacing[1]};
-
-  svg {
-    flex-shrink: 0;
-  }
 `;
 
 const StyledStatusTag = styled.div`
@@ -86,10 +82,9 @@ export const SettingsAdminChatAskQuestionsPart = ({
         <IconHelpCircle size={14} />
         {t`Questions`}
         <StyledStatusTag>
-          <Tag
-            color={getStatusTagColor(result.status)}
-            text={getStatusLabel(result.status)}
-          />
+          <Tag color={getStatusTagColor(result.status)}>
+            {getStatusLabel(result.status)}
+          </Tag>
         </StyledStatusTag>
       </StyledCardHeader>
       {result.questions.map((question, questionIndex) => (

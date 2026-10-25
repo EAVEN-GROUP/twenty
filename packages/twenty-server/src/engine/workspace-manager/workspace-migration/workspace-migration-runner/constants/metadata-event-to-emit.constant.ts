@@ -32,5 +32,11 @@ export const METADATA_EVENTS_TO_EMIT = {
   applicationVariable: false,
   connectionProvider: true,
   timelineActivityType: true,
+  validationRule: true,
   searchFieldMetadata: true,
+  agentChatChannel: true,
+  agentChatChannelRole: true,
+  settingsMenuItem: true,
+  workflow: true,
+  workflowVersion: true,
 } as const satisfies { [P in AllMetadataName]: boolean };
