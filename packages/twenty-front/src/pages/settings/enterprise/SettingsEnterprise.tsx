@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -245,12 +246,12 @@ export const SettingsEnterprise = ({
     : null;
 
   const licenseExpiresAtDate = isDefined(licenseExpiresAt)
-    ? licenseExpiresAt.toLocaleDateString()
+    ? licenseExpiresAt.toLocaleDateString(i18n.locale)
     : '';
 
   const cancelAtDate =
     isCancelScheduled && isDefined(cancelAt)
-      ? cancelAt.toLocaleDateString()
+      ? cancelAt.toLocaleDateString(i18n.locale)
       : '';
 
   const cancellationMessage =
@@ -713,7 +714,9 @@ export const SettingsEnterprise = ({
                 <SubscriptionInfoRowContainer
                   label={cancellationOrPeriodEndDateLabel}
                   Icon={IconCalendarRepeat}
-                  currentValue={cancellationOrPeriodEndDate.toLocaleDateString()}
+                  currentValue={cancellationOrPeriodEndDate.toLocaleDateString(
+                    i18n.locale,
+                  )}
                 />
               )}
             </SubscriptionInfoContainer>
@@ -776,7 +779,9 @@ export const SettingsEnterprise = ({
                 <SubscriptionInfoRowContainer
                   label={cancellationOrPeriodEndDateLabel}
                   Icon={IconCalendarRepeat}
-                  currentValue={cancellationOrPeriodEndDate.toLocaleDateString()}
+                  currentValue={cancellationOrPeriodEndDate.toLocaleDateString(
+                    i18n.locale,
+                  )}
                 />
               )}
             </SubscriptionInfoContainer>

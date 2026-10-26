@@ -1,7 +1,6 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
-import { doNotTranslate } from 'twenty-shared/i18n';
 import { Tag } from 'twenty-ui/primitives/data-display';
 import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -65,9 +64,7 @@ export const ApplicationMonitoringIssuesTable = ({
             >
               <TableCell>
                 <Tag color={issue.level === 'ERROR' ? 'red' : 'orange'}>
-                  {issue.level === 'ERROR'
-                    ? doNotTranslate('Error')
-                    : doNotTranslate('Warning')}
+                  {issue.level === 'ERROR' ? t`Error` : t`Warning`}
                 </Tag>
               </TableCell>
               <TableCell

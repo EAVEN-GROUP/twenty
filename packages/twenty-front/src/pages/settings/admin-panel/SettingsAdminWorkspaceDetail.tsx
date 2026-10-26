@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { currentUserState } from '@/auth/states/currentUserState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { billingState } from '@/client-config/states/billingState';
@@ -482,7 +483,9 @@ export const SettingsAdminWorkspaceDetail = () => {
                           {thread.messageCount}
                         </TableCell>
                         <TableCell align="right">
-                          {new Date(thread.updatedAt).toLocaleDateString()}
+                          {new Date(thread.updatedAt).toLocaleDateString(
+                            i18n.locale,
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

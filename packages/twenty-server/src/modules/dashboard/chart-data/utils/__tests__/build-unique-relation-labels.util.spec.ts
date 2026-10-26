@@ -1,8 +1,17 @@
+import { setupI18n } from '@lingui/core';
+import { compileMessage } from '@lingui/message-utils/compileMessage';
 import { buildUniqueRelationLabels } from 'src/modules/dashboard/chart-data/utils/build-unique-relation-labels.util';
+
+const i18n = setupI18n();
+
+i18n.setMessagesCompiler(compileMessage);
+i18n.load('en', {});
+i18n.activate('en');
 
 describe('buildUniqueRelationLabels', () => {
   it('should keep unique labels untouched', () => {
     const { labelByRecordId, unresolvedRecordIds } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([
         ['id-1', 'Alice'],
         ['id-2', 'Bob'],
@@ -17,6 +26,7 @@ describe('buildUniqueRelationLabels', () => {
 
   it('should suffix every member of a colliding label group', () => {
     const { labelByRecordId } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([
         ['id-1', 'John Smith'],
         ['id-2', 'John Smith'],
@@ -32,6 +42,7 @@ describe('buildUniqueRelationLabels', () => {
 
   it('should assign ordinals by ascending record id regardless of input order', () => {
     const resolutionFromShuffledInput = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([
         ['id-b', 'John Smith'],
         ['id-a', 'John Smith'],
@@ -49,6 +60,7 @@ describe('buildUniqueRelationLabels', () => {
 
   it('should classify missing labels as unresolved without assigning a label', () => {
     const { labelByRecordId, unresolvedRecordIds } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([['id-1', 'Alice']]),
       allRecordIds: ['id-1', 'id-2'],
     });
@@ -64,6 +76,7 @@ describe('buildUniqueRelationLabels', () => {
     );
 
     const { labelByRecordId, unresolvedRecordIds } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map(),
       allRecordIds,
     });
@@ -74,6 +87,7 @@ describe('buildUniqueRelationLabels', () => {
 
   it('should classify whitespace-only labels as unresolved', () => {
     const { labelByRecordId, unresolvedRecordIds } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([['id-1', '   ']]),
       allRecordIds: ['id-1'],
     });
@@ -84,6 +98,7 @@ describe('buildUniqueRelationLabels', () => {
 
   it('should suffix records genuinely named like the sentinels', () => {
     const { labelByRecordId } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([
         ['id-1', 'Unknown'],
         ['id-2', 'Not Set'],
@@ -97,6 +112,7 @@ describe('buildUniqueRelationLabels', () => {
 
   it('should not reuse a label already taken by a suffixed record', () => {
     const { labelByRecordId } = buildUniqueRelationLabels({
+      i18n,
       rawLabelByRecordId: new Map([
         ['id-1', 'John Smith'],
         ['id-2', 'John Smith'],

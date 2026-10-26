@@ -91,6 +91,7 @@ export const transformToTwoDimensionalLineChartData = ({
     firstDayOfTheWeek: convertedFirstDayOfTheWeek,
     primaryRelationLabelResolution,
     secondaryRelationLabelResolution,
+    i18n,
   });
 
   const allXValues: string[] = [];

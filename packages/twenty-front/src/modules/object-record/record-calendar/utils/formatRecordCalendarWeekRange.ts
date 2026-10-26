@@ -9,6 +9,14 @@ type FormatRecordCalendarWeekRangeArgs = {
   locale: Locale;
 };
 
+const isDayFirstLocale = (locale: Locale) => {
+  const partTypes = new Intl.DateTimeFormat(locale.code)
+    .formatToParts(new Date(2000, 0, 31))
+    .map(({ type }) => type);
+
+  return partTypes.indexOf('day') < partTypes.indexOf('month');
+};
+
 export const formatRecordCalendarWeekRange = ({
   firstDayOfWeek,
   lastDayOfWeek,
@@ -17,26 +25,32 @@ export const formatRecordCalendarWeekRange = ({
   const firstDay = turnPlainDateToShiftedDateInSystemTimeZone(firstDayOfWeek);
   const lastDay = turnPlainDateToShiftedDateInSystemTimeZone(lastDayOfWeek);
   const formatOptions = { locale };
+  const isDayFirst = isDayFirstLocale(locale);
+
+  const fullDatePattern = doNotTranslate(
+    isDayFirst ? 'd MMM yyyy' : 'MMM d, yyyy',
+  );
+  const shortDatePattern = doNotTranslate(isDayFirst ? 'd MMM' : 'MMM d');
 
   if (firstDayOfWeek.year !== lastDayOfWeek.year) {
-    return `${format(firstDay, doNotTranslate('MMM d, yyyy'), formatOptions)} – ${format(
+    return `${format(firstDay, fullDatePattern, formatOptions)} – ${format(
       lastDay,
-      doNotTranslate('MMM d, yyyy'),
+      fullDatePattern,
       formatOptions,
     )}`;
   }
 
   if (firstDayOfWeek.month !== lastDayOfWeek.month) {
-    return `${format(firstDay, 'MMM d', formatOptions)} – ${format(
+    return `${format(firstDay, shortDatePattern, formatOptions)} – ${format(
       lastDay,
-      doNotTranslate('MMM d, yyyy'),
+      fullDatePattern,
       formatOptions,
     )}`;
   }
 
-  return `${format(firstDay, 'MMM d', formatOptions)} – ${format(
+  return `${format(firstDay, doNotTranslate(isDayFirst ? 'd' : 'MMM d'), formatOptions)} – ${format(
     lastDay,
-    doNotTranslate('d, yyyy'),
+    doNotTranslate(isDayFirst ? 'd MMM yyyy' : 'd, yyyy'),
     formatOptions,
   )}`;
 };

@@ -1,7 +1,9 @@
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { useUserDateFormat } from '@/ui/input/components/internal/date/hooks/useUserDateFormat';
 import { useUserTimeFormat } from '@/ui/input/components/internal/date/hooks/useUserTimeFormat';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { getTimezoneAbbreviationForZonedDateTime } from '@/ui/input/components/internal/date/utils/getTimeZoneAbbreviationForZonedDateTime';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { type Temporal } from 'temporal-polyfill';
 import { formatZonedDateTimeDatePart } from '@/localization/utils/formatZonedDateTimeDatePart';
 import { formatZonedDateTimeTimePart } from '@/localization/utils/formatZonedDateTimeTimePart';
@@ -10,6 +12,7 @@ export const useGetDateTimeFilterDisplayValue = () => {
   const { isSystemTimezone } = useUserTimezone();
 
   const { userDateFormat } = useUserDateFormat();
+  const dateLocale = useAtomStateValue(dateLocaleState);
   const { userTimeFormat } = useUserTimeFormat();
 
   const getDateTimeFilterDisplayValue = (
@@ -19,7 +22,7 @@ export const useGetDateTimeFilterDisplayValue = () => {
       ? ` (${getTimezoneAbbreviationForZonedDateTime(referenceZonedDateTime)})`
       : '';
 
-    const displayValue = `${formatZonedDateTimeDatePart(referenceZonedDateTime, userDateFormat)} ${formatZonedDateTimeTimePart(referenceZonedDateTime, userTimeFormat)}${timezoneSuffix}`;
+    const displayValue = `${formatZonedDateTimeDatePart(referenceZonedDateTime, userDateFormat, dateLocale.localeCatalog.code)} ${formatZonedDateTimeTimePart(referenceZonedDateTime, userTimeFormat)}${timezoneSuffix}`;
 
     return { displayValue };
   };

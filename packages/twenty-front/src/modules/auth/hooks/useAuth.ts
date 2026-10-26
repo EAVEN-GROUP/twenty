@@ -61,7 +61,7 @@ import { isChooseWorkspaceActionRequested } from '@/auth/utils/isChooseWorkspace
 import { useLoadCurrentUser } from '@/users/hooks/useLoadCurrentUser';
 import { i18n } from '@lingui/core';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { SOURCE_LOCALE } from 'twenty-shared/translations';
+import { DEFAULT_APP_LOCALE } from 'twenty-shared/translations';
 import { isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
 import { getWorkspaceUrl } from '~/utils/getWorkspaceUrl';
@@ -400,7 +400,7 @@ export const useAuth = () => {
           email,
           password,
           captchaToken,
-          locale: i18n.locale ?? SOURCE_LOCALE,
+          locale: i18n.locale ?? DEFAULT_APP_LOCALE,
         },
       });
 
@@ -486,7 +486,7 @@ export const useAuth = () => {
           workspaceInviteHash,
           workspacePersonalInviteToken,
           captchaToken,
-          locale: i18n.locale ?? SOURCE_LOCALE,
+          locale: i18n.locale ?? DEFAULT_APP_LOCALE,
           ...(workspacePublicData?.id
             ? { workspaceId: workspacePublicData.id }
             : {}),

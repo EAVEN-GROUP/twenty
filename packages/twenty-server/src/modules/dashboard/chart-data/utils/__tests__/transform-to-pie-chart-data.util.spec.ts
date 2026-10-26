@@ -1,3 +1,5 @@
+import { setupI18n } from '@lingui/core';
+import { compileMessage } from '@lingui/message-utils/compileMessage';
 import { CalendarStartDay } from 'twenty-shared/constants';
 import { FieldMetadataType } from 'twenty-shared/types';
 
@@ -6,6 +8,12 @@ import { type PieChartConfigurationDTO } from 'src/engine/metadata-modules/page-
 import { GraphOrderBy } from 'src/engine/metadata-modules/page-layout-widget/enums/graph-order-by.enum';
 import { PIE_CHART_MAXIMUM_NUMBER_OF_SLICES } from 'src/modules/dashboard/chart-data/constants/pie-chart-maximum-number-of-slices.constant';
 import { transformToPieChartData } from 'src/modules/dashboard/chart-data/utils/transform-to-pie-chart-data.util';
+
+const i18n = setupI18n();
+
+i18n.setMessagesCompiler(compileMessage);
+i18n.load('en', {});
+i18n.activate('en');
 
 const groupByField = {
   type: FieldMetadataType.TEXT,
@@ -27,6 +35,7 @@ const transform = ({
   configuration?: PieChartConfigurationDTO;
 }) =>
   transformToPieChartData({
+    i18n,
     filteredRawResults,
     groupByField,
     configuration,

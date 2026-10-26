@@ -1,3 +1,4 @@
+import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 import { useLingui } from '@lingui/react/macro';
 
 import { useMergeManyRecords } from '@/object-record/hooks/useMergeManyRecords';
@@ -63,7 +64,7 @@ export const useMergeRecordsActions = ({
         status: 'error',
         children:
           error instanceof Error
-            ? error.message
+            ? getErrorMessageFromApolloError(error)
             : t`Failed to merge records. Please try again.`,
       });
     } finally {

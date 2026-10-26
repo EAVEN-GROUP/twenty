@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { type I18n } from '@lingui/core';
 import chunk from 'lodash.chunk';
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
 
@@ -28,6 +29,7 @@ type ResolveRelationLabelsParams = {
   authContext: WorkspaceAuthContext;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>;
+  i18n: I18n;
 };
 
 @Injectable()
@@ -43,6 +45,7 @@ export class ChartRelationLabelService {
     authContext,
     flatObjectMetadataMaps,
     flatFieldMetadataMaps,
+    i18n,
   }: ResolveRelationLabelsParams): Promise<{
     primary?: RelationLabelResolution;
     secondary?: RelationLabelResolution;
@@ -93,6 +96,7 @@ export class ChartRelationLabelService {
         buildUniqueRelationLabels({
           rawLabelByRecordId,
           allRecordIds: resolvableAxis.recordIds,
+          i18n,
         }),
       );
     }

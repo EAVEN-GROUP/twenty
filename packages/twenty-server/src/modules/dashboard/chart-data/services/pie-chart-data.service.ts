@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import { CalendarStartDay } from 'twenty-shared/constants';
+import { type APP_LOCALES } from 'twenty-shared/translations';
 import { isDefined } from 'twenty-shared/utils';
 
+import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
@@ -30,6 +32,7 @@ type GetPieChartDataParams = {
   objectMetadataId: string;
   configuration: PieChartConfigurationDTO;
   authContext: WorkspaceAuthContext;
+  locale: keyof typeof APP_LOCALES;
 };
 
 @Injectable()
@@ -38,6 +41,7 @@ export class PieChartDataService {
     private readonly workspaceManyOrAllFlatEntityMapsCacheService: WorkspaceManyOrAllFlatEntityMapsCacheService,
     private readonly chartDataQueryService: ChartDataQueryService,
     private readonly chartRelationLabelService: ChartRelationLabelService,
+    private readonly i18nService: I18nService,
   ) {}
 
   async getPieChartData({
@@ -45,6 +49,7 @@ export class PieChartDataService {
     objectMetadataId,
     configuration,
     authContext,
+    locale,
   }: GetPieChartDataParams): Promise<PieChartDataDTO> {
     try {
       if (
@@ -130,6 +135,8 @@ export class PieChartDataService {
         shouldOmitEmptyBuckets: configuration.hideEmptyCategory ?? false,
       });
 
+      const i18n = this.i18nService.getI18nInstance(locale);
+
       const relationLabelResolutions =
         await this.chartRelationLabelService.resolveRelationLabels({
           rawResults: filteredResults,
@@ -140,6 +147,7 @@ export class PieChartDataService {
           authContext,
           flatObjectMetadataMaps,
           flatFieldMetadataMaps,
+          i18n,
         });
 
       const resolvedResults = filterOutUnresolvedRelationBuckets({
@@ -157,6 +165,7 @@ export class PieChartDataService {
           (configuration.firstDayOfTheWeek as CalendarStartDay | undefined) ??
           CalendarStartDay.MONDAY,
         relationLabelResolution: relationLabelResolutions.primary,
+        i18n,
       });
     } catch (error) {
       throw wrapChartDataQueryError(error, 'Pie chart data retrieval failed');

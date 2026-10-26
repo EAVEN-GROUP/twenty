@@ -9,12 +9,13 @@ import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMemb
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { isCurrentUserLoadedState } from '@/auth/states/isCurrentUserLoadedState';
 import { useInitializeFormatPreferences } from '@/localization/hooks/useInitializeFormatPreferences';
-import { getDateFnsLocale } from '@/ui/field/display/utils/getDateFnsLocale';
+import { useUpdateDateLocaleCatalog } from '@/localization/hooks/useUpdateDateLocaleCatalog';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
-import { enUS } from 'date-fns/locale';
-import { useStore } from 'jotai';
-import { useCallback, useEffect, useState } from 'react';
-import { type APP_LOCALES, SOURCE_LOCALE } from 'twenty-shared/translations';
+import { useEffect, useState } from 'react';
+import {
+  DEFAULT_APP_LOCALE,
+  type APP_LOCALES,
+} from 'twenty-shared/translations';
 import { type CurrentUserWorkspaceObjectPermissions } from '@/auth/types/CurrentUserWorkspaceObjectPermissions';
 import { isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
@@ -23,14 +24,12 @@ import {
   type WorkspaceMember,
   GetCurrentUserDocument,
 } from '~/generated-metadata/graphql';
-import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { dynamicActivate } from '~/utils/i18n/dynamicActivate';
 import { type ColorScheme } from '@/ui/theme/types/ColorScheme';
 import { type UiScale } from '@/ui/theme/types/UiScale';
 
 export const UserMetadataProviderInitialEffect = () => {
   const isLogged = useIsLogged();
-  const store = useStore();
   const [isInitialized, setIsInitialized] = useState(false);
 
   const setCurrentUser = useSetAtomState(currentUserState);
@@ -50,21 +49,7 @@ export const UserMetadataProviderInitialEffect = () => {
 
   const { initializeFormatPreferences } = useInitializeFormatPreferences();
 
-  const updateLocaleCatalog = useCallback(
-    async (newLocale: keyof typeof APP_LOCALES) => {
-      const localeValue = store.get(dateLocaleState.atom);
-      if (localeValue.locale !== newLocale) {
-        getDateFnsLocale(newLocale).then((localeCatalog) => {
-          const newValue = {
-            locale: newLocale,
-            localeCatalog: localeCatalog || enUS,
-          };
-          store.set(dateLocaleState.atom, newValue);
-        });
-      }
-    },
-    [store],
-  );
+  const { updateDateLocaleCatalog } = useUpdateDateLocaleCatalog();
 
   const shouldSkipUserQuery = !isLogged;
 
@@ -140,7 +125,8 @@ export const UserMetadataProviderInitialEffect = () => {
           (workspaceMember.uiScale as UiScale) ?? doNotTranslate('Default'),
         openRecordIn: toOpenRecordInPreference(workspaceMember.openRecordIn),
         locale:
-          (workspaceMember.locale as keyof typeof APP_LOCALES) ?? SOURCE_LOCALE,
+          (workspaceMember.locale as keyof typeof APP_LOCALES) ??
+          DEFAULT_APP_LOCALE,
       };
     };
 
@@ -149,12 +135,13 @@ export const UserMetadataProviderInitialEffect = () => {
         affectDefaultValuesOnEmptyWorkspaceMemberFields(workspaceMember);
       setCurrentWorkspaceMember(updatedWorkspaceMember);
 
-      updateLocaleCatalog(updatedWorkspaceMember.locale);
+      void updateDateLocaleCatalog(updatedWorkspaceMember.locale);
 
       initializeFormatPreferences(updatedWorkspaceMember);
 
       dynamicActivate(
-        (workspaceMember.locale as keyof typeof APP_LOCALES) ?? SOURCE_LOCALE,
+        (workspaceMember.locale as keyof typeof APP_LOCALES) ??
+          DEFAULT_APP_LOCALE,
       );
     }
 
@@ -185,7 +172,7 @@ export const UserMetadataProviderInitialEffect = () => {
     setCurrentWorkspaceMember,
     initializeFormatPreferences,
     setCurrentWorkspaceDeletedMembers,
-    updateLocaleCatalog,
+    updateDateLocaleCatalog,
     setIsCurrentUserLoaded,
   ]);
 

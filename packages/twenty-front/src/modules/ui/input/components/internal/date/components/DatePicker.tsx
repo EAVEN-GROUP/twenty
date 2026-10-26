@@ -7,6 +7,7 @@ import { SKELETON_HEIGHT_SIZES } from 'twenty-ui/primitives/feedback';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { CalendarStartDay } from 'twenty-shared/constants';
 
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { detectCalendarStartDay } from '@/localization/utils/detection/detectCalendarStartDay';
 import { DatePickerHeader } from '@/ui/input/components/internal/date/components/DatePickerHeader';
 import { RelativeDatePickerHeader } from '@/ui/input/components/internal/date/components/RelativeDatePickerHeader';
@@ -153,6 +154,7 @@ export const DatePicker = ({
   );
 
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const dateLocale = useAtomStateValue(dateLocaleState);
 
   const handleChangeMonth = (month: number) => {
     const newDate = plainDate?.with({ month: month });
@@ -236,6 +238,7 @@ export const DatePicker = ({
           <ReactDatePicker
             key={relativeDateRangeKey}
             open={true}
+            locale={dateLocale.localeCatalog}
             disabledKeyboardNavigation
             onChange={handleDateChange}
             onSelect={handleDateSelect}

@@ -1,3 +1,4 @@
+import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useUploadWorkspaceMemberProfilePicture } from '@/settings/members/hooks/useUploadWorkspaceMemberProfilePicture';
 import { useUpdateWorkspaceMemberSettings } from '@/workspace-member/hooks/useUpdateWorkspaceMemberSettings';
@@ -58,7 +59,9 @@ export const OnboardingProfilePictureUploader = ({
       enqueueToast({
         status: 'error',
         children:
-          error instanceof Error ? error.message : t`Failed to upload picture`,
+          error instanceof Error
+            ? getErrorMessageFromApolloError(error)
+            : t`Failed to upload picture`,
       });
     }
   };

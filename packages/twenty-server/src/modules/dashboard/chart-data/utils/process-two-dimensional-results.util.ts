@@ -1,3 +1,4 @@
+import { type I18n } from '@lingui/core';
 import {
   type ObjectRecordGroupByDateGranularity,
   type FirstDayOfTheWeek,
@@ -36,6 +37,7 @@ type ProcessTwoDimensionalResultsParams = {
   firstDayOfTheWeek: FirstDayOfTheWeek;
   primaryRelationLabelResolution: RelationLabelResolution | undefined;
   secondaryRelationLabelResolution: RelationLabelResolution | undefined;
+  i18n: I18n;
 };
 
 export const processTwoDimensionalResults = ({
@@ -50,6 +52,7 @@ export const processTwoDimensionalResults = ({
   firstDayOfTheWeek,
   primaryRelationLabelResolution,
   secondaryRelationLabelResolution,
+  i18n,
 }: ProcessTwoDimensionalResultsParams): ProcessTwoDimensionalResultsOutput => {
   const formattedToRawLookup = new Map<string, RawDimensionValue>();
   const secondaryFormattedToRawLookup = new Map<string, RawDimensionValue>();
@@ -73,6 +76,7 @@ export const processTwoDimensionalResults = ({
       userTimezone,
       firstDayOfTheWeek,
       relationLabelByRecordId: primaryRelationLabelResolution?.labelByRecordId,
+      i18n,
     });
 
     const yFormatted = formatDimensionValue({
@@ -84,6 +88,7 @@ export const processTwoDimensionalResults = ({
       firstDayOfTheWeek,
       relationLabelByRecordId:
         secondaryRelationLabelResolution?.labelByRecordId,
+      i18n,
     });
 
     if (isDefined(rawXValue)) {

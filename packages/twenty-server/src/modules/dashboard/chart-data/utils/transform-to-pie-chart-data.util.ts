@@ -1,3 +1,4 @@
+import { type I18n } from '@lingui/core';
 import { CalendarStartDay } from 'twenty-shared/constants';
 import { FirstDayOfTheWeek } from 'twenty-shared/types';
 import {
@@ -22,6 +23,7 @@ export const transformToPieChartData = ({
   userTimezone,
   firstDayOfTheWeek,
   relationLabelResolution,
+  i18n,
 }: {
   filteredRawResults: Array<{
     groupByDimensionValues: unknown[];
@@ -32,6 +34,7 @@ export const transformToPieChartData = ({
   userTimezone: string;
   firstDayOfTheWeek: CalendarStartDay;
   relationLabelResolution: RelationLabelResolution | undefined;
+  i18n: I18n;
 }): PieChartDataDTO => {
   const selectOptions = getSelectOptions(groupByField);
 
@@ -50,6 +53,7 @@ export const transformToPieChartData = ({
       userTimezone,
       firstDayOfTheWeek: convertedFirstDayOfTheWeek,
       relationLabelResolution,
+      i18n,
     });
 
   const processedDataPoints = rawProcessedDataPoints.map((point) => {

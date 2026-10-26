@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { t } from '@lingui/core/macro';
 import { styled } from '@linaria/react';
 
@@ -54,7 +55,7 @@ export const SettingsAdminChatMessage = ({
         />
       ))}
       <StyledTimestamp>
-        {new Date(message.createdAt).toLocaleString()}
+        {new Date(message.createdAt).toLocaleString(i18n.locale)}
       </StyledTimestamp>
     </StyledMessageBubble>
   );

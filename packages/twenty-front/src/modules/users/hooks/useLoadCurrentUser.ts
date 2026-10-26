@@ -8,12 +8,16 @@ import { authProvidersState } from '@/client-config/states/authProvidersState';
 import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCurrentLocationOnAWorkspace';
 import { useLastAuthenticatedWorkspaceDomain } from '@/domain-manager/hooks/useLastAuthenticatedWorkspaceDomain';
 import { useInitializeFormatPreferences } from '@/localization/hooks/useInitializeFormatPreferences';
+import { useUpdateDateLocaleCatalog } from '@/localization/hooks/useUpdateDateLocaleCatalog';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { workspaceAuthBypassProvidersState } from '@/workspace/states/workspaceAuthBypassProvidersState';
 import { useCallback } from 'react';
 import { t } from '@lingui/core/macro';
-import { SOURCE_LOCALE, type APP_LOCALES } from 'twenty-shared/translations';
+import {
+  DEFAULT_APP_LOCALE,
+  type APP_LOCALES,
+} from 'twenty-shared/translations';
 import { type CurrentUserWorkspaceObjectPermissions } from '@/auth/types/CurrentUserWorkspaceObjectPermissions';
 import { isDefined } from 'twenty-shared/utils';
 import { toOpenRecordInPreference } from '@/workspace-member/utils/toOpenRecordInPreference';
@@ -38,6 +42,7 @@ export const useLoadCurrentUser = () => {
   );
   const setCurrentWorkspace = useSetAtomState(currentWorkspaceState);
   const { initializeFormatPreferences } = useInitializeFormatPreferences();
+  const { updateDateLocaleCatalog } = useUpdateDateLocaleCatalog();
   const setWorkspaceAuthBypassProviders = useSetAtomState(
     workspaceAuthBypassProvidersState,
   );
@@ -96,14 +101,18 @@ export const useLoadCurrentUser = () => {
         openRecordIn: toOpenRecordInPreference(
           user.workspaceMember?.openRecordIn,
         ),
-        locale: user.workspaceMember?.locale ?? SOURCE_LOCALE,
+        locale: user.workspaceMember?.locale ?? DEFAULT_APP_LOCALE,
       };
 
       setCurrentWorkspaceMember(workspaceMember);
 
       initializeFormatPreferences(workspaceMember);
+      void updateDateLocaleCatalog(
+        workspaceMember.locale as keyof typeof APP_LOCALES,
+      );
       dynamicActivate(
-        (workspaceMember.locale as keyof typeof APP_LOCALES) ?? SOURCE_LOCALE,
+        (workspaceMember.locale as keyof typeof APP_LOCALES) ??
+          DEFAULT_APP_LOCALE,
       );
     }
 
@@ -149,6 +158,7 @@ export const useLoadCurrentUser = () => {
     setCurrentUserWorkspace,
     setCurrentWorkspaceMember,
     initializeFormatPreferences,
+    updateDateLocaleCatalog,
     setLastAuthenticateWorkspaceDomain,
     authProviders,
     setWorkspaceAuthBypassProviders,

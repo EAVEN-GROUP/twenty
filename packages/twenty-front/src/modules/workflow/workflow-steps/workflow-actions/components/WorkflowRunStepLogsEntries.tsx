@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { type WorkflowRunStepLog } from 'twenty-shared/workflow';
@@ -69,7 +70,7 @@ const formatTimestamp = (timestamp: string): string => {
     return timestamp;
   }
 
-  return date.toLocaleTimeString();
+  return date.toLocaleTimeString(i18n.locale);
 };
 
 export const WorkflowRunStepLogsEntries = ({

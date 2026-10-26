@@ -1,4 +1,5 @@
-import { t } from '@lingui/core/macro';
+import { type I18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -8,12 +9,17 @@ import { claimUniqueSuffixedLabel } from 'src/modules/dashboard/chart-data/utils
 export const buildUniqueRelationLabels = ({
   rawLabelByRecordId,
   allRecordIds,
+  i18n,
 }: {
   rawLabelByRecordId: ReadonlyMap<string, string>;
   allRecordIds: string[];
+  i18n: I18n;
 }): RelationLabelResolution => {
   const sortedRecordIds = [...new Set(allRecordIds)].sort();
-  const takenLabels = new Set<string>([t`Not Set`, t`Unknown`]);
+  const takenLabels = new Set<string>([
+    i18n._(msg`Not Set`),
+    i18n._(msg`Unknown`),
+  ]);
   const labelByRecordId = new Map<string, string>();
   const unresolvedRecordIds = new Set<string>();
   const recordIdsByRawLabel = new Map<string, string[]>();

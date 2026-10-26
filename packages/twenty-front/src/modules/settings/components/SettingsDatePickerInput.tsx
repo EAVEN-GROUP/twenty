@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useId, useRef, useState } from 'react';
@@ -131,7 +132,7 @@ export const SettingsDatePickerInput = ({
       return placeholder ?? t`Select date & time`;
     }
 
-    return date.toLocaleString(undefined, {
+    return date.toLocaleString(i18n.locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

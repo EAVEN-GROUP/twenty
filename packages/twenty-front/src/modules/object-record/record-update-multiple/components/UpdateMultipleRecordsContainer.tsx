@@ -1,3 +1,4 @@
+import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 import { contextStoreNumberOfSelectedRecordsComponentState } from '@/context-store/states/contextStoreNumberOfSelectedRecordsComponentState';
 import { UpdateMultipleRecordsFooter } from '@/object-record/record-update-multiple/components/UpdateMultipleRecordsFooter';
 import { UpdateMultipleRecordsForm } from '@/object-record/record-update-multiple/components/UpdateMultipleRecordsForm';
@@ -77,7 +78,7 @@ export const UpdateMultipleRecordsContainer = ({
         status: 'error',
         children:
           error instanceof Error
-            ? error.message
+            ? getErrorMessageFromApolloError(error)
             : t`Failed to update records. Please try again.`,
       });
     }

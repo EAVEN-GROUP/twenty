@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { TabListRoot } from '@/ui/layout/tab-list/components/TabListRoot';
 import { Tabs } from 'twenty-ui/primitives/navigation';
 import { useParams } from 'react-router-dom';
@@ -119,7 +120,7 @@ export const SettingsAdminUserDetail = () => {
       Icon: IconCalendar,
       label: t`Created`,
       value: user?.createdAt
-        ? new Date(user.createdAt).toLocaleDateString()
+        ? new Date(user.createdAt).toLocaleDateString(i18n.locale)
         : '',
     },
     ...(currentUser?.canAccessFullAdminPanel && isDefined(userId)

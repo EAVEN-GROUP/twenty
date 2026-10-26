@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
 import { useObjectMetadataSelectHelpers } from '@/object-metadata/hooks/useObjectMetadataSelectHelpers';
 import { IconPicker } from '@/ui/input/components/IconPicker';
@@ -61,7 +62,7 @@ export const WorkflowEditTriggerManual = ({
   const { getIcon } = useIcons();
   const { getSelectIconPropsFromObjectMetadataItem } =
     useObjectMetadataSelectHelpers();
-  const maxRecordsFormatted = QUERY_MAX_RECORDS.toLocaleString();
+  const maxRecordsFormatted = QUERY_MAX_RECORDS.toLocaleString(i18n.locale);
 
   const { activeNonSystemObjectMetadataItems } =
     useFilteredObjectMetadataItems();

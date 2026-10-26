@@ -1,3 +1,4 @@
+import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 import { t } from '@lingui/core/macro';
 import { useState } from 'react';
 
@@ -42,7 +43,9 @@ export const WorkspaceLogoUploader = () => {
       });
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : t`Failed to upload picture`;
+        error instanceof Error
+          ? getErrorMessageFromApolloError(error)
+          : t`Failed to upload picture`;
       setErrorMessage(t`An error occurred while uploading the picture.`);
       enqueueToast({ status: 'error', children: message });
     } finally {
@@ -74,7 +77,9 @@ export const WorkspaceLogoUploader = () => {
       });
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : t`Failed to remove picture`;
+        error instanceof Error
+          ? getErrorMessageFromApolloError(error)
+          : t`Failed to remove picture`;
       setErrorMessage(t`An error occurred while removing the picture.`);
       enqueueToast({ status: 'error', children: message });
     } finally {

@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { SettingsEmptyPlaceholder } from '@/settings/components/SettingsEmptyPlaceholder';
 import { SettingsAdminDeleteJobsConfirmationModal } from '@/settings/admin-panel/health-status/components/SettingsAdminDeleteJobsConfirmationModal';
 import { SettingsAdminJobDetailsExpandable } from '@/settings/admin-panel/health-status/components/SettingsAdminJobDetailsExpandable';
@@ -208,7 +209,7 @@ export const SettingsAdminQueueJobsTable = ({
   const formatTimestampFull = (timestamp?: number | null) => {
     if (!timestamp) return '';
 
-    return new Date(timestamp).toLocaleString();
+    return new Date(timestamp).toLocaleString(i18n.locale);
   };
 
   return (

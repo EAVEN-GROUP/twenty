@@ -1,4 +1,5 @@
-import { t } from '@lingui/core/macro';
+import { type I18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { isNonEmptyString, isNumber } from '@sniptt/guards';
 import {
   FieldMetadataType,
@@ -23,6 +24,7 @@ type FormatDimensionValueParams = {
   userTimezone: string;
   firstDayOfTheWeek: FirstDayOfTheWeek;
   relationLabelByRecordId?: ReadonlyMap<string, string>;
+  i18n: I18n;
 };
 
 const normalizeMultiSelectValue = (value: unknown): unknown[] => {
@@ -55,9 +57,10 @@ export const formatDimensionValue = ({
   userTimezone,
   firstDayOfTheWeek,
   relationLabelByRecordId,
+  i18n,
 }: FormatDimensionValueParams): string => {
   if (!isDefined(value)) {
-    return t`Not Set`;
+    return i18n._(msg`Not Set`);
   }
 
   const effectiveDateGranularity = (dateGranularity ??
@@ -87,7 +90,7 @@ export const formatDimensionValue = ({
     }
 
     case FieldMetadataType.BOOLEAN: {
-      return value === true ? t`Yes` : t`No`;
+      return value === true ? i18n._(msg`Yes`) : i18n._(msg`No`);
     }
 
     case FieldMetadataType.DATE:
@@ -110,6 +113,7 @@ export const formatDimensionValue = ({
         effectiveDateGranularity,
         userTimezone,
         firstDayOfTheWeek,
+        i18n.locale,
       );
     }
 
@@ -120,7 +124,9 @@ export const formatDimensionValue = ({
           return String(value);
         }
 
-        return relationLabelByRecordId.get(String(value)) ?? t`Unknown`;
+        return (
+          relationLabelByRecordId.get(String(value)) ?? i18n._(msg`Unknown`)
+        );
       }
 
       if (isDefined(dateGranularity)) {
@@ -150,7 +156,7 @@ export const formatDimensionValue = ({
         subFieldName === 'currencyCode'
       ) {
         if (!isNonEmptyString(value)) {
-          return t`Not Set`;
+          return i18n._(msg`Not Set`);
         }
 
         return String(value);

@@ -104,16 +104,6 @@ msgstr "Trovati {hostnameCount} nomi host per il dominio \"{domainName}\". Previ
 msgid "{operationLabel} of {aggregateFieldLabel}"
 msgstr "{operationLabel} di {aggregateFieldLabel}"
 
-#. js-lingui-id: TJ2Qca
-#: src/engine/core-modules/application/connection-provider/utils/assert-connection-scope-allowed-by-provider-or-throw.util.ts
-msgid "{providerDisplayName} only supports connections shared with the workspace."
-msgstr "{providerDisplayName} supporta solo connessioni condivise con lo workspace."
-
-#. js-lingui-id: Hz1hn8
-#: src/engine/core-modules/application/connection-provider/utils/assert-connection-scope-allowed-by-provider-or-throw.util.ts
-msgid "{providerDisplayName} only supports personal connections."
-msgstr "{providerDisplayName} supporta solo connessioni personali."
-
 #. js-lingui-id: dmxzg7
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
@@ -152,6 +142,22 @@ msgstr "Una destinazione di evento del calendario"
 #: src/engine/core-modules/emailing-domain/exceptions/emailing-domain.exception.ts
 msgid "A campaign is still sending. Wait for it to finish or cancel it before removing this sender."
 msgstr "Una campagna è ancora in fase di invio. Attendi che termini oppure annullala prima di rimuovere questo mittente."
+
+#. js-lingui-id: kZaUc+
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-agent-chat-channel-name-uniqueness.util.ts
+msgid "A channel named \"{name}\" already exists"
+msgstr "Esiste già un canale chiamato \"{name}\""
+
+#. js-lingui-id: y84xpa
+#: src/engine/metadata-modules/ai/ai.exception.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-validator.service.ts
+msgid "A channel needs a name."
+msgstr "Un canale deve avere un nome."
+
+#. js-lingui-id: 3bCT2z
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-agent-chat-channel-name-uniqueness.util.ts
+msgid "A channel with this name already exists."
+msgstr "Esiste già un canale con questo nome."
 
 #. js-lingui-id: PInBOB
 #: src/engine/metadata-modules/flat-page-layout-widget/validators/utils/validate-chart-filter.util.ts
@@ -442,6 +448,12 @@ msgstr "Una variabile utente non può avere un valore: ogni membro imposta il pr
 #: src/engine/core-modules/auth/auth.exception.ts
 msgid "A user with this email already exists."
 msgstr "Esiste già un utente con questa email."
+
+#. js-lingui-id: wSP1qx
+#: src/engine/metadata-modules/flat-navigation-menu-item/validators/utils/validate-navigation-menu-item-type-required-properties.util.ts
+#: src/engine/metadata-modules/flat-navigation-menu-item/validators/utils/validate-navigation-menu-item-type-required-properties.util.ts
+msgid "A valid agentChatChannelUniversalIdentifier is required for AGENT_CHAT_CHANNEL type"
+msgstr "Per il tipo AGENT_CHAT_CHANNEL è richiesto un agentChatChannelUniversalIdentifier valido"
 
 #. js-lingui-id: Dwa/Bm
 #: src/engine/metadata-modules/flat-navigation-menu-item/validators/utils/validate-navigation-menu-item-type-required-properties.util.ts
@@ -1062,10 +1074,17 @@ msgid "An error occurred."
 msgstr "Si è verificato un errore."
 
 #. js-lingui-id: CKXJCD
-#: src/engine/core-modules/record-export/services/record-export.workspace-service.ts
-#: src/engine/core-modules/record-export/services/record-export.workspace-service.ts
+#: src/engine/core-modules/record-export/__tests__/record-export-exception-filter.spec.ts
+#: src/engine/core-modules/record-export/services/record-export-query.service.ts
+#: src/engine/core-modules/record-export/services/record-export-query.service.ts
+#: src/engine/core-modules/record-export/utils/expand-morph-relation-export-fields.util.ts
 msgid "An export field is no longer available."
 msgstr "Un campo di esportazione non è più disponibile."
+
+#. js-lingui-id: zv+Pcr
+#: src/engine/core-modules/workspace-data-export/workspace-data-export.exception.ts
+msgid "An export is already running for this workspace."
+msgstr "Per questo spazio di lavoro è già in corso un'esportazione."
 
 #. js-lingui-id: jiELc8
 #: src/engine/core-modules/record-export/services/record-export.workspace-service.ts
@@ -1879,7 +1898,7 @@ msgstr "L'aggiornamento in blocco delle voci della lista di blocco non è consen
 #. js-lingui-id: 9N+p+g
 #: src/engine/metadata-modules/view-field-group/constants/standard-view-field-group-names.ts
 msgid "Business"
-msgstr ""
+msgstr "Business"
 
 #. js-lingui-id: 4pIUYY
 #: src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-company-view-field-groups.util.ts
@@ -2561,6 +2580,18 @@ msgstr "Cc"
 msgid "Changing log retention requires an Organization subscription."
 msgstr "La modifica della conservazione dei registri richiede un abbonamento Organization."
 
+#. js-lingui-id: zBdJe6
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Channel"
+msgstr "Canale"
+
+#. js-lingui-id: gPIeS4
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Channel archived at"
+msgstr "Canale archiviato il"
+
 #. js-lingui-id: +4WR+J
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-calendar-channel-event-association-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -2572,6 +2603,49 @@ msgstr "ID del canale"
 msgctxt "fieldMetadata.label"
 msgid "Channel ID"
 msgstr "ID del canale"
+
+#. js-lingui-id: G+8qH5
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-validator.service.ts
+msgid "Channel name is required"
+msgstr "Il nome del canale è obbligatorio"
+
+#. js-lingui-id: Nd2xnP
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-validator.service.ts
+msgid "Channel not found"
+msgstr "Canale non trovato"
+
+#. js-lingui-id: ZJRMDQ
+#: src/engine/metadata-modules/ai/ai.exception.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-validator.service.ts
+msgid "Channel not found."
+msgstr "Canale non trovato."
+
+#. js-lingui-id: /84Bpj
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+msgid "Channel role link not found"
+msgstr "Collegamento tra canale e ruolo non trovato"
+
+#. js-lingui-id: 86oa9B
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Channel snoozed until"
+msgstr "Canale posticipato fino a"
+
+#. js-lingui-id: ieLfO5
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Channel the thread is triaged in"
+msgstr "Canale in cui viene smistata la conversazione"
+
+#. js-lingui-id: 7LMBzP
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "Channels are not available yet. Try again in a few minutes."
+msgstr "I canali non sono ancora disponibili. Riprova tra qualche minuto."
 
 #. js-lingui-id: z851aK
 #: src/engine/metadata-modules/flat-page-layout-widget/validators/utils/validate-chart-filter.util.ts
@@ -3004,7 +3078,7 @@ msgstr "La configurazione è obbligatoria per il widget"
 #. js-lingui-id: FCKoEz
 #: src/engine/metadata-modules/flat-page-layout-widget/validators/utils/validate-simple-record-page-widget-for-creation.util.ts
 msgid "Configuration is required for widget \"{widgetTitle}\""
-msgstr ""
+msgstr "La configurazione è obbligatoria per il widget \"{widgetTitle}\""
 
 #. js-lingui-id: oH0/eJ
 #: src/engine/metadata-modules/flat-page-layout-widget/validators/utils/validate-front-component-configuration-type.util.ts
@@ -3111,6 +3185,16 @@ msgstr "Il campo oauthConfig.{label} del provider di connessione è obbligatorio
 msgid "Connection provider scope \"{scope}\" is invalid"
 msgstr "L'ambito del provider di connessione \"{scope}\" non è valido"
 
+#. js-lingui-id: lOJLh7
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts
+msgid "Connection provider scope cannot be changed"
+msgstr "L'ambito del provider di connessione non può essere modificato"
+
+#. js-lingui-id: rGTdmC
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts
+msgid "Connection provider scope cannot be changed after creation: declare a new connection provider with a new universalIdentifier"
+msgstr "L'ambito del provider di connessione non può essere modificato dopo la creazione: dichiara un nuovo provider di connessione con un nuovo universalIdentifier"
+
 #. js-lingui-id: vOKvb8
 #. placeholder {0}: flatConnectionProvider.name
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts
@@ -3190,7 +3274,7 @@ msgstr "Il contenuto non può essere vuoto"
 #. js-lingui-id: 869Uds
 #: src/engine/api/common/common-args-processors/data-arg-processor/validator-utils/validate-rich-text-field-or-throw.util.ts
 msgid "Content contains a URL with a dangerous protocol."
-msgstr ""
+msgstr "Il contenuto include un URL con un protocollo pericoloso."
 
 #. js-lingui-id: dFtfEl
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
@@ -4404,7 +4488,7 @@ msgstr "Indirizzo email"
 #. js-lingui-id: AcnTuz
 #: src/engine/core-modules/user/services/user.service.ts
 msgid "Email already in use"
-msgstr ""
+msgstr "Email già in uso"
 
 #. js-lingui-id: BBXuRb
 #: src/engine/core-modules/email-verification/email-verification-exception-filter.util.ts
@@ -4426,7 +4510,7 @@ msgstr "Posizione del record della campagna email"
 #. js-lingui-id: LT5dFi
 #: src/engine/core-modules/user/services/user.service.ts
 msgid "Email can only be updated when you belong to a single workspace."
-msgstr ""
+msgstr "L'email può essere aggiornata solo se appartieni a un unico spazio di lavoro."
 
 #. js-lingui-id: MYgdAv
 #: src/engine/core-modules/emailing-domain/drivers/exceptions/emailing-domain-driver.exception.ts
@@ -4886,7 +4970,6 @@ msgstr "Esperienza"
 #. js-lingui-id: PCGpYB
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
-#: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
 msgctxt "commandMenuItem.shortLabel"
 msgid "Export"
 msgstr "Esporta"
@@ -4901,12 +4984,6 @@ msgstr "Esporta {objectLabel}"
 #: src/engine/core-modules/record-export/services/record-export.workspace-service.ts
 msgid "Export not found."
 msgstr "Esportazione non trovata."
-
-#. js-lingui-id: xvfw7w
-#: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
-msgctxt "commandMenuItem.label"
-msgid "Export to PDF"
-msgstr "Esporta in PDF"
 
 #. js-lingui-id: c5P53s
 #: src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts
@@ -5238,7 +5315,7 @@ msgstr "Campo per l'aggiornamento dei metadati dell'oggetto non trovato"
 #. js-lingui-id: stY5BO
 #: src/engine/metadata-modules/flat-field-metadata/services/flat-field-metadata-type-validator.service.ts
 msgid "Field type NUMERIC is not supported. Use Number instead."
-msgstr ""
+msgstr "Il tipo di campo NUMERIC non è supportato. Usa Number."
 
 #. js-lingui-id: p6JTHU
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-position-flat-field-metadata.util.ts
@@ -6813,7 +6890,7 @@ msgstr "Payload di creazione relazione non valido"
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-morph-or-relation-flat-field-metadata.util.ts
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-morph-relation-flat-field-metadata.util.ts
 msgid "Invalid relation field target"
-msgstr ""
+msgstr "Destinazione del campo relazione non valida"
 
 #. js-lingui-id: lOyHVQ
 #: src/engine/core-modules/record-crud/exceptions/record-crud.exception.ts
@@ -7032,6 +7109,7 @@ msgid "Invalid value for position: \"{inspectedValue}\""
 msgstr "Valore non valido per la posizione: \"{inspectedValue}\""
 
 #. js-lingui-id: Sf+6YJ
+#: src/engine/api/common/common-args-processors/data-arg-processor/validator-utils/validate-rich-text-field-or-throw.util.ts
 #: src/engine/api/common/common-args-processors/data-arg-processor/validator-utils/validate-rich-text-field-or-throw.util.ts
 #: src/engine/api/common/common-args-processors/data-arg-processor/validator-utils/validate-rich-text-field-or-throw.util.ts
 #: src/engine/api/common/common-args-processors/data-arg-processor/validator-utils/validate-rich-text-field-or-throw.util.ts
@@ -8410,6 +8488,11 @@ msgstr "Mese per primo"
 msgid "Morph relation field must have a morph id"
 msgstr "Il campo della relazione morph deve avere un ID morph"
 
+#. js-lingui-id: /eQ78F
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "Move this channel's chats to another channel before deleting it."
+msgstr "Sposta le chat di questo canale in un altro canale prima di eliminarlo."
+
 #. js-lingui-id: Wu/pkS
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-enum-flat-field-metadata.util.ts
 msgid "Multi-select field default value must be an array"
@@ -8459,7 +8542,7 @@ msgstr "Il nome \"{name}\" non è disponibile poiché è già utilizzato da un a
 #. js-lingui-id: dBDpp2
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name-availability.util.ts
 msgid "Name \"{name}\" is not available as it is already used by join column name"
-msgstr ""
+msgstr "Il nome \"{name}\" non è disponibile perché è già usato dal nome di una colonna di join"
 
 #. js-lingui-id: Aam+mb
 #: src/engine/metadata-modules/utils/exceptions/invalid-metadata.exception.ts
@@ -8589,7 +8672,7 @@ msgstr "Nuova chat"
 #. js-lingui-id: TYhxR+
 #: src/engine/core-modules/user/services/user.service.ts
 msgid "New email must be different from current email"
-msgstr ""
+msgstr "La nuova email deve essere diversa da quella attuale"
 
 #. js-lingui-id: nXXBKB
 #: src/engine/core-modules/auth/services/sign-in-up.service.ts
@@ -8751,6 +8834,7 @@ msgid "Not recorded"
 msgstr "Non registrato"
 
 #. js-lingui-id: NpVtef
+#: src/modules/dashboard/chart-data/utils/__tests__/format-dimension-value.util.spec.ts
 #: src/modules/dashboard/chart-data/utils/build-unique-relation-labels.util.ts
 #: src/modules/dashboard/chart-data/utils/format-dimension-value.util.ts
 #: src/modules/dashboard/chart-data/utils/format-dimension-value.util.ts
@@ -9146,12 +9230,18 @@ msgstr "Ottobre"
 #. js-lingui-id: Tp2ptT
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-morph-or-relation-flat-field-on-delete.util.ts
 msgid "On delete action is only supported for many to one relations"
-msgstr ""
+msgstr "L'azione in caso di eliminazione è supportata solo per le relazioni molti a uno"
 
 #. js-lingui-id: DWJeR1
 #: src/engine/metadata-modules/index-metadata/services/index-metadata.service.ts
 msgid "One of the selected fields does not belong to this object."
 msgstr "Uno dei campi selezionati non appartiene a questo oggetto."
+
+#. js-lingui-id: mhOSep
+#: src/engine/metadata-modules/ai/ai.exception.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+msgid "One of these roles no longer exists."
+msgstr "Uno di questi ruoli non esiste più."
 
 #. js-lingui-id: JZB2eY
 #: src/engine/api/common/common-query-runners/common-merge-many-query-runner.service.ts
@@ -9944,6 +10034,11 @@ msgstr "Scegli un orario di invio futuro."
 msgid "Pick a specific sub-field of \"{0}\" — composite fields can't be indexed as a whole."
 msgstr "Seleziona un sotto-campo specifico di \"{0}\" — i campi compositi non possono essere indicizzati nel loro insieme."
 
+#. js-lingui-id: r+tlvn
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "Pick another channel to move the chats to."
+msgstr "Scegli un altro canale in cui spostare le chat."
+
 #. js-lingui-id: TtfDdb
 #: src/engine/metadata-modules/index-metadata/services/index-metadata.service.ts
 msgid "Pick at least one field for the index."
@@ -9968,7 +10063,7 @@ msgstr "Seleziona una data e un'ora di fine successive alla data e all'ora di in
 #. js-lingui-id: mqzu5F
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
 msgid "Please confirm your updated email"
-msgstr ""
+msgstr "Conferma la tua email aggiornata"
 
 #. js-lingui-id: Zm9s4F
 #: src/engine/api/common/common-args-processors/data-arg-processor/validator-utils/validate-links-field-or-throw.util.ts
@@ -10190,7 +10285,7 @@ msgstr "Il prompt non può essere vuoto"
 #. js-lingui-id: OTJNm9
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-role-required-properties-are-defined.util.ts
 msgid "Property {property} is required for role"
-msgstr ""
+msgstr "La proprietà {property} è obbligatoria per il ruolo"
 
 #. js-lingui-id: IBJ/4j
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
@@ -10882,19 +10977,19 @@ msgstr "Ruolo"
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-assignation-availability.util.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-assignation-availability.util.ts
 msgid "Role \"{roleLabel}\" cannot be assigned to agents"
-msgstr ""
+msgstr "Il ruolo \"{roleLabel}\" non può essere assegnato agli agenti"
 
 #. js-lingui-id: u1Fm8i
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-assignation-availability.util.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-assignation-availability.util.ts
 msgid "Role \"{roleLabel}\" cannot be assigned to API keys"
-msgstr ""
+msgstr "Il ruolo \"{roleLabel}\" non può essere assegnato alle chiavi API"
 
 #. js-lingui-id: 9ZQkou
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-assignation-availability.util.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-assignation-availability.util.ts
 msgid "Role \"{roleLabel}\" cannot be assigned to users"
-msgstr ""
+msgstr "Il ruolo \"{roleLabel}\" non può essere assegnato agli utenti"
 
 #. js-lingui-id: T/H/3z
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-flat-role-target-role-is-entitled.util.ts
@@ -10930,6 +11025,7 @@ msgid "Role name is invalid"
 msgstr "Nome del ruolo non valido"
 
 #. js-lingui-id: MvTCyk
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-field-permission-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-field-permission-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-field-permission-validator.service.ts
@@ -10959,7 +11055,7 @@ msgstr "Nome del ruolo non valido"
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-row-level-permission-predicate-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-row-level-permission-predicate-validator.service.ts
 msgid "Role not found"
-msgstr ""
+msgstr "Ruolo non trovato"
 
 #. js-lingui-id: /BTyf+
 #: src/engine/metadata-modules/ai/ai.exception.ts
@@ -11003,7 +11099,7 @@ msgstr "Il target del ruolo deve avere esattamente uno tra: apiKeyId, userWorksp
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-role-target-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-role-target-validator.service.ts
 msgid "Role target not found"
-msgstr ""
+msgstr "Destinazione del ruolo non trovata"
 
 #. js-lingui-id: gz6uii
 #: src/engine/metadata-modules/role/exceptions/role-target.exception.ts
@@ -11125,6 +11221,12 @@ msgstr "Predicato di autorizzazione a livello di record da aggiornare non trovat
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-row-level-permission-predicate-validator.service.ts
 msgid "Row level permission predicate with this universal identifier already exists"
 msgstr "Esiste già un predicato di autorizzazione a livello di record con questo identificatore universale"
+
+#. js-lingui-id: UUGTla
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.label"
+msgid "Row tint color"
+msgstr "Colore della riga"
 
 #. js-lingui-id: 2feo6q
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-record-share-standard-flat-field-metadata.util.ts
@@ -11495,6 +11597,11 @@ msgstr "Inviata con errori"
 #: src/engine/api/graphql/graphql-query-runner/group-by/resolvers/utils/format-result-with-group-by-dimension-values.util.ts
 msgid "September"
 msgstr "Settembre"
+
+#. js-lingui-id: wF2qRd
+#: src/modules/dashboard/chart-data/constants/chart-second-series-default-label.constant.ts
+msgid "Series 2"
+msgstr "Serie 2"
 
 #. js-lingui-id: tYtTv9
 #: src/engine/core-modules/admin-panel/services/admin-panel-server-admin.service.ts
@@ -11882,7 +11989,7 @@ msgstr "ID origine"
 #. js-lingui-id: OmgwCE
 #: src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-morph-relation-flat-field-metadata.util.ts
 msgid "Source object cannot be the target object"
-msgstr ""
+msgstr "L'oggetto di origine non può essere l'oggetto di destinazione"
 
 #. js-lingui-id: pdLYF5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-message-part-standard-flat-field-metadata.util.ts
@@ -11952,6 +12059,11 @@ msgstr "Fase"
 #: src/engine/metadata-modules/ai/ai.exception.ts
 msgid "Standard agents cannot be modified."
 msgstr "Gli agenti standard non possono essere modificati."
+
+#. js-lingui-id: rQq8lH
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "Standard channels cannot be deleted."
+msgstr "I canali standard non possono essere eliminati."
 
 #. js-lingui-id: Ptv+nG
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-object-metadata-validator.service.ts
@@ -12755,6 +12867,11 @@ msgstr "L'esportazione non è riuscita. Riprova o esporta meno record."
 msgid "The export file is too large. Please export fewer records."
 msgstr "Il file di esportazione è troppo grande. Esporta meno record."
 
+#. js-lingui-id: bjRiGF
+#: src/engine/core-modules/workspace-data-export/workspace-data-export.exception.ts
+msgid "The export is missing data and could not be completed."
+msgstr "All'esportazione mancano dei dati e non è stato possibile completarla."
+
 #. js-lingui-id: RKP94c
 #: src/engine/core-modules/record-export/services/record-export.workspace-service.ts
 #: src/engine/core-modules/record-export/services/record-export.workspace-service.ts
@@ -13231,6 +13348,12 @@ msgstr "Il suo ruolo non può accedere a questi record e questo oggetto è condi
 msgid "Their role cannot see this record, and this object is only shared with people who can."
 msgstr "Il suo ruolo non può visualizzare questo record e questo oggetto è condiviso solo con persone che possono farlo."
 
+#. js-lingui-id: 7O0QCL
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "Theme color name used to tint the opportunity row in tables"
+msgstr "Nome del colore del tema usato per colorare la riga dell'immobile nelle tabelle"
+
 #. js-lingui-id: mTxjri
 #: src/engine/core-modules/workspace-invitation/workspace-invitation.exception.ts
 msgid "There is an issue with your invitation. Please try again."
@@ -13409,6 +13532,27 @@ msgstr "L'elenco di questa campagna si trova nel cestino. Ripristinalo o selezio
 msgid "This change would corrupt the workflow, it was not saved"
 msgstr "Questa modifica danneggerebbe il flusso di lavoro, pertanto non è stata salvata"
 
+#. js-lingui-id: ThXjDv
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+msgid "This channel access no longer exists."
+msgstr "Questo accesso al canale non esiste più."
+
+#. js-lingui-id: ++E+5T
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "This channel is being changed. Try again in a moment."
+msgstr "Questo canale è in fase di modifica. Riprova tra un momento."
+
+#. js-lingui-id: /mdJSV
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "This chat has no owner, so it has to stay in a channel."
+msgstr "Questa chat non ha un proprietario, quindi deve restare in un canale."
+
+#. js-lingui-id: 6zaKtA
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "This chat is not in a channel."
+msgstr "Questa chat non è in un canale."
+
 #. js-lingui-id: 99gsJ/
 #: src/engine/metadata-modules/index-metadata/utils/validate-no-duplicate-unique-index.util.ts
 msgid "This column is already marked as unique. Toggle the field's \"Unique\" off first if you want to manage the constraint here."
@@ -13423,11 +13567,6 @@ msgstr "Questo account connesso non può essere utilizzato per questa azione."
 #: src/engine/twenty-orm/exceptions/twenty-orm.exception.ts
 msgid "This connection is not allowed."
 msgstr "Questa connessione non è consentita."
-
-#. js-lingui-id: 5G7DBW
-#: src/engine/core-modules/application/connection-provider/connection-provider.exception.ts
-msgid "This connection provider does not support this kind of connection."
-msgstr "Questo provider di connessione non supporta questo tipo di connessione."
 
 #. js-lingui-id: DtHdRF
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-connection-provider-scope.util.ts
@@ -13611,6 +13750,11 @@ msgstr "Impossibile salvare questo limite."
 msgid "This limit changed while you were editing it. Reload and try again."
 msgstr "Questo limite è cambiato mentre lo stavi modificando. Ricarica e riprova."
 
+#. js-lingui-id: STVycN
+#: src/engine/metadata-modules/ai/ai.exception.ts
+msgid "This list of chats could not be loaded. Try again."
+msgstr "Non è stato possibile caricare questo elenco di chat. Riprova."
+
 #. js-lingui-id: ReKpPg
 #: src/engine/core-modules/event-logs/event-logs.exception.ts
 msgid "This log filter is not valid."
@@ -13776,6 +13920,16 @@ msgstr "Questa richiesta non è più in attesa di una risposta."
 msgid "This request is still getting ready. Try again in a moment."
 msgstr "Questa richiesta è ancora in preparazione. Riprova tra poco."
 
+#. js-lingui-id: T6c4z3
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+msgid "This role already has access to the channel"
+msgstr "Questo ruolo ha già accesso al canale"
+
+#. js-lingui-id: ce6Oq+
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-agent-chat-channel-role-validator.service.ts
+msgid "This role already has access to the channel."
+msgstr "Questo ruolo ha già accesso al canale."
+
 #. js-lingui-id: rExecr
 #: src/engine/metadata-modules/ai/ai.exception.ts
 msgid "This role cannot be assigned to agents."
@@ -13806,7 +13960,7 @@ msgstr "Questo ruolo non può essere modificato."
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-role-permission-flag-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-role-permission-flag-validator.service.ts
 #: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-role-permission-flag-validator.service.ts
-#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/validate-role-is-editable.util.ts
+#: src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/utils/get-role-not-editable-errors.util.ts
 msgid "This role cannot be modified because it is a system role. Only custom roles can be edited."
 msgstr "Questo ruolo non può essere modificato perché è un ruolo di sistema. Solo i ruoli personalizzati possono essere modificati."
 
@@ -14301,7 +14455,7 @@ msgstr "Troppe richieste. Per favore riprova più tardi."
 #. js-lingui-id: mfqtz7
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
 msgid "Too many workspace invitations sent. Please try again later."
-msgstr ""
+msgstr "Hai inviato troppi inviti allo spazio di lavoro. Riprova più tardi."
 
 #. js-lingui-id: GT/+KO
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-message-part-standard-flat-field-metadata.util.ts
@@ -15701,6 +15855,12 @@ msgctxt "fieldMetadata.description"
 msgid "When a snoozed thread comes back to the inbox"
 msgstr "Quando una discussione posticipata torna nella posta in arrivo"
 
+#. js-lingui-id: zdfiR1
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When a thread snoozed in its channel comes back to it"
+msgstr "Quando una conversazione posticipata nel suo canale ritorna al canale"
+
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.description"
@@ -15730,6 +15890,12 @@ msgstr "Quando il membro è stato menzionato per l'ultima volta nella discussion
 msgctxt "fieldMetadata.description"
 msgid "When the thread was created or last received a message"
 msgstr "Quando la discussione è stata creata o ha ricevuto l'ultimo messaggio"
+
+#. js-lingui-id: 5JPMXf
+#: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-agent-chat-thread-standard-flat-field-metadata.util.ts
+msgctxt "fieldMetadata.description"
+msgid "When the thread was marked as done or snoozed in its channel"
+msgstr "Quando la conversazione è stata segnata come completata o posticipata nel suo canale"
 
 #. js-lingui-id: Kx3ltI
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workspace-member-standard-flat-field-metadata.util.ts
@@ -16236,7 +16402,7 @@ msgstr "workflowVersionId non deve essere impostato quando engineComponentKey è
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-blocklist-standard-flat-field-metadata.util.ts
 msgctxt "fieldMetadata.label"
 msgid "Workspace"
-msgstr "Workspace"
+msgstr "Spazio di lavoro"
 
 #. js-lingui-id: bK8AyJ
 #: src/engine/core-modules/billing-webhook/services/billing-webhook-subscription.service.ts
@@ -16435,6 +16601,7 @@ msgstr "Spazio di lavoro non trovato per l'evento di abbonamento."
 #: src/engine/core-modules/logic-function/logic-function-trigger/triggers/route/exceptions/route-trigger.exception.ts
 #: src/engine/core-modules/record-crud/exceptions/record-crud.exception.ts
 #: src/engine/core-modules/tool/tools/email-tool/exceptions/email-tool.exception.ts
+#: src/engine/core-modules/workspace-data-export/workspace-data-export.exception.ts
 #: src/engine/core-modules/workspace/workspace.exception.ts
 #: src/engine/metadata-modules/ai/ai.exception.ts
 #: src/engine/twenty-orm/exceptions/twenty-orm.exception.ts
@@ -16543,6 +16710,7 @@ msgid "Year First"
 msgstr "Anno per primo"
 
 #. js-lingui-id: l75CjT
+#: src/modules/dashboard/chart-data/utils/__tests__/format-dimension-value.util.spec.ts
 #: src/modules/dashboard/chart-data/utils/format-dimension-value.util.ts
 msgid "Yes"
 msgstr "Sì"
@@ -16596,7 +16764,7 @@ msgstr "È possibile aggiornare un solo record con il campo files alla volta."
 #: src/engine/twenty-orm/repository/workspace-repository.ts
 #: src/engine/twenty-orm/repository/workspace-repository.ts
 msgid "You can only update up to {QUERY_MAX_RECORDS} records at once."
-msgstr ""
+msgstr "Puoi aggiornare al massimo {QUERY_MAX_RECORDS} record alla volta."
 
 #. js-lingui-id: UyTIP7
 #: src/engine/core-modules/two-factor-authentication/two-factor-authentication.exception.ts
@@ -16835,6 +17003,11 @@ msgstr "Il tuo account AWS SES è ancora nella sandbox, quindi questo dominio no
 #: src/engine/core-modules/billing/utils/build-phase-update-params-or-throw.util.ts
 msgid "Your billing subscription is corrupted. Please contact support."
 msgstr "Il tuo abbonamento di fatturazione è danneggiato. Si prega di contattare il supporto."
+
+#. js-lingui-id: L8/bmN
+#: src/modules/emailing/utils/build-campaign-send-refusal-exception.util.ts
+msgid "Your daily limit is {limitValue, plural, one {# email} other {# emails}}, and this campaign would go over what's left today. Contact us to raise it."
+msgstr "Il tuo limite giornaliero è di {limitValue, plural, one {# email} other {# email}}, e questa campagna supererebbe quello che resta per oggi. Contattaci per aumentarlo."
 
 #. js-lingui-id: tOV45d
 #: src/engine/core-modules/imap-smtp-caldav-connection/services/imap-smtp-caldav-connection.service.ts

@@ -92,6 +92,7 @@ export const transformToOneDimensionalBarChartData = ({
       userTimezone,
       firstDayOfTheWeek: convertedFirstDayOfTheWeek,
       relationLabelResolution,
+      i18n,
     });
 
   const sortedData = sortChartDataIfNeeded({
@@ -148,7 +149,7 @@ export const transformToOneDimensionalBarChartData = ({
       key: CHART_SECOND_SERIES_KEY,
       label: isNonEmptyString(configuration.secondSeriesLabel)
         ? configuration.secondSeriesLabel
-        : CHART_SECOND_SERIES_DEFAULT_LABEL,
+        : i18n._(CHART_SECOND_SERIES_DEFAULT_LABEL),
     });
   }
 

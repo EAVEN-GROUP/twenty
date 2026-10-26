@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { styled } from '@linaria/react';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -72,7 +73,7 @@ const formatDateTime = (isoString?: string | null): string => {
     return isoString;
   }
 
-  return date.toLocaleString();
+  return date.toLocaleString(i18n.locale);
 };
 
 export const SettingsApplicationConnectionDetail = () => {

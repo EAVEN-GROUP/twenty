@@ -22,6 +22,7 @@ import {
   generateChartDataExceptionMessage,
 } from 'src/modules/dashboard/chart-data/exceptions/chart-data.exception';
 import { ChartDataQueryService } from 'src/modules/dashboard/chart-data/services/chart-data-query.service';
+import { ChartFieldLabelTranslationService } from 'src/modules/dashboard/chart-data/services/chart-field-label-translation.service';
 import { ChartRelationLabelService } from 'src/modules/dashboard/chart-data/services/chart-relation-label.service';
 import { addMissingChartBuckets } from 'src/modules/dashboard/chart-data/utils/add-missing-chart-buckets.util';
 import { filterOutEmptyChartBuckets } from 'src/modules/dashboard/chart-data/utils/filter-out-empty-chart-buckets.util';
@@ -47,6 +48,7 @@ export class BarChartDataService {
     private readonly chartDataQueryService: ChartDataQueryService,
     private readonly chartRelationLabelService: ChartRelationLabelService,
     private readonly i18nService: I18nService,
+    private readonly chartFieldLabelTranslationService: ChartFieldLabelTranslationService,
   ) {}
 
   async getBarChartData({
@@ -90,15 +92,21 @@ export class BarChartDataService {
         );
       }
 
-      const primaryAxisGroupByField = getFieldMetadata(
-        configuration.primaryAxisGroupByFieldMetadataId,
-        flatFieldMetadataMaps,
-      );
-
-      const aggregateField = getFieldMetadata(
-        configuration.aggregateFieldMetadataId,
-        flatFieldMetadataMaps,
-      );
+      const [primaryAxisGroupByField, aggregateField] =
+        await this.chartFieldLabelTranslationService.translateFieldLabels({
+          fields: [
+            getFieldMetadata(
+              configuration.primaryAxisGroupByFieldMetadataId,
+              flatFieldMetadataMaps,
+            ),
+            getFieldMetadata(
+              configuration.aggregateFieldMetadataId,
+              flatFieldMetadataMaps,
+            ),
+          ],
+          locale,
+          workspaceId,
+        });
 
       const isTwoDimensional = isDefined(
         configuration.secondaryAxisGroupByFieldMetadataId,
@@ -107,10 +115,17 @@ export class BarChartDataService {
       let secondaryAxisGroupByField: FlatFieldMetadata | undefined;
 
       if (isTwoDimensional) {
-        secondaryAxisGroupByField = getFieldMetadata(
-          configuration.secondaryAxisGroupByFieldMetadataId!,
-          flatFieldMetadataMaps,
-        );
+        [secondaryAxisGroupByField] =
+          await this.chartFieldLabelTranslationService.translateFieldLabels({
+            fields: [
+              getFieldMetadata(
+                configuration.secondaryAxisGroupByFieldMetadataId!,
+                flatFieldMetadataMaps,
+              ),
+            ],
+            locale,
+            workspaceId,
+          });
       }
 
       const isStackedTwoDimensional =
@@ -188,6 +203,8 @@ export class BarChartDataService {
         rawResultsWithExtraBuckets: filteredSecondSeriesResults ?? [],
       });
 
+      const i18n = this.i18nService.getI18nInstance(locale);
+
       const relationLabelResolutions =
         await this.chartRelationLabelService.resolveRelationLabels({
           rawResults: filteredResults,
@@ -205,6 +222,7 @@ export class BarChartDataService {
           authContext,
           flatObjectMetadataMaps,
           flatFieldMetadataMaps,
+          i18n,
         });
 
       const resolvedResults = filterOutUnresolvedRelationBuckets({
@@ -212,8 +230,6 @@ export class BarChartDataService {
         primaryRelationLabelResolution: relationLabelResolutions.primary,
         secondaryRelationLabelResolution: relationLabelResolutions.secondary,
       });
-
-      const i18n = this.i18nService.getI18nInstance(locale);
 
       if (isTwoDimensional && isDefined(secondaryAxisGroupByField)) {
         return transformToTwoDimensionalBarChartData({

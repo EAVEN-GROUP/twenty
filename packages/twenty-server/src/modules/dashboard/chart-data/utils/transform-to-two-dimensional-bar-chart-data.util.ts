@@ -99,6 +99,7 @@ export const transformToTwoDimensionalBarChartData = ({
     firstDayOfTheWeek: convertedFirstDayOfTheWeek,
     primaryRelationLabelResolution,
     secondaryRelationLabelResolution,
+    i18n,
   });
 
   const allSecondaryValues = new Set<string>();

@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { parseDate } from '~/utils/date-utils';
 
 export const formatToHumanReadableMonth = (
@@ -6,7 +7,7 @@ export const formatToHumanReadableMonth = (
 ) => {
   const parsedJSDate = parseDate(date);
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(i18n.locale, {
     month: 'short',
     timeZone: timeZone,
   }).format(parsedJSDate);
@@ -18,7 +19,7 @@ export const formatToHumanReadableDay = (
 ) => {
   const parsedJSDate = parseDate(date);
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(i18n.locale, {
     day: 'numeric',
     timeZone: timeZone,
   }).format(parsedJSDate);
@@ -30,7 +31,7 @@ export const formatToHumanReadableTime = (
 ) => {
   const parsedJSDate = parseDate(date);
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(i18n.locale, {
     hour: 'numeric',
     minute: 'numeric',
     timeZone: timeZone,

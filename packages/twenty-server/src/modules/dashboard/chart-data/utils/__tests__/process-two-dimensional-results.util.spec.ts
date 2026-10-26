@@ -1,7 +1,15 @@
+import { setupI18n } from '@lingui/core';
+import { compileMessage } from '@lingui/message-utils/compileMessage';
 import { FieldMetadataType, FirstDayOfTheWeek } from 'twenty-shared/types';
 
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { processTwoDimensionalResults } from 'src/modules/dashboard/chart-data/utils/process-two-dimensional-results.util';
+
+const i18n = setupI18n();
+
+i18n.setMessagesCompiler(compileMessage);
+i18n.load('en', {});
+i18n.activate('en');
 
 const createMockFieldMetadata = (
   overrides: Partial<FlatFieldMetadata>,
@@ -31,6 +39,7 @@ describe('processTwoDimensionalResults', () => {
   it('should keep two records resolving to distinct labels as distinct data points', () => {
     const { processedDataPoints, formattedToRawLookup } =
       processTwoDimensionalResults({
+        i18n,
         rawResults: [
           {
             groupByDimensionValues: ['agent-id-1', 'open'],
@@ -68,6 +77,7 @@ describe('processTwoDimensionalResults', () => {
   it('should resolve secondary axis relation labels independently', () => {
     const { processedDataPoints, secondaryFormattedToRawLookup } =
       processTwoDimensionalResults({
+        i18n,
         rawResults: [
           {
             groupByDimensionValues: ['open', 'agent-id-1'],
@@ -92,6 +102,7 @@ describe('processTwoDimensionalResults', () => {
 
   it('should keep raw values untouched without a resolution', () => {
     const { processedDataPoints } = processTwoDimensionalResults({
+      i18n,
       rawResults: [
         {
           groupByDimensionValues: ['agent-id-1', 'open'],

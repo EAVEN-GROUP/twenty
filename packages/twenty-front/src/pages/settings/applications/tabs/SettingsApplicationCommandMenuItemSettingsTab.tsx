@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
@@ -36,7 +37,7 @@ const formatDateTime = (isoString: string): string => {
   if (Number.isNaN(date.getTime())) {
     return isoString;
   }
-  return date.toLocaleString();
+  return date.toLocaleString(i18n.locale);
 };
 
 const GRID_TEMPLATE = '220px 1fr';

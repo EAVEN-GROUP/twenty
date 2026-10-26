@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { useLingui } from '@lingui/react/macro';
 import { isNumber } from '@sniptt/guards';
 import { useEffect, useState } from 'react';
@@ -60,7 +61,7 @@ export const WorkflowEditActionFindRecords = ({
   actionOptions,
 }: WorkflowEditActionFindRecordsProps) => {
   const { t } = useLingui();
-  const maxRecordsFormatted = QUERY_MAX_RECORDS.toLocaleString();
+  const maxRecordsFormatted = QUERY_MAX_RECORDS.toLocaleString(i18n.locale);
 
   const dropdownId = 'workflow-edit-action-record-find-records-object-name';
 

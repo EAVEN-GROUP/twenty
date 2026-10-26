@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { t } from '@lingui/core/macro';
 import { differenceInCalendarDays } from 'date-fns';
 
@@ -17,7 +18,7 @@ const getMonthGroupId = (date: Date) =>
   `month:${date.getFullYear()}-${date.getMonth() + 1}`;
 
 const formatMonthGroupTitle = (date: Date) =>
-  new Intl.DateTimeFormat(undefined, {
+  new Intl.DateTimeFormat(i18n.locale, {
     month: 'long',
     year: 'numeric',
   }).format(date);

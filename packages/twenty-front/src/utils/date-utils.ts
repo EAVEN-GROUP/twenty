@@ -76,10 +76,11 @@ export const beautifyExactDateTime = (
 ) => {
   const parsedDate = parseDate(dateToBeautify);
   const isTodayDate = isToday(parsedDate);
-  const dateFormat = doNotTranslate(
-    isTodayDate ? 'HH:mm' : 'MMM d, yyyy · HH:mm',
-  );
-  return formatDate(dateToBeautify, dateFormat);
+  const time = formatDate(dateToBeautify, doNotTranslate('HH:mm'));
+
+  return isTodayDate
+    ? time
+    : `${i18n.date(parsedDate, { dateStyle: 'medium' })} · ${time}`;
 };
 
 export const beautifyExactDate = (dateToBeautify: Date | string | number) => {
@@ -88,7 +89,7 @@ export const beautifyExactDate = (dateToBeautify: Date | string | number) => {
   if (isTodayDate) {
     return t`Today`;
   }
-  return formatDate(dateToBeautify, doNotTranslate('MMM d, yyyy'));
+  return i18n.date(parsedDate, { dateStyle: 'medium' });
 };
 
 export const beautifyPastDateRelativeToNow = (

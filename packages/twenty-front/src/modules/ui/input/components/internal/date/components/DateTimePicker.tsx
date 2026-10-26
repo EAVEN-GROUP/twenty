@@ -23,6 +23,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { IconCalendarX } from 'twenty-ui/icon';
 import { Text } from 'twenty-ui/primitives/typography';
 
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useGetShiftedDateToSystemTimeZone } from '@/ui/input/components/internal/date/hooks/useGetShiftedDateToSystemTimeZone';
 import { useUserFirstDayOfTheWeek } from '@/ui/input/components/internal/date/hooks/useUserFirstDayOfTheWeek';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
@@ -141,6 +143,7 @@ export const DateTimePicker = ({
 }: DateTimePickerProps) => {
   const theme = useTheme();
   const { userFirstDayOfTheWeek } = useUserFirstDayOfTheWeek();
+  const dateLocale = useAtomStateValue(dateLocaleState);
 
   const { userTimezone } = useUserTimezone();
 
@@ -281,6 +284,7 @@ export const DateTimePicker = ({
             <ReactDatePicker
               key={relativeDateRangeKey}
               open={true}
+              locale={dateLocale.localeCatalog}
               disabledKeyboardNavigation
               onChange={handleDateChange}
               onSelect={handleDateSelect}

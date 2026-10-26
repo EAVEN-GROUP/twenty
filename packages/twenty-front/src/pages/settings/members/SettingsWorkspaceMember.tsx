@@ -1,3 +1,4 @@
+import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 import { useParams } from 'react-router-dom';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -112,7 +113,7 @@ export const SettingsWorkspaceMember = () => {
           status: 'error',
           children:
             error instanceof Error
-              ? error.message
+              ? getErrorMessageFromApolloError(error)
               : t`Error while saving the name`,
         });
       }
@@ -137,7 +138,7 @@ export const SettingsWorkspaceMember = () => {
         status: 'error',
         children:
           error instanceof Error
-            ? error.message
+            ? getErrorMessageFromApolloError(error)
             : t`Unable to delete member right now`,
       });
     }

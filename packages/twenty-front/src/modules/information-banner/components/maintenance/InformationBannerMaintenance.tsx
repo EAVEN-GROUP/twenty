@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { Temporal } from 'temporal-polyfill';
 
 import { maintenanceModeState } from '@/client-config/states/maintenanceModeState';
@@ -17,7 +18,7 @@ const formatMaintenanceDateTime = (
   const zonedDateTime =
     Temporal.Instant.from(isoString).toZonedDateTimeISO(timeZone);
 
-  return zonedDateTime.toLocaleString(undefined, {
+  return zonedDateTime.toLocaleString(i18n.locale, {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',

@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { maintenanceModeState } from '@/client-config/states/maintenanceModeState';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
 import { CLEAR_MAINTENANCE_MODE } from '@/settings/admin-panel/health-status/maintenance-mode/graphql/mutations/clearMaintenanceMode';
@@ -177,7 +178,7 @@ export const SettingsAdminMaintenanceMode = () => {
     : undefined;
 
   const formattedStartDate = isDefined(scheduledStartDate)
-    ? scheduledStartDate.toLocaleDateString(undefined, {
+    ? scheduledStartDate.toLocaleDateString(i18n.locale, {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric',

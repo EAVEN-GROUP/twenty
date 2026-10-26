@@ -1,3 +1,4 @@
+import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { partnerCookieState } from '@/auth/states/partnerCookieState';
 import { useUploadNewWorkspaceLogo } from '@/auth/sign-in-up/hooks/useUploadNewWorkspaceLogo';
@@ -92,7 +93,7 @@ export const useSignUpInNewWorkspace = () => {
           status: 'error',
           children:
             error instanceof Error
-              ? error.message
+              ? getErrorMessageFromApolloError(error)
               : t`Workspace creation failed`,
         });
       }

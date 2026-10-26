@@ -5,8 +5,9 @@ import { WorkspaceMemberDateFormatEnum } from '~/generated-metadata/graphql';
 export const formatZonedDateTimeDatePart = (
   zonedDateTime: Temporal.ZonedDateTime,
   dateFormat: WorkspaceMemberDateFormatEnum,
+  locale: string,
 ): string => {
-  const MMM = zonedDateTime.toLocaleString('en-US', { month: 'short' });
+  const MMM = zonedDateTime.toLocaleString(locale, { month: 'short' });
   const d = zonedDateTime.day;
   const yyyy = zonedDateTime.year;
 
@@ -14,7 +15,7 @@ export const formatZonedDateTimeDatePart = (
     case WorkspaceMemberDateFormatEnum.SYSTEM: {
       const detectedFormat = WorkspaceMemberDateFormatEnum[detectDateFormat()];
 
-      return formatZonedDateTimeDatePart(zonedDateTime, detectedFormat);
+      return formatZonedDateTimeDatePart(zonedDateTime, detectedFormat, locale);
     }
     case WorkspaceMemberDateFormatEnum.MONTH_FIRST:
       return `${MMM} ${d}, ${yyyy}`;

@@ -1,3 +1,6 @@
+import { setupI18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { compileMessage } from '@lingui/message-utils/compileMessage';
 import {
   FieldMetadataType,
   FirstDayOfTheWeek,
@@ -6,6 +9,12 @@ import {
 
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { formatDimensionValue } from 'src/modules/dashboard/chart-data/utils/format-dimension-value.util';
+
+const i18n = setupI18n();
+
+i18n.setMessagesCompiler(compileMessage);
+i18n.load('en', {});
+i18n.activate('en');
 
 const createMockFieldMetadata = (
   overrides: Partial<FlatFieldMetadata>,
@@ -29,6 +38,7 @@ describe('formatDimensionValue', () => {
       });
 
       const result = formatDimensionValue({
+        i18n,
         value: null,
         fieldMetadata,
         userTimezone,
@@ -44,6 +54,7 @@ describe('formatDimensionValue', () => {
       });
 
       const result = formatDimensionValue({
+        i18n,
         value: undefined,
         fieldMetadata,
         userTimezone,
@@ -65,6 +76,7 @@ describe('formatDimensionValue', () => {
 
     it('should return option label for matching value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'ACTIVE',
         fieldMetadata: selectFieldMetadata,
         userTimezone,
@@ -76,6 +88,7 @@ describe('formatDimensionValue', () => {
 
     it('should return value as string when option not found', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'UNKNOWN',
         fieldMetadata: selectFieldMetadata,
         userTimezone,
@@ -98,6 +111,7 @@ describe('formatDimensionValue', () => {
 
     it('should return joined labels for array value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: ['TAG1', 'TAG2'],
         fieldMetadata: multiSelectFieldMetadata,
         userTimezone,
@@ -109,6 +123,7 @@ describe('formatDimensionValue', () => {
 
     it('should parse postgres array format', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '{TAG1,TAG2}',
         fieldMetadata: multiSelectFieldMetadata,
         userTimezone,
@@ -120,6 +135,7 @@ describe('formatDimensionValue', () => {
 
     it('should handle empty postgres array format', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '{}',
         fieldMetadata: multiSelectFieldMetadata,
         userTimezone,
@@ -131,6 +147,7 @@ describe('formatDimensionValue', () => {
 
     it('should handle single value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'TAG1',
         fieldMetadata: multiSelectFieldMetadata,
         userTimezone,
@@ -148,6 +165,7 @@ describe('formatDimensionValue', () => {
 
     it('should return "Yes" for true', () => {
       const result = formatDimensionValue({
+        i18n,
         value: true,
         fieldMetadata: booleanFieldMetadata,
         userTimezone,
@@ -159,6 +177,7 @@ describe('formatDimensionValue', () => {
 
     it('should return "No" for false', () => {
       const result = formatDimensionValue({
+        i18n,
         value: false,
         fieldMetadata: booleanFieldMetadata,
         userTimezone,
@@ -180,6 +199,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value for DAY_OF_THE_WEEK granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'Monday',
         fieldMetadata: dateFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.DAY_OF_THE_WEEK,
@@ -192,6 +212,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value for MONTH_OF_THE_YEAR granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'January',
         fieldMetadata: dateFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.MONTH_OF_THE_YEAR,
@@ -204,6 +225,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value for QUARTER_OF_THE_YEAR granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'Q1',
         fieldMetadata: dateFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.QUARTER_OF_THE_YEAR,
@@ -216,6 +238,7 @@ describe('formatDimensionValue', () => {
 
     it('should format date for DAY granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '2024-01-15',
         fieldMetadata: dateFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.DAY,
@@ -229,6 +252,7 @@ describe('formatDimensionValue', () => {
 
     it('should format datetime for MONTH granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '2024-01-15',
         fieldMetadata: dateTimeFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.MONTH,
@@ -248,6 +272,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value for relation', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'Company Name',
         fieldMetadata: relationFieldMetadata,
         userTimezone,
@@ -259,6 +284,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value for relation with date granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '2024-01-15',
         fieldMetadata: relationFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.DAY,
@@ -271,6 +297,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value for DAY_OF_THE_WEEK granularity', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'Monday',
         fieldMetadata: relationFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.DAY_OF_THE_WEEK,
@@ -290,6 +317,7 @@ describe('formatDimensionValue', () => {
 
     it('should return the resolved label when the record id is in the map', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'record-id-1',
         fieldMetadata: relationFieldMetadata,
         userTimezone,
@@ -302,6 +330,7 @@ describe('formatDimensionValue', () => {
 
     it('should return the resolved label even when a date granularity is set', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'record-id-1',
         fieldMetadata: relationFieldMetadata,
         dateGranularity: ObjectRecordGroupByDateGranularity.DAY,
@@ -315,6 +344,7 @@ describe('formatDimensionValue', () => {
 
     it('should return "Unknown" when the record id is not in the map', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'record-id-2',
         fieldMetadata: relationFieldMetadata,
         userTimezone,
@@ -327,6 +357,7 @@ describe('formatDimensionValue', () => {
 
     it('should keep returning the raw value when a subFieldName is set', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'Acme',
         fieldMetadata: relationFieldMetadata,
         subFieldName: 'name',
@@ -340,6 +371,7 @@ describe('formatDimensionValue', () => {
 
     it('should return "Not Set" for null value even with a map', () => {
       const result = formatDimensionValue({
+        i18n,
         value: null,
         fieldMetadata: relationFieldMetadata,
         userTimezone,
@@ -358,6 +390,7 @@ describe('formatDimensionValue', () => {
 
     it('should return the resolved label when the record id is in the map', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'record-id-1',
         fieldMetadata: morphRelationFieldMetadata,
         userTimezone,
@@ -370,6 +403,7 @@ describe('formatDimensionValue', () => {
 
     it('should return the raw value without a map', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'record-id-1',
         fieldMetadata: morphRelationFieldMetadata,
         userTimezone,
@@ -387,6 +421,7 @@ describe('formatDimensionValue', () => {
 
     it('should format number with short number format', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 1500,
         fieldMetadata: numberFieldMetadata,
         userTimezone,
@@ -398,6 +433,7 @@ describe('formatDimensionValue', () => {
 
     it('should handle string number value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '2000',
         fieldMetadata: numberFieldMetadata,
         userTimezone,
@@ -409,6 +445,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string for NaN value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'not a number',
         fieldMetadata: numberFieldMetadata,
         userTimezone,
@@ -420,6 +457,7 @@ describe('formatDimensionValue', () => {
 
     it('should handle zero', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 0,
         fieldMetadata: numberFieldMetadata,
         userTimezone,
@@ -437,6 +475,7 @@ describe('formatDimensionValue', () => {
 
     it('should format currency amount value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 1500,
         fieldMetadata: currencyFieldMetadata,
         userTimezone,
@@ -448,6 +487,7 @@ describe('formatDimensionValue', () => {
 
     it('should return currency code as-is for currencyCode subfield', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'USD',
         fieldMetadata: currencyFieldMetadata,
         subFieldName: 'currencyCode',
@@ -460,6 +500,7 @@ describe('formatDimensionValue', () => {
 
     it('should return "Not Set" for empty currency code', () => {
       const result = formatDimensionValue({
+        i18n,
         value: '',
         fieldMetadata: currencyFieldMetadata,
         subFieldName: 'currencyCode',
@@ -478,6 +519,7 @@ describe('formatDimensionValue', () => {
 
     it('should return string value', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 'Hello World',
         fieldMetadata: textFieldMetadata,
         userTimezone,
@@ -489,6 +531,7 @@ describe('formatDimensionValue', () => {
 
     it('should convert number to string', () => {
       const result = formatDimensionValue({
+        i18n,
         value: 123,
         fieldMetadata: textFieldMetadata,
         userTimezone,
@@ -496,6 +539,71 @@ describe('formatDimensionValue', () => {
       });
 
       expect(result).toBe('123');
+    });
+  });
+
+  describe('locale', () => {
+    const italianI18n = setupI18n();
+
+    italianI18n.setMessagesCompiler(compileMessage);
+    italianI18n.load('it-IT', {
+      [msg`Not Set`.id]: 'Non impostato',
+      [msg`Yes`.id]: 'Sì',
+    });
+    italianI18n.activate('it-IT');
+
+    it('should translate fallback and boolean labels with the given instance', () => {
+      const booleanFieldMetadata = createMockFieldMetadata({
+        type: FieldMetadataType.BOOLEAN,
+      });
+
+      expect(
+        formatDimensionValue({
+          i18n: italianI18n,
+          value: null,
+          fieldMetadata: booleanFieldMetadata,
+          userTimezone,
+          firstDayOfTheWeek,
+        }),
+      ).toBe('Non impostato');
+
+      expect(
+        formatDimensionValue({
+          i18n: italianI18n,
+          value: true,
+          fieldMetadata: booleanFieldMetadata,
+          userTimezone,
+          firstDayOfTheWeek,
+        }),
+      ).toBe('Sì');
+    });
+
+    it('should format dates with the given locale', () => {
+      const dateFieldMetadata = createMockFieldMetadata({
+        type: FieldMetadataType.DATE,
+      });
+
+      expect(
+        formatDimensionValue({
+          i18n: italianI18n,
+          value: '2024-01-15',
+          fieldMetadata: dateFieldMetadata,
+          dateGranularity: ObjectRecordGroupByDateGranularity.DAY,
+          userTimezone,
+          firstDayOfTheWeek,
+        }),
+      ).toBe('15 gen 2024');
+
+      expect(
+        formatDimensionValue({
+          i18n: italianI18n,
+          value: '2024-01-15',
+          fieldMetadata: dateFieldMetadata,
+          dateGranularity: ObjectRecordGroupByDateGranularity.WEEK,
+          userTimezone,
+          firstDayOfTheWeek,
+        }),
+      ).toBe('15 - 21 gen 2024');
     });
   });
 });

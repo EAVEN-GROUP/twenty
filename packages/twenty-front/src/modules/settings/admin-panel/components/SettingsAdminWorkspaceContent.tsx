@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core';
 import { getChipLabel } from '@/ui/field/display/utils/getChipLabel';
 import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { type WorkspaceInfo } from '@/settings/admin-panel/types/WorkspaceInfo';
@@ -131,7 +132,7 @@ export const SettingsAdminWorkspaceContent = ({
       Icon: IconCalendar,
       label: t`Created`,
       value: activeWorkspace?.createdAt
-        ? new Date(activeWorkspace.createdAt).toLocaleDateString()
+        ? new Date(activeWorkspace.createdAt).toLocaleDateString(i18n.locale)
         : '',
     },
   ];

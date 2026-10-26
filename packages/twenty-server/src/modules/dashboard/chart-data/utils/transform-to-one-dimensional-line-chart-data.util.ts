@@ -79,6 +79,7 @@ export const transformToOneDimensionalLineChartData = ({
       userTimezone,
       firstDayOfTheWeek: convertedFirstDayOfTheWeek,
       relationLabelResolution,
+      i18n,
     });
 
   const processedDataPoints = rawProcessedDataPoints.map((point) => ({
@@ -137,7 +138,7 @@ export const transformToOneDimensionalLineChartData = ({
       key: `${seriesIdPrefix}${CHART_SECOND_SERIES_KEY}`,
       label: isNonEmptyString(configuration.secondSeriesLabel)
         ? configuration.secondSeriesLabel
-        : CHART_SECOND_SERIES_DEFAULT_LABEL,
+        : i18n._(CHART_SECOND_SERIES_DEFAULT_LABEL),
       data: limitedSortedData.map(({ x }, index) => ({
         x,
         y: secondSeriesValues[index],
