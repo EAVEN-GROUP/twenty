@@ -1,0 +1,5 @@
+export const MEETING_STATUS_VALUE = {
+  SCHEDULED: 'SCHEDULED',
+  COMPLETED: 'COMPLETED',
+  NO_SHOW: 'NO_SHOW',
+} as const;

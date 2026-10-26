@@ -1,8 +1,6 @@
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 
-import { createMeetingModalState } from '@/meetings/states/createMeetingModalState';
-import { shouldPromptMeetingForStatusChange } from '@/meetings/utils/shouldPromptMeetingForStatusChange';
 import { type FieldDefinition } from '@/object-record/record-field/ui/types/FieldDefinition';
 import {
   type FieldMetadata,
@@ -57,6 +55,7 @@ import { isFieldText } from '@/object-record/record-field/ui/types/guards/isFiel
 import { isFieldTextValue } from '@/object-record/record-field/ui/types/guards/isFieldTextValue';
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { getForeignKeyNameFromRelationFieldName } from '@/object-record/utils/getForeignKeyNameFromRelationFieldName';
+import { enqueueSalesPipelineFieldChange } from '@/sales-pipeline/utils/enqueueSalesPipelineFieldChange';
 import { isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
 import { isDeeplyEqual } from '~/utils/isDeeplyEqual';
@@ -268,7 +267,17 @@ export const usePersistField = ({
           return;
         }
 
+        const salesPipelineFieldChange = {
+          store,
+          objectNameSingular: objectMetadataItem.nameSingular,
+          recordId,
+          fieldName,
+          previousValue: currentValue,
+          nextValue: valueToPersist,
+        };
+
         if (isDeeplyEqual(valueToPersist, currentValue)) {
+          enqueueSalesPipelineFieldChange(salesPipelineFieldChange);
           return;
         }
 
@@ -285,16 +294,7 @@ export const usePersistField = ({
           valueToPersist,
         );
 
-        if (
-          shouldPromptMeetingForStatusChange({
-            objectNameSingular: objectMetadataItem.nameSingular,
-            fieldName,
-            previousValue: currentValue,
-            nextValue: valueToPersist,
-          })
-        ) {
-          store.set(createMeetingModalState.atom, { personId: recordId });
-        }
+        enqueueSalesPipelineFieldChange(salesPipelineFieldChange);
       } else {
         throw new Error(
           doNotTranslate(

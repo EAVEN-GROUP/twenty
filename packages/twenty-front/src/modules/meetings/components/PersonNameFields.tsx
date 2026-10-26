@@ -10,15 +10,17 @@ const StyledNameFields = styled.div`
   gap: ${themeCssVariables.spacing[3]};
 `;
 
-type CreateMeetingModalNameStepProps = {
+type PersonNameFieldsProps = {
   personName: FieldFullNameValue;
   onPersonNameChange: (personName: FieldFullNameValue) => void;
+  autoFocus?: boolean;
 };
 
-export const CreateMeetingModalNameStep = ({
+export const PersonNameFields = ({
   personName,
   onPersonNameChange,
-}: CreateMeetingModalNameStepProps) => {
+  autoFocus = false,
+}: PersonNameFieldsProps) => {
   const { t } = useLingui();
 
   return (
@@ -29,7 +31,7 @@ export const CreateMeetingModalNameStep = ({
         onChange={(firstName) =>
           onPersonNameChange({ ...personName, firstName })
         }
-        autoFocus
+        autoFocus={autoFocus}
         fullWidth
       />
       <TextInput

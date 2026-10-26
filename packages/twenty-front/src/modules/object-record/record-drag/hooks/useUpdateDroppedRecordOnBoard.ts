@@ -8,6 +8,7 @@ import { getFieldMetadataItemGqlFieldName } from '@/object-metadata/utils/getFie
 import { recordIndexRecordIdsByGroupComponentFamilyState } from '@/object-record/record-index/states/recordIndexRecordIdsByGroupComponentFamilyState';
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
+import { enqueueSalesPipelineFieldChange } from '@/sales-pipeline/utils/enqueueSalesPipelineFieldChange';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 import { useAtomComponentFamilyStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateCallbackState';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
@@ -18,7 +19,7 @@ import { sortByProperty } from '~/utils/array/sortByProperty';
 
 export const useUpdateDroppedRecordOnBoard = () => {
   const store = useStore();
-  const { updateOneRecord, selectFieldMetadataItem } =
+  const { updateOneRecord, selectFieldMetadataItem, objectMetadataItem } =
     useContext(RecordBoardContext);
 
   const recordIndexRecordIdsByGroupCallbackFamilyState =
@@ -181,8 +182,20 @@ export const useUpdateDroppedRecordOnBoard = () => {
           ...(isDefined(newPosition) && { position: newPosition }),
         },
       });
+
+      if (!movingInsideSameRecordGroup) {
+        enqueueSalesPipelineFieldChange({
+          store,
+          objectNameSingular: objectMetadataItem.nameSingular,
+          recordId,
+          fieldName: recordGroupColumnName,
+          previousValue: initialRecord[recordGroupColumnName],
+          nextValue: targetRecordGroupValue,
+        });
+      }
     },
     [
+      objectMetadataItem.nameSingular,
       recordGroupDefinitions,
       recordIndexRecordIdsByGroupCallbackFamilyState,
       selectFieldMetadataItem,

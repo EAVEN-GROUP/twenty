@@ -1,0 +1,1 @@
+export const DEFAULT_AFTERNOON_CALL_HOUR = 15;

@@ -1,15 +1,23 @@
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { CreateMeetingModalDateStep } from '@/meetings/components/CreateMeetingModalDateStep';
-import { CreateMeetingModalNameStep } from '@/meetings/components/CreateMeetingModalNameStep';
+import { PersonNameFields } from '@/meetings/components/PersonNameFields';
 import { CREATE_MEETING_MODAL_ID } from '@/meetings/constants/CreateMeetingModalId';
+import { MEETING_DEFAULT_NAME } from '@/meetings/constants/MeetingDefaultName';
+import { MEETING_OBJECT_NAME_SINGULAR } from '@/meetings/constants/MeetingObjectNameSingular';
+import { MEETING_TYPE_FIELD_NAME } from '@/meetings/constants/MeetingTypeFieldName';
 import { PERSON_NAME_FIELD_NAME } from '@/meetings/constants/PersonNameFieldName';
 import { useCanCreateMeetings } from '@/meetings/hooks/useCanCreateMeetings';
 import { useCreateMeetingForPerson } from '@/meetings/hooks/useCreateMeetingForPerson';
 import { useUpdatePersonName } from '@/meetings/hooks/useUpdatePersonName';
 import { createMeetingModalState } from '@/meetings/states/createMeetingModalState';
 import { type CreateMeetingModalStep } from '@/meetings/types/CreateMeetingModalStep';
+import { getEditablePersonName } from '@/meetings/utils/getEditablePersonName';
 import { normalizePersonName } from '@/meetings/utils/normalizePersonName';
+import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { type FieldFullNameValue } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
+import { useMoveLeadOpportunitiesToCloser } from '@/sales-pipeline/hooks/useMoveLeadOpportunitiesToCloser';
+import { usePickNextCloser } from '@/sales-pipeline/hooks/usePickNextCloser';
 import { DialogInstance } from '@/ui/layout/dialog/components/DialogInstance';
 import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -28,16 +36,38 @@ const StyledActionSlot = styled.div`
   flex: 1;
 `;
 
-const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
+const CreateMeetingModalContent = ({
+  personId,
+  closerId,
+}: {
+  personId: string;
+  closerId?: string;
+}) => {
   const { t } = useLingui();
   const store = useStore();
   const { openDialog, closeDialog } = useDialog();
   const { enqueueToast } = useToast();
   const setCreateMeetingModal = useSetAtomState(createMeetingModalState);
+  const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const { objectMetadataItem: meetingObjectMetadataItem } =
+    useObjectMetadataItem({ objectNameSingular: MEETING_OBJECT_NAME_SINGULAR });
 
-  const [step, setStep] = useState<CreateMeetingModalStep>('name');
+  const isCloserBooking = isDefined(closerId);
+  const meetingTypeOptions = (
+    meetingObjectMetadataItem.fields.find(
+      ({ name }) => name === MEETING_TYPE_FIELD_NAME,
+    )?.options ?? []
+  ).toSorted((left, right) => left.position - right.position);
+
+  const [step, setStep] = useState<CreateMeetingModalStep>(
+    isCloserBooking ? 'date' : 'name',
+  );
+  const [meetingType, setMeetingType] = useState<string | null>(
+    meetingTypeOptions[0]?.value ?? null,
+  );
+  const [isBooking, setIsBooking] = useState(false);
   const [personName, setPersonName] = useState<FieldFullNameValue>(() =>
-    normalizePersonName(
+    getEditablePersonName(
       store.get(
         recordStoreFamilySelector.selectorFamily({
           recordId: personId,
@@ -52,7 +82,9 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
   );
 
   const { updatePersonName } = useUpdatePersonName();
-  const { createMeetingForPerson, loading } = useCreateMeetingForPerson();
+  const { createMeetingForPerson } = useCreateMeetingForPerson();
+  const { pickNextCloser } = usePickNextCloser();
+  const { moveLeadOpportunitiesToCloser } = useMoveLeadOpportunitiesToCloser();
 
   const { firstName, lastName } = normalizePersonName(personName);
   const personFullName = `${firstName} ${lastName}`.trim();
@@ -86,23 +118,67 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!isDefined(meetingDate)) {
+  const bookWithCloser = async (meetingDateIso: string) => {
+    if (isCloserBooking) {
+      await createMeetingForPerson({
+        personId,
+        meetingDate: meetingDateIso,
+        meetingName: personFullName,
+        meetingType: meetingType ?? undefined,
+        ownerId: closerId,
+      });
       return;
     }
 
+    const closer = await pickNextCloser();
+    const assignedCloserId = closer?.id ?? currentWorkspaceMember?.id;
+
+    await createMeetingForPerson({
+      personId,
+      meetingDate: meetingDateIso,
+      meetingName: personFullName,
+      meetingType: meetingType ?? undefined,
+      ownerId: assignedCloserId,
+    });
+    await moveLeadOpportunitiesToCloser({
+      personId,
+      closerId: assignedCloserId,
+      opportunityName:
+        personFullName.length > 0 ? personFullName : MEETING_DEFAULT_NAME,
+    });
+
+    const closerName = closer?.name ?? '';
+
+    enqueueToast(
+      isDefined(closer)
+        ? {
+            status: 'success',
+            children: t`Meeting booked. Closer: ${closerName}.`,
+          }
+        : {
+            status: 'warning',
+            children: t`Meeting booked. No closer is set up, so it is assigned to you.`,
+          },
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!isDefined(meetingDate) || isBooking) {
+      return;
+    }
+
+    setIsBooking(true);
+
     try {
-      await createMeetingForPerson({
-        personId,
-        meetingDate: meetingDate.toInstant().toString(),
-        meetingName: personFullName,
-      });
+      await bookWithCloser(meetingDate.toInstant().toString());
       handleClose();
     } catch {
       enqueueToast({
         status: 'error',
         children: t`The meeting could not be created.`,
       });
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -132,14 +208,18 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
           </Dialog.Header>
           <Dialog.Body>
             {step === 'name' ? (
-              <CreateMeetingModalNameStep
+              <PersonNameFields
                 personName={personName}
                 onPersonNameChange={setPersonName}
+                autoFocus
               />
             ) : (
               <CreateMeetingModalDateStep
                 meetingDate={meetingDate}
                 onMeetingDateChange={setMeetingDate}
+                meetingTypeOptions={meetingTypeOptions}
+                meetingType={meetingType}
+                onMeetingTypeChange={setMeetingType}
               />
             )}
           </Dialog.Body>
@@ -164,21 +244,23 @@ const CreateMeetingModalContent = ({ personId }: { personId: string }) => {
             </Dialog.Footer>
           ) : (
             <Dialog.Footer>
-              <StyledActionSlot>
-                <Button
-                  onClick={() => setStep('name')}
-                  variant="outline"
-                  fullWidth
-                >
-                  {t`Back`}
-                </Button>
-              </StyledActionSlot>
+              {!isCloserBooking && (
+                <StyledActionSlot>
+                  <Button
+                    onClick={() => setStep('name')}
+                    variant="outline"
+                    fullWidth
+                  >
+                    {t`Back`}
+                  </Button>
+                </StyledActionSlot>
+              )}
               <StyledActionSlot>
                 <Button
                   onClick={handleSubmit}
                   variant="solid"
                   color="accent"
-                  disabled={!isDefined(meetingDate) || loading}
+                  disabled={!isDefined(meetingDate) || isBooking}
                   fullWidth
                 >
                   {t`Book meeting`}
@@ -200,5 +282,10 @@ export const CreateMeetingModal = () => {
     return null;
   }
 
-  return <CreateMeetingModalContent personId={createMeetingModal.personId} />;
+  return (
+    <CreateMeetingModalContent
+      personId={createMeetingModal.personId}
+      closerId={createMeetingModal.closerId}
+    />
+  );
 };

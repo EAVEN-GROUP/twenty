@@ -10,6 +10,7 @@ import { SettingsWorkspaceDomainCard } from '@/settings/domains/components/Setti
 import { SettingsLogs } from '@/settings/event-logs/components/SettingsLogs';
 import { SettingsOpenLogConsoleCard } from '@/settings/event-logs/components/SettingsOpenLogConsoleCard';
 import { DeleteWorkspace } from '@/settings/profile/components/DeleteWorkspace';
+import { SettingsSalesPipelineSection } from '@/sales-pipeline/components/SettingsSalesPipelineSection';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { SettingsSecuritySettings } from '@/settings/security/components/SettingsSecuritySettings';
 import { NameField } from '@/settings/workspace/components/NameField';
@@ -92,6 +93,7 @@ export const SettingsGeneral = () => {
             <SettingsWorkspaceDomainCard />
           </Section.Root>
         )}
+        <SettingsSalesPipelineSection />
         <Section.Root>
           <DeleteWorkspace />
         </Section.Root>

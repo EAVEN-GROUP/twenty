@@ -1,0 +1,1 @@
+export const DEFAULT_MORNING_CALL_HOUR = 10;

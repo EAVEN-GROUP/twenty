@@ -20,6 +20,7 @@ import { MAIN_CONTEXT_STORE_INSTANCE_ID } from '@/context-store/constants/MainCo
 import { ContextStoreComponentInstanceContext } from '@/context-store/states/contexts/ContextStoreComponentInstanceContext';
 import { ErrorMessageEffect } from '@/error-handler/components/ErrorMessageEffect';
 import { CreateMeetingModal } from '@/meetings/components/CreateMeetingModal';
+import { SalesPipelineManager } from '@/sales-pipeline/components/SalesPipelineManager';
 import { PromiseRejectionEffect } from '@/error-handler/components/PromiseRejectionEffect';
 import { IsMinimalMetadataReadyEffect } from '@/metadata-store/effect-components/IsMinimalMetadataReadyEffect';
 import { MinimalMetadataLoadEffect } from '@/metadata-store/effect-components/MinimalMetadataLoadEffect';
@@ -84,6 +85,7 @@ export const WorkspaceAppProviders = () => {
                                 <Outlet />
                                 <GlobalFilePreviewModal />
                                 <CreateMeetingModal />
+                                <SalesPipelineManager />
                                 <CommandMenuConfirmationModalManager />
                                 <CommandRunner />
                               </RecordCreationFormProvider>

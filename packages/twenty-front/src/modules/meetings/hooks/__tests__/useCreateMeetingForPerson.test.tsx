@@ -70,8 +70,27 @@ describe('useCreateMeetingForPerson', () => {
     expect(mockUpdateOneRecord).toHaveBeenCalledWith({
       objectNameSingular: 'person',
       idToUpdate: PERSON_ID,
-      updateOneRecordInput: { status: 'BOOKED' },
+      updateOneRecordInput: expect.objectContaining({
+        status: 'BOOKED',
+        callAttempts: 0,
+        nextCallAt: null,
+      }),
     });
+  });
+
+  it('assigns the meeting to the given closer', async () => {
+    const { result } = renderCreateMeetingForPerson('BOOKED');
+
+    await result.current.createMeetingForPerson({
+      personId: PERSON_ID,
+      meetingDate: MEETING_DATE,
+      meetingType: 'VISIT',
+      ownerId: 'closer-id',
+    });
+
+    expect(mockCreateOneRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerId: 'closer-id', meetingType: 'VISIT' }),
+    );
   });
 
   it('names the meeting after the given name', async () => {
@@ -98,7 +117,7 @@ describe('useCreateMeetingForPerson', () => {
     });
 
     expect(mockCreateOneRecord).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Meeting' }),
+      expect.objectContaining({ name: 'Appuntamento' }),
     );
   });
 

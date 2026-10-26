@@ -1,17 +1,14 @@
 .root {
-  --toaster-offset: 40px;
+  --toaster-offset: -40px;
   display: flex;
   flex-direction: column;
-  inset-block-end: var(--t-spacing-3);
+  inset-block-start: var(--t-spacing-3);
   inset-inline-end: var(--t-spacing-3);
   pointer-events: none;
   position: fixed;
   z-index: var(--t-last-layer-z-index);
 
   @include respond-to(mobile) {
-    --toaster-offset: -40px;
-
-    inset-block-end: auto;
     inset-block-start: 0;
     inset-inline: 0;
   }

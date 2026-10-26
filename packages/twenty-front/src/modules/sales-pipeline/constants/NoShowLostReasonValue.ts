@@ -1,0 +1,1 @@
+export const NO_SHOW_LOST_REASON_VALUE = 'NO_SHOW';

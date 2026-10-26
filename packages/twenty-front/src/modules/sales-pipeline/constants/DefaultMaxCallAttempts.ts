@@ -1,0 +1,1 @@
+export const DEFAULT_MAX_CALL_ATTEMPTS = 3;
