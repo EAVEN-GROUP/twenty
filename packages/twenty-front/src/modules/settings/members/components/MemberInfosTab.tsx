@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useState } from 'react';
 
+import { MemberCloserSection } from '@/sales-pipeline/components/MemberCloserSection';
 import { MemberEmailField } from '@/settings/members/components/MemberEmailField';
 import { MemberNameFields } from '@/settings/members/components/MemberNameFields';
 import { MemberTwoFactorAuthenticationRecoverySection } from '@/settings/members/components/MemberTwoFactorAuthenticationRecoverySection';
@@ -85,6 +86,8 @@ export const MemberInfosTab = ({
         />
         <MemberEmailField email={member.userEmail} />
       </Section.Root>
+
+      <MemberCloserSection memberId={member.id} />
 
       {isDefined(twoFactorAuthenticationRecoveryUserId) && (
         <MemberTwoFactorAuthenticationRecoverySection

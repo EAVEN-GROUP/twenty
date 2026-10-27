@@ -6076,6 +6076,16 @@ msgstr "Close side panel"
 msgid "Close video"
 msgstr "Close video"
 
+#. js-lingui-id: q6EohA
+#: src/modules/sales-pipeline/components/MemberCloserSection.tsx
+msgid "Closer"
+msgstr "Closer"
+
+#. js-lingui-id: ys7MFS
+#: src/modules/sales-pipeline/components/MemberCloserSection.tsx
+msgid "Closers take turns receiving the meetings booked by the setters"
+msgstr "Closers take turns receiving the meetings booked by the setters"
+
 #. js-lingui-id: gZoap8
 #: src/modules/settings/emailing-domains/utils/buildEmailingDomainAiSetupPrompt.ts
 msgid "Cloudflare may expect a name relative to the zone rather than the full hostname; avoid appending the domain twice. Show me the proposed changes and ask for confirmation before saving them."
@@ -21282,6 +21292,11 @@ msgstr "Receive an email containing password set link"
 msgid "Receive an email containing password update link"
 msgstr "Receive an email containing password update link"
 
+#. js-lingui-id: sle2Qc
+#: src/modules/sales-pipeline/components/MemberCloserSection.tsx
+msgid "Receives the meetings booked by the setters"
+msgstr "Receives the meetings booked by the setters"
+
 #. js-lingui-id: CCTop/
 #: src/modules/ai/components/NavigationDrawerAiChatContent.tsx
 msgid "Recent"
@@ -26077,6 +26092,11 @@ msgstr "The call recording could not be processed."
 #: src/modules/page-layout/widgets/call-recording/utils/getCallRecordingStatusDisplayConfiguration.ts
 msgid "The call recording is being processed…"
 msgstr "The call recording is being processed…"
+
+#. js-lingui-id: oAmBFj
+#: src/modules/sales-pipeline/components/MemberCloserSection.tsx
+msgid "The closer setting could not be saved."
+msgstr "The closer setting could not be saved."
 
 #. js-lingui-id: ejqgDV
 #: src/modules/settings/two-factor-authentication/components/TwoFactorAuthenticationRecoveryCodeConfirmationDialog.tsx
